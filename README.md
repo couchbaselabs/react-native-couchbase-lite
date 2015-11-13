@@ -1,21 +1,23 @@
-# react-native-couchbase-lite-android
-Couchbase Lite binding for react-native Android
+# react-native-couchbase-lite
+Couchbase Lite binding for react-native
 
-As the name imply, this moudle is only for Android.
+Only for Android at the moment.
 
 This moudle is based on [Getting Started with React Native Android and Couchbase Lite](http://blog.couchbase.com/2015/november/getting-started-with-react-native-android-and-couchbase-lite) by James Nocentini on Couchbase Blog.
 
 ### Installation
 
 ```
-$ npm install react-native-couchbase-lite-android --save
+$ npm install react-native-couchbase-lite --save
 ```
+
+## Android
 
 * Add dependency to `android/settings.gradle`
 ```
 ...
-include ':react-native-couchbase-lite-android'
-project(':react-native-couchbase-lite-android').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-couchbase-lite-android/android')
+include ':react-native-couchbase-lite'
+project(':react-native-couchbase-lite').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-couchbase-lite/android')
 ```
 
 * Add `android/app/build.gradle`
@@ -33,7 +35,7 @@ project(':react-native-couchbase-lite-android').projectDir = new File(rootProjec
       compile 'com.facebook.react:react-native:0.12.+'
 
       // Add this line:
-      compile project(':react-native-couchbase-lite-android')
+      compile project(':react-native-couchbase-lite')
   }
 ```
 
@@ -68,7 +70,7 @@ project(':react-native-couchbase-lite-android').projectDir = new File(rootProjec
 In your app entry, init and start listening Couchbase Lite server
 
 ```JavaScript
-import ReactCBLite from 'react-native-couchbase-lite-android'
+import ReactCBLite from 'react-native-couchbase-lite'
 ReactCBLite.init()
 ```
 
