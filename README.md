@@ -1,5 +1,5 @@
 # react-native-couchbase-lite-android
-couchbase lite binding for react-native android
+Couchbase Lite binding for react-native Android
 
 As the name imply, this moudle is only for Android.
 
@@ -15,42 +15,53 @@ $ npm install react-native-couchbase-lite-android --save
 ```
 ...
 include ':react-native-couchbase-lite-android'
-project(':react-native-couchbase-lite-android').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-couchbase-lite-android/android/couchbase-lite-android')
+project(':react-native-couchbase-lite-android').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-couchbase-lite-android/android')
 ```
 
 * Add `android/app/build.gradle`
-```
-...
-dependencies {
-    ...
-    compile project(':react-native-couchbase-lite-android')
-}
+
+  ```
+  apply plugin: 'com.android.application'
+
+  android {
+      ...
+  }
+
+  dependencies {
+      compile fileTree(dir: 'libs', include: ['*.jar'])
+      compile 'com.android.support:appcompat-v7:23.0.0'
+      compile 'com.facebook.react:react-native:0.12.+'
+
+      // Add this line:
+      compile project(':react-native-couchbase-lite-android')
+  }
 ```
 
 * Register module in `MainActivity.java`
-```
-import me.fraserxu.rncouchbaselite.*;  // <--- import
 
-@Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mReactRootView = new ReactRootView(this);
+  ```
+  import me.fraserxu.rncouchbaselite.*;  // <--- import
 
-        mReactInstanceManager = ReactInstanceManager.builder()
-                .setApplication(getApplication())
-                .setBundleAssetName("index.android.bundle")
-                .setJSMainModuleName("index.android")
-                .addPackage(new ReactCBLite())  // <------- here
-                .addPackage(new MainReactPackage())
-                .setUseDeveloperSupport(BuildConfig.DEBUG)
-                .setInitialLifecycleState(LifecycleState.RESUMED)
-                .build();
+  @Override
+      protected void onCreate(Bundle savedInstanceState) {
+          super.onCreate(savedInstanceState);
+          mReactRootView = new ReactRootView(this);
 
-        mReactRootView.startReactApplication(mReactInstanceManager, "doubanbook", null);
+          mReactInstanceManager = ReactInstanceManager.builder()
+                  .setApplication(getApplication())
+                  .setBundleAssetName("index.android.bundle")
+                  .setJSMainModuleName("index.android")
+                  .addPackage(new ReactCBLite())  // <------- here
+                  .addPackage(new MainReactPackage())
+                  .setUseDeveloperSupport(BuildConfig.DEBUG)
+                  .setInitialLifecycleState(LifecycleState.RESUMED)
+                  .build();
 
-        setContentView(mReactRootView);
-    }
-```
+          mReactRootView.startReactApplication(mReactInstanceManager, "MyApp", null);
+
+          setContentView(mReactRootView);
+      }
+  ```
 
 #### Usage
 
