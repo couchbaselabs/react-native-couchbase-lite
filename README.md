@@ -93,7 +93,8 @@ In your app entry, init and start listening Couchbase Lite server
 
 ```JavaScript
 import ReactCBLite from 'react-native-couchbase-lite'
-ReactCBLite.init()
+// init the database with a port and login credentials
+ReactCBLite.init(5984, 'admin', 'password')
 ```
 
 Once you started the local Couchbase Lite server, you could simple use the `fetch` method providered by react-native to do your operation.

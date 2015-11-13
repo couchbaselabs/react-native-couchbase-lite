@@ -16,9 +16,9 @@ import com.facebook.react.bridge.Callback;
 public class ReactCBLite extends ReactContextBaseJavaModule {
 
     public static final String REACT_CLASS = "ReactCBLite";
-    private ReactApplicationContext context;
-    private final String TAG = "ReactCBLite";
     private static final int DEFAULT_LISTEN_PORT = 5984;
+    private final String TAG = "ReactCBLite";
+    private ReactApplicationContext context;
     private int listenPort;
     private Credentials allowedCredentials;
 
@@ -33,13 +33,13 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void init() {
-        initCBLite();
+    public void init(int listenPort, String login, String password) {
+        initCBLite(listenPort, login, password);
     }
 
-    private void initCBLite() {
+    private void initCBLite(int listenPort, String login, String password) {
         try {
-            allowedCredentials = new Credentials("", "");
+            allowedCredentials = new Credentials(login || "", password || "");
 
             View.setCompiler(new JavaScriptViewCompiler());
 
@@ -57,7 +57,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
             Manager.enableLogging(Log.TAG_ROUTER, Log.VERBOSE);
             Manager manager = new Manager(context, Manager.DEFAULT_OPTIONS);
 
-            listenPort = startCBLListener(DEFAULT_LISTEN_PORT, manager, allowedCredentials);
+            listenPort = startCBLListener(listenPort || DEFAULT_LISTEN_PORT, manager, allowedCredentials);
 
             Log.i(TAG, "initCBLite() completed successfully with: " + String.format(
                     "http://%s:%s@localhost:%d/",
