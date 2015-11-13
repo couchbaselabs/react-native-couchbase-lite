@@ -65,9 +65,44 @@ project(':react-native-couchbase-lite-android').projectDir = new File(rootProjec
 
 #### Usage
 
+In your app entry, init and start listening Couchbase Lite server
+
 ```JavaScript
 import ReactCBLite from 'react-native-couchbase-lite-android'
 ReactCBLite.init()
+```
+
+Once you started the local Couchbase Lite server, you could simple use the `fetch` method providered by react-native to do your operation.
+
+```JavaScript
+CONST LOCAL_DB_URL = 'http://localhost:5984'
+
+// fetch data
+fetch(LOCAL_DB_URL + '/todos/_all_docs?include_docs=true').then((response) => {
+  if (response.status !== 200) {
+    return fetch(LOCAL_DB_URL + '/todos', {
+      method: 'put',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ok: true})
+    }).then((res) => res.json())
+  }
+  return response.json()
+})
+
+// save data
+fetch(this.localDatabaseUrl + '/todos', {
+  method: 'post',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    type: 'list',
+    title: 'my title'
+  })
+}).then((res) => res.json())
 ```
 
 #### LICENSE
