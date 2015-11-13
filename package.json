@@ -15,6 +15,9 @@
     "react-native",
     "android"
   ],
+  "peerDependencies": {
+    "react-native": ">=0.14"
+  },
   "author": "Fraser Xu",
   "license": "MIT",
   "bugs": {
