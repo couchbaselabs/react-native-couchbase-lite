@@ -20,24 +20,46 @@ include ':react-native-couchbase-lite'
 project(':react-native-couchbase-lite').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-couchbase-lite/android')
 ```
 
+* Add `android/build.gradle`
+
+```
+allprojects {
+    repositories {
+        mavenLocal()
+        jcenter()
+
+        // add couchbase url
+        maven {
+            url "http://files.couchbase.com/maven2/"
+        }
+    }
+}
+```
+
 * Add `android/app/build.gradle`
 
   ```
-  apply plugin: 'com.android.application'
+    apply plugin: 'com.android.application'
 
-  android {
-      ...
-  }
+    android {
+        ...
 
-  dependencies {
-      compile fileTree(dir: 'libs', include: ['*.jar'])
-      compile 'com.android.support:appcompat-v7:23.0.0'
-      compile 'com.facebook.react:react-native:0.12.+'
+        packagingOptions {
+            exclude 'META-INF/ASL2.0'
+            exclude 'META-INF/LICENSE'
+            exclude 'META-INF/NOTICE'
+        }
+    }
 
-      // Add this line:
-      compile project(':react-native-couchbase-lite')
-  }
-```
+    dependencies {
+        compile fileTree(dir: 'libs', include: ['*.jar'])
+        compile 'com.android.support:appcompat-v7:23.0.0'
+        compile 'com.facebook.react:react-native:0.12.+'
+
+        // Add this line:
+        compile project(':react-native-couchbase-lite')
+    }
+  ```
 
 * Register module in `MainActivity.java`
 
@@ -53,7 +75,7 @@ project(':react-native-couchbase-lite').projectDir = new File(rootProject.projec
                   .setApplication(getApplication())
                   .setBundleAssetName("index.android.bundle")
                   .setJSMainModuleName("index.android")
-                  .addPackage(new ReactCBLite())  // <------- here
+                  .addPackage(new ReactCBLiteManager())  // <------- here
                   .addPackage(new MainReactPackage())
                   .setUseDeveloperSupport(BuildConfig.DEBUG)
                   .setInitialLifecycleState(LifecycleState.RESUMED)
