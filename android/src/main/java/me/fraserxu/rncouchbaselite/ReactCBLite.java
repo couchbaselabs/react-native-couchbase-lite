@@ -1,4 +1,4 @@
-package me.fraserxu.rncouchbaselite
+package me.fraserxu.rncouchbaselite;
 
 import com.couchbase.lite.Manager;
 import com.couchbase.lite.View;
@@ -16,12 +16,15 @@ import com.facebook.react.bridge.Callback;
 public class ReactCBLite extends ReactContextBaseJavaModule {
 
     public static final String REACT_CLASS = "ReactCBLite";
+    private ReactApplicationContext context;
+    private final String TAG = "ReactCBLite";
     private static final int DEFAULT_LISTEN_PORT = 5984;
     private int listenPort;
     private Credentials allowedCredentials;
 
     public ReactCBLite(ReactApplicationContext reactContext) {
         super(reactContext);
+        this.context = reactContext;
     }
 
     @Override
@@ -40,7 +43,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
 
             View.setCompiler(new JavaScriptViewCompiler());
 
-            AndroidContext context = new AndroidContext(this);
+            AndroidContext context = new AndroidContext(this.context);
             Manager.enableLogging(Log.TAG, Log.VERBOSE);
             Manager.enableLogging(Log.TAG_SYNC, Log.VERBOSE);
             Manager.enableLogging(Log.TAG_QUERY, Log.VERBOSE);

@@ -1,4 +1,4 @@
-package me.frasexu.rncouchbaselite;
+package me.fraserxu.rncouchbaselite;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;
