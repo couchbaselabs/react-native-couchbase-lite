@@ -75,7 +75,7 @@ ReactCBLite.init()
 Once you started the local Couchbase Lite server, you could simple use the `fetch` method providered by react-native to do your operation.
 
 ```JavaScript
-CONST LOCAL_DB_URL = 'http://localhost:5984'
+const LOCAL_DB_URL = 'http://localhost:5984'
 
 // fetch data
 fetch(LOCAL_DB_URL + '/todos/_all_docs?include_docs=true').then((response) => {
@@ -93,7 +93,7 @@ fetch(LOCAL_DB_URL + '/todos/_all_docs?include_docs=true').then((response) => {
 })
 
 // save data
-fetch(this.localDatabaseUrl + '/todos', {
+fetch(LOCAL_DB_URL + '/todos', {
   method: 'post',
   headers: {
     'Content-Type': 'application/json'
