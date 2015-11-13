@@ -1,24 +1,24 @@
 {
-  "name": "react-native-couchbase-lite-android",
+  "name": "react-native-couchbase-lite",
   "version": "0.0.1",
-  "description": "couchbase lite binding for react-native android ",
+  "description": "couchbase lite binding for react-native",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fraserxu/react-native-couchbase-lite-android.git"
+    "url": "git+https://github.com/fraserxu/react-native-couchbase-lite.git"
   },
   "keywords": [
     "react-component",
-    "react-tative",
+    "react-native",
     "android"
   ],
   "author": "Fraser Xu",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/fraserxu/react-native-couchbase-lite-android/issues"
+    "url": "https://github.com/fraserxu/react-native-couchbase-lite/issues"
   },
-  "homepage": "https://github.com/fraserxu/react-native-couchbase-lite-android#readme"
+  "homepage": "https://github.com/fraserxu/react-native-couchbase-lite#readme"
 }
