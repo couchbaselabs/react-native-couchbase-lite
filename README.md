@@ -1,9 +1,6 @@
 # react-native-couchbase-lite
-Couchbase Lite binding for react-native
 
-Only for Android at the moment.
-
-This moudle is based on [Getting Started with React Native Android and Couchbase Lite](http://blog.couchbase.com/2015/november/getting-started-with-react-native-android-and-couchbase-lite) by James Nocentini on Couchbase Blog.
+Couchbase Lite binding for react-native on both iOS and Android.
 
 ### Installation
 
@@ -11,9 +8,33 @@ This moudle is based on [Getting Started with React Native Android and Couchbase
 $ npm install react-native-couchbase-lite --save
 ```
 
+## iOS
+
+
+* XCode CouchbaseLite project dependency set up: Drag the ReactCBLite Xcode project as a dependency project into your React Native Xcode project.
+
+![](http://cl.ly/image/0S133n1O3g3W/static-library.png)
+
+* XCode ReactCBLite library dependency set up: Add ReactCBLite.a (from Workspace location) to the required Libraries and Frameworks.
+
+![](http://cl.ly/image/2c0Z2u0S0r1G/link.png)
+
+* From the `Link Binary With Libraries` section in the `Build Phases` of the top-level project, add the following frameworks in your Xcode project (they are dependencies for Couchbase Lite)
+
+	- libsqlite3.0.tbd
+	- libz.tbd
+	- Security.framework
+	- CFNetwork.framework
+	- SystemConfiguration.framework
+
+* Download the Couchbase Lite iOS SDK from [here](http://www.couchbase.com/nosql-databases/downloads#) and drag CouchbaseLite.framework, CouchbaseLiteListener.framework, CBLRegisterJSViewCompiler.h and libCBLJSViewCompiler.a in the Xcode project.
+
+![](http://cl.ly/image/3Z1b0n0W0i3w/sdk.png)
+
 ## Android
 
 * Add dependency to `android/settings.gradle`
+
 ```
 ...
 include ':react-native-couchbase-lite'
@@ -38,28 +59,28 @@ allprojects {
 
 * Add `android/app/build.gradle`
 
-  ```
-    apply plugin: 'com.android.application'
+```
+apply plugin: 'com.android.application'
 
-    android {
-        ...
+android {
+    ...
 
-        packagingOptions {
-            exclude 'META-INF/ASL2.0'
-            exclude 'META-INF/LICENSE'
-            exclude 'META-INF/NOTICE'
-        }
+    packagingOptions {
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
     }
+}
 
-    dependencies {
-        compile fileTree(dir: 'libs', include: ['*.jar'])
-        compile 'com.android.support:appcompat-v7:23.0.0'
-        compile 'com.facebook.react:react-native:0.12.+'
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:23.0.0'
+    compile 'com.facebook.react:react-native:0.12.+'
 
-        // Add this line:
-        compile project(':react-native-couchbase-lite')
-    }
-  ```
+    // Add this line:
+    compile project(':react-native-couchbase-lite')
+}
+```
 
 * Register module in `MainActivity.java`
 
