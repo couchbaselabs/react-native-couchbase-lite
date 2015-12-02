@@ -1,0 +1,268 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BE8EFD451C0E6D9000627BBA /* ReactCBLite.m in Sources */ = {isa = PBXBuildFile; fileRef = BE8EFD441C0E6D9000627BBA /* ReactCBLite.m */; settings = {ASSET_TAGS = (); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BE8EFD231C0E6C6B00627BBA /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		BE8EFD251C0E6C6B00627BBA /* libReactCBLite.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libReactCBLite.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		BE8EFD431C0E6D9000627BBA /* ReactCBLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReactCBLite.h; sourceTree = "<group>"; };
+		BE8EFD441C0E6D9000627BBA /* ReactCBLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReactCBLite.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BE8EFD221C0E6C6B00627BBA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		BE8EFD1C1C0E6C6B00627BBA = {
+			isa = PBXGroup;
+			children = (
+				BE8EFD431C0E6D9000627BBA /* ReactCBLite.h */,
+				BE8EFD441C0E6D9000627BBA /* ReactCBLite.m */,
+				BE8EFD261C0E6C6B00627BBA /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BE8EFD261C0E6C6B00627BBA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BE8EFD251C0E6C6B00627BBA /* libReactCBLite.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		BE8EFD241C0E6C6B00627BBA /* ReactCBLite */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BE8EFD2E1C0E6C6B00627BBA /* Build configuration list for PBXNativeTarget "ReactCBLite" */;
+			buildPhases = (
+				BE8EFD211C0E6C6B00627BBA /* Sources */,
+				BE8EFD221C0E6C6B00627BBA /* Frameworks */,
+				BE8EFD231C0E6C6B00627BBA /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ReactCBLite;
+			productName = RNCouchbaseLite;
+			productReference = BE8EFD251C0E6C6B00627BBA /* libReactCBLite.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BE8EFD1D1C0E6C6B00627BBA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0700;
+				ORGANIZATIONNAME = Couchbase;
+				TargetAttributes = {
+					BE8EFD241C0E6C6B00627BBA = {
+						CreatedOnToolsVersion = 7.0;
+					};
+				};
+			};
+			buildConfigurationList = BE8EFD201C0E6C6B00627BBA /* Build configuration list for PBXProject "ReactCBLite" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = BE8EFD1C1C0E6C6B00627BBA;
+			productRefGroup = BE8EFD261C0E6C6B00627BBA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BE8EFD241C0E6C6B00627BBA /* ReactCBLite */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BE8EFD211C0E6C6B00627BBA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BE8EFD451C0E6D9000627BBA /* ReactCBLite.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		BE8EFD2C1C0E6C6B00627BBA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		BE8EFD2D1C0E6C6B00627BBA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		BE8EFD2F1C0E6C6B00627BBA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios/**",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../../react-native/React/**",
+					"$(SRCROOT)/../ReactNativeCouchbaseLiteExample/node_modules/react-native/React/**",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(inherited)",
+					"$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios/**",
+				);
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios/**";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = ReactCBLite;
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios/**";
+			};
+			name = Debug;
+		};
+		BE8EFD301C0E6C6B00627BBA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios/**",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/../../../react-native/React/**",
+					"$(SRCROOT)/../ReactNativeCouchbaseLiteExample/node_modules/react-native/React/**",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(inherited)",
+					"$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios/**",
+				);
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios/**";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = ReactCBLite;
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios/**";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BE8EFD201C0E6C6B00627BBA /* Build configuration list for PBXProject "ReactCBLite" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BE8EFD2C1C0E6C6B00627BBA /* Debug */,
+				BE8EFD2D1C0E6C6B00627BBA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BE8EFD2E1C0E6C6B00627BBA /* Build configuration list for PBXNativeTarget "ReactCBLite" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BE8EFD2F1C0E6C6B00627BBA /* Debug */,
+				BE8EFD301C0E6C6B00627BBA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BE8EFD1D1C0E6C6B00627BBA /* Project object */;
+}
