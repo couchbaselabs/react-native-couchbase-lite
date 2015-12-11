@@ -21,4 +21,4 @@ Example project to get started with the React Native Couchbase Lite module.
 
 6. You should now see the list of movies in the iOS app:
 
-	<img src="assets/thumbnail-ios.png" width="25%" />
+	<img src="screenshots/thumbnail-ios.png" width="25%" />
