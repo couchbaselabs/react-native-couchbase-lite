@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/fraserxu/react-native-couchbase-lite/issues"
   },
-  "homepage": "https://github.com/fraserxu/react-native-couchbase-lite#readme"
+  "homepage": "https://github.com/fraserxu/react-native-couchbase-lite#readme",
+  "dependencies": {
+    "base-64": "^0.1.0"
+  }
 }

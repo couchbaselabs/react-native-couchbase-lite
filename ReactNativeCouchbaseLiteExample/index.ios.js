@@ -15,12 +15,16 @@ var {
 var ReactCBLite = require('react-native').NativeModules.ReactCBLite;
 ReactCBLite.init(5984, 'admin', 'password');
 
+var { manager } = require('react-native-couchbase-lite');
+
 var ReactNativeCouchbaseLiteExample = React.createClass({
   
   componentDidMount: function() {
-    fetch('http://admin:password@localhost:5984/_all_dbs', {credentials: true})
+    var database = new manager('http://admin:password@localhost:5984/', 'myapp');
+    database.createDatabase()
       .then((res) => {
         console.log(res);
+        database.createDocument({"name": "london2"})
       }).catch((err) => {throw err;});
   },
   
