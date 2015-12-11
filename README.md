@@ -110,45 +110,42 @@ dependencies {
 
 #### Usage
 
-In your app entry, init and start listening Couchbase Lite server
+In your app entry, init and start the Couchbase Lite Listener
 
 ```JavaScript
-import ReactCBLite from 'react-native-couchbase-lite'
-// init the database with a port and login credentials
+import {manager, ReactCBLite} from 'react-native-couchbase-lite'
+// init the Listener with a port and login credentials
 ReactCBLite.init(5984, 'admin', 'password')
+
+// instantiate a new database
+var database = new manager('http://admin:password@localhost:5984/', 'myapp');
+database.createDatabase()
+  .then((res) => {
+    database.getAllDocuments()
+      .then((res) => {
+        this.setState({
+          dataSource: this.state.dataSource.cloneWithRows(res.rows)
+        });
+      });
 ```
 
-Once you started the local Couchbase Lite server, you could simple use the `fetch` method providered by react-native to do your operation.
+See the [example project](https://github.com/fraserxu/react-native-couchbase-lite/tree/master/ReactNativeCouchbaseLiteExample) for a more in-depth use case.
 
-```JavaScript
-const LOCAL_DB_URL = 'http://localhost:5984'
 
-// fetch data
-fetch(LOCAL_DB_URL + '/todos/_all_docs?include_docs=true').then((response) => {
-  if (response.status !== 200) {
-    return fetch(LOCAL_DB_URL + '/todos', {
-      method: 'put',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ok: true})
-    }).then((res) => res.json())
-  }
-  return response.json()
-})
 
-// save data
-fetch(LOCAL_DB_URL + '/todos', {
-  method: 'post',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    type: 'list',
-    title: 'my title'
-  })
-}).then((res) => res.json())
+## Available commands
+
+```
+promise database.createDatabase();
+promise database.createDesignDocument(string designDocumentName, object designDocumentViews);
+promise database.createDocument(object json);
+promise database.getDesignDocument(string designDocumentName);
+promise database.queryView(string designDocumentName, string viewName);
+promise database.deleteDocument(string documentId, string documentRevision);
+promise database.getAllDocuments();
+promise database.getDocument();
+promise database.replicate(string source, string target, boolean continuous);
+void    database.listen();
 ```
 
 #### LICENSE
