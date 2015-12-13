@@ -10,33 +10,70 @@ var {
   StyleSheet,
   Text,
   View,
-} = React;
+  Image,
+  ListView,
+  } = React;
 
 var ReactCBLite = require('react-native').NativeModules.ReactCBLite;
 ReactCBLite.init(5984, 'admin', 'password');
 
+var { manager } = require('react-native-couchbase-lite');
+
 var ReactNativeCouchbaseLiteExample = React.createClass({
-  
-  componentDidMount: function() {
-    fetch('http://admin:password@localhost:5984/_all_dbs', {credentials: true})
-      .then((res) => {
-        console.log(res);
-      }).catch((err) => {throw err;});
+  render: function () {
+    return (
+      <Home></Home>
+    );
+  }
+});
+
+var Home = React.createClass({
+  getInitialState() {
+    return {
+      dataSource: new ListView.DataSource({
+        rowHasChanged: (row1, row2) => row1 !== row2,
+      })
+    }
   },
-  
-  render: function() {
+  componentDidMount() {
+    var database = new manager('http://admin:password@localhost:5984/', 'myapp');
+
+    database.createDatabase()
+      .then((res) => {
+        database.getAllDocuments()
+          .then((res) => {
+            this.setState({
+              dataSource: this.state.dataSource.cloneWithRows(res.rows)
+            });
+          });
+
+        database.replicate('http://localhost:4984/moviesapp', 'myapp')
+          .then((res) => {
+            console.log(res);
+          });
+      });
+  },
+  render() {
+    return (
+      <View>
+        <ListView
+          dataSource={this.state.dataSource}
+          renderRow={this.renderMovie}
+          style={styles.listView}/>
+      </View>
+    )
+  },
+  renderMovie(movie) {
+    var movie = movie.doc;
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.ios.js
-        </Text>
-        <Text style={styles.instructions}>
-          Press Cmd+R to reload,{'\n'}
-          Cmd+D or shake for dev menu
-        </Text>
+        <Image
+          source={{uri: movie.posters.thumbnail}}
+          style={styles.thumbnail}/>
+        <View style={styles.rightContainer}>
+          <Text style={styles.title}>{movie.title}</Text>
+          <Text style={styles.year}>{movie.year}</Text>
+        </View>
       </View>
     );
   }
@@ -45,19 +82,29 @@ var ReactNativeCouchbaseLiteExample = React.createClass({
 var styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+  rightContainer: {
+    flex: 1,
   },
-  instructions: {
+  title: {
+    fontSize: 20,
+    marginBottom: 8,
     textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+  },
+  year: {
+    textAlign: 'center',
+  },
+  thumbnail: {
+    width: 53,
+    height: 81,
+  },
+  listView: {
+    paddingTop: 20,
+    backgroundColor: '#F5FCFF',
   },
 });
 

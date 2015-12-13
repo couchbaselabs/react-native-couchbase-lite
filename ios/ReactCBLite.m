@@ -25,7 +25,7 @@ RCT_EXPORT_METHOD(init:(float)port username:(NSString *)username password:(NSStr
     CBLRegisterJSViewCompiler();
     
     CBLListener* listener = [[CBLListener alloc] initWithManager:dbmgr port:port];
-//    [listener setPasswords:@{username: password}];
+    [listener setPasswords:@{username: password}];
     [listener start:nil];
     
     NSLog(@"Couchbase Lite url = %@", listener.URL);

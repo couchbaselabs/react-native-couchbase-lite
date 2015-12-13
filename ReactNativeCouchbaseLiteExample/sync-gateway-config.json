@@ -1,0 +1,10 @@
+{
+  "log": ["*"],
+  "databases": {
+    "moviesapp": {
+      "users": {
+        "GUEST": {"disabled": false, "admin_channels": ["*"]}
+      }
+    }
+  }
+}
