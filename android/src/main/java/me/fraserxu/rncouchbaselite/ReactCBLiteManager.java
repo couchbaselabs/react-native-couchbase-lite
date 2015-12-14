@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ReactPlayerManager implements ReactPackage {
+public class ReactCBLiteManager implements ReactPackage {
 
     @Override
     public List<Class<? extends JavaScriptModule>> createJSModules() {

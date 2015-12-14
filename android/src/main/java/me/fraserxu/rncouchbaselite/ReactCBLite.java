@@ -1,5 +1,7 @@
 package me.fraserxu.rncouchbaselite;
 
+import android.content.Context;
+
 import com.couchbase.lite.Manager;
 import com.couchbase.lite.View;
 import com.couchbase.lite.android.AndroidContext;
@@ -7,6 +9,7 @@ import com.couchbase.lite.javascript.JavaScriptViewCompiler;
 import com.couchbase.lite.listener.Credentials;
 import com.couchbase.lite.listener.LiteListener;
 import com.couchbase.lite.util.Log;
+import com.couchbase.lite.android.*;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -39,7 +42,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
 
     private void initCBLite(int listenPort, String login, String password) {
         try {
-            allowedCredentials = new Credentials(login || "", password || "");
+            allowedCredentials = new Credentials(login, password);
 
             View.setCompiler(new JavaScriptViewCompiler());
 
@@ -57,7 +60,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
             Manager.enableLogging(Log.TAG_ROUTER, Log.VERBOSE);
             Manager manager = new Manager(context, Manager.DEFAULT_OPTIONS);
 
-            listenPort = startCBLListener(listenPort || DEFAULT_LISTEN_PORT, manager, allowedCredentials);
+            listenPort = startCBLListener(listenPort, manager, allowedCredentials);
 
             Log.i(TAG, "initCBLite() completed successfully with: " + String.format(
                     "http://%s:%s@localhost:%d/",
