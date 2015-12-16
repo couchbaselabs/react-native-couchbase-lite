@@ -21,4 +21,8 @@ Example project to get started with the React Native Couchbase Lite module.
 
 6. You should now see the list of movies in the iOS app:
 
-	<img src="screenshots/thumbnail-ios.png" width="25%" />
+	<img src="screenshots/thumbnail-ios.png" width="25%" align="left" hspace=30 />
+
+	<img src="screenshots/thumbnail-android.png" width="25%" />
+
+	**Note**: On Android, you must open a port mapping with `adb reverse tcp:4984 tcp:4984` to make the Sync Gateway accessible from the Couchbase Listener.
