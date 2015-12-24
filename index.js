@@ -53,7 +53,7 @@ manager.prototype = {
    * @return   promise
    */
   queryView: function(designDocumentName, viewName, options) {
-    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/" + designDocumentName + "/_view/" + viewName, options);
+    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_design/" + designDocumentName + "/_view/" + viewName, options);
   },
 
   /**
@@ -64,6 +64,27 @@ manager.prototype = {
    */
   createDocument: function (jsonDocument) {
     return this.makeRequest("POST", this.databaseUrl + this.databaseName, {}, jsonDocument);
+  },
+  
+  /**
+   * Add, update, or delete multiple documents to a database in a single request
+   *
+   * @param object jsonDocument
+   * @returns {*|promise}
+   */
+  modifyDocuments: function (jsonDocument) {
+    return this.makeRequest("POST", this.databaseUrl + this.databaseName + '/_bulk_docs', {}, {docs: jsonDocument});
+  },
+  
+  
+  /**
+   * Creates a new document or creates a new revision of an existing document
+   *
+   * @param object jsonDocument
+   * @returns {*|promise}
+   */
+  updateDocument: function (jsonDocument, documentRevision) {
+    return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/" + jsonDocument._id + "?rev=" + documentRevision, {}, jsonDocument);
   },
 
   /**
