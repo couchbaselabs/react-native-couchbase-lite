@@ -202,20 +202,21 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios/**",
+					"$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios",
+					"$(SRCROOT)/../../../ios",
 				);
 				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../../../react-native/React/**",
 					"$(SRCROOT)/../ReactNativeCouchbaseLiteExample/node_modules/react-native/React/**",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SRCROOT)/../../react-native/React/**",
 					"$(inherited)",
-					"$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios/**",
+					"$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios",
+					"$(SRCROOT)/../../../ios",
 				);
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios/**";
+				LIBRARY_SEARCH_PATHS = "";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = ReactCBLite;
 				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios/**";
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Debug;
 		};
@@ -224,20 +225,21 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios/**",
+					"$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios",
+					"$(SRCROOT)/../../../ios",
 				);
 				HEADER_SEARCH_PATHS = (
-					"$(SRCROOT)/../../../react-native/React/**",
 					"$(SRCROOT)/../ReactNativeCouchbaseLiteExample/node_modules/react-native/React/**",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SRCROOT)/../../react-native/React/**",
 					"$(inherited)",
-					"$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios/**",
+					"$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios",
+					"$(SRCROOT)/../../../ios",
 				);
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios/**";
+				LIBRARY_SEARCH_PATHS = "";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = ReactCBLite;
 				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../ReactNativeCouchbaseLiteExample/ios/**";
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Release;
 		};
