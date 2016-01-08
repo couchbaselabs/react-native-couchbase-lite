@@ -40,18 +40,20 @@ var Home = React.createClass({
 
     database.createDatabase()
       .then((res) => {
-        database.getAllDocuments()
-          .then((res) => {
-            this.setState({
-              dataSource: this.state.dataSource.cloneWithRows(res.rows)
-            });
-          });
-
         database.replicate('http://localhost:4984/moviesapp', 'myapp')
-          .then((res) => {
-            console.log(res);
-          });
-      });
+      })
+      .then((res) => {
+        return database.getAllDocuments()
+      })
+      .then((res) => {
+        this.setState({
+          dataSource: this.state.dataSource.cloneWithRows(res.rows)
+        });
+        console.log(res.rows)
+      })
+      .catch((ex) => {
+        console.log(ex)
+      })
   },
   render() {
     return (
