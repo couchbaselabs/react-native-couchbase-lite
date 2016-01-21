@@ -18,4 +18,5 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/fraserxu/react-native-couchbase-lite.git"
   s.source       = { :git => 'https://github.com/fraserxu/react-native-couchbase-lite.git' }
   s.source_files = 'ios/**/*.{h,m}'
+  s.dependency 'couchbase-lite-ios'
 end
