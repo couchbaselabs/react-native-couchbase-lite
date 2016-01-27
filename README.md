@@ -33,12 +33,6 @@ $ npm install react-native-couchbase-lite --save
 
 ## iOS (Cocoapods)
 
-* Create a new XCode project and run the following commands:
-
-```
-$ pod init
-```
-
 * Install both npm modules:
 
 ```
@@ -46,16 +40,26 @@ $ npm install react-native
 $ npm install react-native-couchbase-lite
 ```
 
-* In `Podfile`, add dependencies:
+* In the `Podfile`, add dependencies:
 
 ```
 pod 'React', :path => './node_modules/react-native'
 pod 'ReactNativeCouchbaseLite', :path => './node_modules/react-native-couchbase-lite'
 ```
 
-* So far so good! Lastly, you must install CBLRegisterJSViewCompiler.h and libCBLJSViewCompiler.a that can be downloaded [here](http://www.couchbase.com/nosql-databases/downloads#) and located in the `Extras` folder. Open `{project-name}.xcworkspace` and drag both the header file and static lib in the project:
+* Install the Cocoapods dependencies:
+
+```
+$ pod install
+```
+
+* So far so good! Next, you must install CBLRegisterJSViewCompiler.h and libCBLJSViewCompiler.a. You can download both components from [here](http://www.couchbase.com/nosql-databases/downloads#). Drag CBLRegisterJSViewCompiler.h into the couchbase-lite-ios Pod:
 
 ![](http://cl.ly/1L2s28462D2W/Image%202016-01-26%20at%2012.47.12%20pm.png)
+
+* Add the libCBLJSViewCompiler.a static library:
+
+![](http://cl.ly/2G1L392h0b1Z/Image%202016-01-27%20at%2010.30.32%20pm.png)
 
 ## Android
 
