@@ -17,7 +17,7 @@ manager.prototype = {
    * @returns {*|promise}
    */
   createDatabase: function() {
-    return this.makeRequest("PUT", this.databaseUrl + this.databaseName, null, null);
+    return this.makeRequest("PUT", this.databaseUrl + this.databaseName, {}, null);
   },
 
   /*
