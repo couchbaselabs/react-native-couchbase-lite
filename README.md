@@ -139,6 +139,8 @@ See the [example project](https://github.com/fraserxu/react-native-couchbase-lit
 promise database.createDatabase();
 promise database.createDesignDocument(string designDocumentName, object designDocumentViews);
 promise database.createDocument(object json);
+promise database.modifyDocuments(object json);
+promise database.updateDocument(object json, string documentRevision);
 promise database.getDesignDocument(string designDocumentName);
 promise database.queryView(string designDocumentName, string viewName);
 promise database.deleteDocument(string documentId, string documentRevision);

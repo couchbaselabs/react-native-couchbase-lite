@@ -81,6 +81,7 @@ manager.prototype = {
    * Creates a new document or creates a new revision of an existing document
    *
    * @param object jsonDocument
+   * @param string documentRevision
    * @returns {*|promise}
    */
   updateDocument: function (jsonDocument, documentRevision) {
