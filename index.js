@@ -20,6 +20,15 @@ manager.prototype = {
     return this.makeRequest("PUT", this.databaseUrl + this.databaseName, {}, null);
   },
 
+  /**
+   * Delete the database
+   *
+   * @returns {*|promise}
+   */
+  deleteDatabase: function() {
+    return this.makeRequest("DELETE", this.databaseUrl + this.databaseName, null, null);
+  },
+
   /*
    * Create a new design document with views
    *
