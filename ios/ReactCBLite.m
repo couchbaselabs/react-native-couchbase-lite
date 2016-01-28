@@ -18,7 +18,7 @@
 
 RCT_EXPORT_MODULE()
 
-RCT_EXPORT_METHOD(init:(float)port username:(NSString *)username password:(NSString *)password)
+RCT_EXPORT_METHOD(init:(float)port username:(NSString *)username password:(NSString *)password callback:(RCTResponseSenderBlock)callback)
 {
     NSLog(@"Launching Couchbase Lite...");
     CBLManager* dbmgr = [CBLManager sharedInstance];
@@ -29,6 +29,7 @@ RCT_EXPORT_METHOD(init:(float)port username:(NSString *)username password:(NSStr
     [listener start:nil];
     
     NSLog(@"Couchbase Lite url = %@", listener.URL);
+    callback(@[[NSNull null]]);
 }
 
 @end
