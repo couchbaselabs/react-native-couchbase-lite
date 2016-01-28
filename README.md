@@ -115,7 +115,7 @@ In your app entry, init and start the Couchbase Lite Listener
 ```JavaScript
 import {manager, ReactCBLite} from 'react-native-couchbase-lite'
 // init the Listener with a port and login credentials
-ReactCBLite.init(5984, 'admin', 'password')
+ReactCBLite.init(5984, 'admin', 'password', e => {})
 
 // instantiate a new database
 var database = new manager('http://admin:password@localhost:5984/', 'myapp');
