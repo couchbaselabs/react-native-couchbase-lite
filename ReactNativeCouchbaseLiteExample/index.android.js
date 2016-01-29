@@ -15,7 +15,7 @@ var {
   } = React;
 
 var ReactCBLite = require('react-native').NativeModules.ReactCBLite;
-ReactCBLite.init(5984, 'admin', 'password');
+ReactCBLite.init(5984, 'admin', 'password', (e) => {});
 
 var { manager } = require('react-native-couchbase-lite');
 
