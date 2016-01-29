@@ -2,9 +2,11 @@
 
 Example project to get started with the React Native Couchbase Lite module.
 
-### Run on iOS
+### Getting Started
 
-1. Open `ios/ReactNativeCouchbaseLiteExample.xcodeproj` in Xcode.
+The instructions below apply to both the iOS and Android versions of the example app.
+
+1. Open `ios/ReactNativeCouchbaseLiteExample.xcodeproj` for iOS and `android/build.gradle` for Android.
 2. Run `npm install` and `react-native start`.
 3. Run the app on a simulator or device.
 4. Start Sync Gateway:
