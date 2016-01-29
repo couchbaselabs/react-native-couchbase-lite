@@ -145,7 +145,7 @@ In your app entry, init and start the Couchbase Lite Listener
 ```JavaScript
 import {manager, ReactCBLite} from 'react-native-couchbase-lite'
 // init the Listener with a port and login credentials
-ReactCBLite.init(5984, 'admin', 'password')
+ReactCBLite.init(5984, 'admin', 'password', e => {})
 
 // instantiate a new database
 var database = new manager('http://admin:password@localhost:5984/', 'myapp');
@@ -169,6 +169,8 @@ See the [example project](https://github.com/fraserxu/react-native-couchbase-lit
 promise database.createDatabase();
 promise database.createDesignDocument(string designDocumentName, object designDocumentViews);
 promise database.createDocument(object json);
+promise database.modifyDocuments(object json);
+promise database.updateDocument(object json, string documentRevision);
 promise database.getDesignDocument(string designDocumentName);
 promise database.queryView(string designDocumentName, string viewName);
 promise database.deleteDocument(string documentId, string documentRevision);

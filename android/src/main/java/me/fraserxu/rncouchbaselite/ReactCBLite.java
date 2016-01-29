@@ -36,11 +36,11 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void init(int listenPort, String login, String password) {
-        initCBLite(listenPort, login, password);
+    public void init(int listenPort, String login, String password, Callback errorCallback) {
+        initCBLite(listenPort, login, password, errorCallback);
     }
 
-    private void initCBLite(int listenPort, String login, String password) {
+    private void initCBLite(int listenPort, String login, String password, Callback errorCallback) {
         try {
             allowedCredentials = new Credentials(login, password);
 
@@ -67,9 +67,11 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
                     allowedCredentials.getLogin(),
                     allowedCredentials.getPassword(),
                     listenPort));
+          errorCallback.invoke();
 
         } catch (final Exception e) {
             e.printStackTrace();
+          errorCallback.invoke(e.getMessage());
         }
     }
 
