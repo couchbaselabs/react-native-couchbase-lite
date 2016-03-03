@@ -17,7 +17,7 @@ manager.prototype = {
    * @returns {*|promise}
    */
   createDatabase: function() {
-    return this.makeRequest("PUT", this.databaseUrl + this.databaseName, null, null);
+    return this.makeRequest("PUT", this.databaseUrl + this.databaseName, {}, null);
   },
 
   /**
@@ -29,7 +29,7 @@ manager.prototype = {
     return this.makeRequest("DELETE", this.databaseUrl + this.databaseName, null, null);
   },
 
-  /**
+  /*
    * Create a new design document with views
    *
    * @param    string designDocumentName
@@ -40,10 +40,10 @@ manager.prototype = {
     var data = {
       views: designDocumentViews
     };
-    return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/" + designDocumentName, {}, data);
+    return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/_design/" + designDocumentName, {}, data);
   },
 
-  /**
+  /*
    * Get a design document and all views associated to insert
    *
    * @param    string designDocumentName
@@ -53,16 +53,36 @@ manager.prototype = {
     return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/" + designDocumentName);
   },
 
-  /**
-   * Query a particular database view
+  /*
+   * Query a particular database view. Options for the query ('descending', 'limit', 'startkey', 'endkey' etc.)
+   * can be specified using query string parameters.
    *
    * @param    string designDocumentName
    * @param    string viewName
-   * @param    object options
+   * @param    object queryStringParameters
    * @return   promise
    */
-  queryView: function(designDocumentName, viewName, options) {
-    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/" + designDocumentName + "/_view/" + viewName, options);
+  queryView: function(designDocumentName, viewName, queryStringParameters) {
+    var url = this.databaseUrl + this.databaseName + "/_design/" + designDocumentName + "/_view/" + viewName;
+
+    var queryString = "";
+
+    if(queryStringParameters) {
+      var parts = [];
+
+      for(var key in queryStringParameters) {
+        var value = queryStringParameters[key];
+        var jsonValue = JSON.stringify(value);
+        var part = key + "=" + encodeURIComponent(jsonValue);
+        parts.push(part);
+      }
+
+      queryString = "?" + parts.join("&");
+    }
+
+    var fullUrl = url + queryString;
+
+    return this.nativeDb.makeRequest("GET", fullUrl);
   },
 
   /**
@@ -73,6 +93,28 @@ manager.prototype = {
    */
   createDocument: function (jsonDocument) {
     return this.makeRequest("POST", this.databaseUrl + this.databaseName, {}, jsonDocument);
+  },
+  
+  /**
+   * Add, update, or delete multiple documents to a database in a single request
+   *
+   * @param object jsonDocument
+   * @returns {*|promise}
+   */
+  modifyDocuments: function (jsonDocument) {
+    return this.makeRequest("POST", this.databaseUrl + this.databaseName + '/_bulk_docs', {}, {docs: jsonDocument});
+  },
+  
+  
+  /**
+   * Creates a new document or creates a new revision of an existing document
+   *
+   * @param object jsonDocument
+   * @param string documentRevision
+   * @returns {*|promise}
+   */
+  updateDocument: function (jsonDocument, documentRevision) {
+    return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/" + jsonDocument._id + "?rev=" + documentRevision, {}, jsonDocument);
   },
 
   /**
@@ -86,7 +128,7 @@ manager.prototype = {
     return this.makeRequest("DELETE", this.databaseUrl + this.databaseName + "/" + documentId + "?rev=" + documentRevision);
   },
 
-  /**
+  /*
    * Get a document from the database
    *
    * @param    string documentId
