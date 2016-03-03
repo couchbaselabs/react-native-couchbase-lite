@@ -40,7 +40,7 @@ manager.prototype = {
     var data = {
       views: designDocumentViews
     };
-    return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/" + designDocumentName, {}, data);
+    return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/_design/" + designDocumentName, {}, data);
   },
 
   /*
@@ -54,15 +54,35 @@ manager.prototype = {
   },
 
   /*
-   * Query a particular database view
+   * Query a particular database view. Options for the query ('descending', 'limit', 'startkey', 'endkey' etc.)
+   * can be specified using query string parameters.
    *
    * @param    string designDocumentName
    * @param    string viewName
-   * @param    object options
+   * @param    object queryStringParameters
    * @return   promise
    */
-  queryView: function(designDocumentName, viewName, options) {
-    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_design/" + designDocumentName + "/_view/" + viewName, options);
+  queryView: function(designDocumentName, viewName, queryStringParameters) {
+    var url = this.databaseUrl + this.databaseName + "/_design/" + designDocumentName + "/_view/" + viewName;
+
+    var queryString = "";
+
+    if(queryStringParameters) {
+      var parts = [];
+
+      for(var key in queryStringParameters) {
+        var value = queryStringParameters[key];
+        var jsonValue = JSON.stringify(value);
+        var part = key + "=" + encodeURIComponent(jsonValue);
+        parts.push(part);
+      }
+
+      queryString = "?" + parts.join("&");
+    }
+
+    var fullUrl = url + queryString;
+
+    return this.nativeDb.makeRequest("GET", fullUrl);
   },
 
   /**
