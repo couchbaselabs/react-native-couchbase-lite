@@ -29,7 +29,7 @@ manager.prototype = {
     return this.makeRequest("DELETE", this.databaseUrl + this.databaseName, null, null);
   },
 
-  /*
+  /**
    * Create a new design document with views
    *
    * @param    string designDocumentName
@@ -43,7 +43,7 @@ manager.prototype = {
     return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/" + designDocumentName, {}, data);
   },
 
-  /*
+  /**
    * Get a design document and all views associated to insert
    *
    * @param    string designDocumentName
@@ -53,7 +53,7 @@ manager.prototype = {
     return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/" + designDocumentName);
   },
 
-  /*
+  /**
    * Query a particular database view
    *
    * @param    string designDocumentName
@@ -86,7 +86,7 @@ manager.prototype = {
     return this.makeRequest("DELETE", this.databaseUrl + this.databaseName + "/" + documentId + "?rev=" + documentRevision);
   },
 
-  /*
+  /**
    * Get a document from the database
    *
    * @param    string documentId
