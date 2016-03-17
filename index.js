@@ -169,10 +169,14 @@ manager.prototype = {
     }
     return fetch(url, settings).then((res) => {
       if (res.status == 401) {
-        console.log(res);
+        console.warn(res);
+
+        throw new Error("Not authorized to access '" + url + "' [" + res.status + "]");
       }
       return res.json();
-    }).catch((err) => { throw err; });
+    }).catch((err) => {
+        throw new Error("http error for '" + url + "', caused by => " + err);
+    });
   }
 };
 
