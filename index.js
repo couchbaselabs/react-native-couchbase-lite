@@ -55,7 +55,16 @@ manager.prototype = {
 
   /*
    * Query a particular database view. Options for the query ('descending', 'limit', 'startkey', 'endkey' etc.)
-   * can be specified using query string parameters.
+   * can be specified using query string parameters.  Query string values are json objects and are URL encoded within,
+   * for example:
+   *
+   *  let options = {
+   *    descending: true,
+   *    startkey: [docId, {}],
+   *    endkey: [docId]
+   *  };
+   *
+   *  return queryView('design_doc_name', 'view_name', options);
    *
    * @param    string designDocumentName
    * @param    string viewName
@@ -65,24 +74,16 @@ manager.prototype = {
   queryView: function(designDocumentName, viewName, queryStringParameters) {
     var url = this.databaseUrl + this.databaseName + "/_design/" + designDocumentName + "/_view/" + viewName;
 
-    var queryString = "";
-
     if(queryStringParameters) {
-      var parts = [];
-
       for(var key in queryStringParameters) {
         var value = queryStringParameters[key];
-        var jsonValue = JSON.stringify(value);
-        var part = key + "=" + encodeURIComponent(jsonValue);
-        parts.push(part);
+        queryStringParameters[key] = JSON.stringify(value);
       }
-
-      queryString = "?" + parts.join("&");
     }
 
     var fullUrl = url + queryString;
 
-    return this.nativeDb.makeRequest("GET", fullUrl);
+    return this.nativeDb.makeRequest("GET", fullUrl, queryStringParameters);
   },
 
   /**
@@ -172,7 +173,7 @@ manager.prototype = {
    * @param object data
    * @returns {*|promise}
    */
-  makeRequest: function(method, url, params, data) {
+  makeRequest: function(method, url, queryStringParameters, data) {
     var settings = {
       method: method,
       headers: {
@@ -181,21 +182,36 @@ manager.prototype = {
         'Authorization': this.authHeader
       }
     };
-    if (params) {
-      settings.params = params;
+
+    var queryString = "";
+
+    if(queryStringParameters) {
+      var parts = [];
+
+      for(var key in queryStringParameters) {
+        var value = queryStringParameters[key];
+        var part = key + "=" + encodeURIComponent(value);
+        parts.push(part);
+      }
+
+      queryString = "?" + parts.join("&");
     }
+
+    var fullUrl = url + queryString;
+
     if (data) {
       settings.body = JSON.stringify(data);
     }
-    return fetch(url, settings).then((res) => {
+
+    return fetch(fullUrl, settings).then((res) => {
       if (res.status == 401) {
         console.warn(res);
 
-        throw new Error("Not authorized to access '" + url + "' [" + res.status + "]");
+        throw new Error("Not authorized to access '" + fullUrl + "' [" + res.status + "]");
       }
       return res.json();
     }).catch((err) => {
-        throw new Error("http error for '" + url + "', caused by => " + err);
+        throw new Error("http error for '" + fullUrl + "', caused by => " + err);
     });
   }
 };
