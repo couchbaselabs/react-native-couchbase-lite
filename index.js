@@ -17,7 +17,7 @@ manager.prototype = {
    * @returns {*|promise}
    */
   createDatabase: function() {
-    return this.makeRequest("PUT", this.databaseUrl + this.databaseName, {}, null);
+    return this.makeRequest("PUT", this.databaseUrl + this.databaseName, null, null);
   },
 
   /**
@@ -40,7 +40,7 @@ manager.prototype = {
     var data = {
       views: designDocumentViews
     };
-    return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/_design/" + designDocumentName, {}, data);
+    return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/_design/" + designDocumentName, null, data);
   },
 
   /**
@@ -91,7 +91,7 @@ manager.prototype = {
    * @returns {*|promise}
    */
   createDocument: function (jsonDocument) {
-    return this.makeRequest("POST", this.databaseUrl + this.databaseName, {}, jsonDocument);
+    return this.makeRequest("POST", this.databaseUrl + this.databaseName, null, jsonDocument);
   },
 
   /**
@@ -101,9 +101,8 @@ manager.prototype = {
    * @returns {*|promise}
    */
   modifyDocuments: function (jsonDocuments) {
-    return this.makeRequest("POST", this.databaseUrl + this.databaseName + '/_bulk_docs', {}, {docs: jsonDocuments});
+    return this.makeRequest("POST", this.databaseUrl + this.databaseName + '/_bulk_docs', null, {docs: jsonDocuments});
   },
-
 
   /**
    * Creates a new document or creates a new revision of an existing document
@@ -137,7 +136,7 @@ manager.prototype = {
    * Get a document with optional revision from the database
    *
    * @param    string documentId
-   * @param    string revision
+   * @param    string revision (optional)
    * @return   promise
    */
   getDocument: function(documentId, rev) {
@@ -196,8 +195,6 @@ manager.prototype = {
         continuous: continuous
       });
     }
-
-
   },
 
   /**
