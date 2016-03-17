@@ -172,7 +172,7 @@ promise database.createDocument(object json);
 promise database.modifyDocuments(object json);
 promise database.updateDocument(object json, string documentRevision);
 promise database.getDesignDocument(string designDocumentName);
-promise database.queryView(string designDocumentName, string viewName);
+promise database.queryView(string designDocumentName, string viewName, object queryStringParameters);
 promise database.deleteDocument(string documentId, string documentRevision);
 promise database.getAllDocuments();
 promise database.getDocument();
