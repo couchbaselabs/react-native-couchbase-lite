@@ -115,7 +115,7 @@ manager.prototype = {
    * @returns {*|promise}
    */
   updateDocument: function (jsonDocument, documentRevision) {
-    return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/" + jsonDocument._id + "?rev=" + documentRevision, {}, jsonDocument);
+    return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/" + jsonDocument._id, {rev: documentRevision}, jsonDocument);
   },
 
   /**
@@ -126,7 +126,7 @@ manager.prototype = {
    * @return promise
    */
   deleteDocument: function(documentId, documentRevision) {
-    return this.makeRequest("DELETE", this.databaseUrl + this.databaseName + "/" + documentId + "?rev=" + documentRevision);
+    return this.makeRequest("DELETE", this.databaseUrl + this.databaseName + "/" + documentId, {rev: documentRevision});
   },
 
   /*
@@ -145,7 +145,7 @@ manager.prototype = {
    * @returns {*|promise}
    */
   getAllDocuments: function() {
-    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_all_docs?include_docs=true");
+    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_all_docs", {include_docs: true});
   },
 
   /**
