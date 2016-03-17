@@ -81,9 +81,7 @@ manager.prototype = {
       }
     }
 
-    var fullUrl = url + queryString;
-
-    return this.nativeDb.makeRequest("GET", fullUrl, queryStringParameters);
+    return this.makeRequest("GET", url, queryStringParameters);
   },
 
   /**
@@ -95,27 +93,33 @@ manager.prototype = {
   createDocument: function (jsonDocument) {
     return this.makeRequest("POST", this.databaseUrl + this.databaseName, {}, jsonDocument);
   },
-  
+
   /**
    * Add, update, or delete multiple documents to a database in a single request
    *
-   * @param object jsonDocument
+   * @param object jsonDocuments array
    * @returns {*|promise}
    */
-  modifyDocuments: function (jsonDocument) {
-    return this.makeRequest("POST", this.databaseUrl + this.databaseName + '/_bulk_docs', {}, {docs: jsonDocument});
+  modifyDocuments: function (jsonDocuments) {
+    return this.makeRequest("POST", this.databaseUrl + this.databaseName + '/_bulk_docs', {}, {docs: jsonDocuments});
   },
-  
-  
+
+
   /**
    * Creates a new document or creates a new revision of an existing document
    *
    * @param object jsonDocument
-   * @param string documentRevision
+   * @param string documentRevision (optional)
    * @returns {*|promise}
    */
   updateDocument: function (jsonDocument, documentRevision) {
-    return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/" + jsonDocument._id, {rev: documentRevision}, jsonDocument);
+    var options = {}
+
+    if(documentRevision) {
+        options.rev = documentRevision;
+    }
+
+    return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/" + jsonDocument._id, options, jsonDocument);
   },
 
   /**
@@ -130,13 +134,18 @@ manager.prototype = {
   },
 
   /*
-   * Get a document from the database
+   * Get a document with optional revision from the database
    *
    * @param    string documentId
+   * @param    string revision
    * @return   promise
    */
-  getDocument: function(documentId) {
-    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/" + documentId);
+  getDocument: function(documentId, rev) {
+    let options = {};
+    if(rev) {
+      options.rev = rev;
+    }
+    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/" + documentId, options);
   },
 
   /**
@@ -149,19 +158,46 @@ manager.prototype = {
   },
 
   /**
-   * Replicate in a single direction whether that be remote from local or local to remote
+   * Get all conflicts
+   *
+   * @returns {*|promise}
+   */
+  getAllDocumentConflicts: function() {
+    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_all_docs", {only_conflicts: true});
+  },
+
+  /**
+   * Replicate in a single direction whether that be remote from local or local to remote.
    *
    * @param source
    * @param target
    * @param continuous
+   * @param sessionCookie (optional)
    * @returns {*|promise}
    */
-  replicate: function(source, target, continuous) {
-    return this.makeRequest("POST", this.databaseUrl + "_replicate", {}, {
-      source: source,
-      target: target,
-      continuous: continuous
-    });
+  replicate: function(source, target, continuous, sessionCookie) {
+    var replicateUrl = this.databaseUrl + "_replicate";
+
+    if(sessionCookie) {
+      return this.makeRequest("POST", replicateUrl, {}, {
+        source: source,
+        target: {
+          headers: {
+            Cookie: sessionCookie
+          },
+          url: target
+        },
+        continuous: continuous
+      });
+    } else {
+      return this.makeRequest("POST", replicateUrl, {}, {
+        source: source,
+        target: target,
+        continuous: continuous
+      });
+    }
+
+
   },
 
   /**
@@ -194,7 +230,9 @@ manager.prototype = {
         parts.push(part);
       }
 
-      queryString = "?" + parts.join("&");
+      if(parts.length > 0) {
+          queryString = "?" + parts.join("&");
+      }
     }
 
     var fullUrl = url + queryString;
