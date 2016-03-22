@@ -163,22 +163,254 @@ See the [example project](https://github.com/fraserxu/react-native-couchbase-lit
 
 
 
-## Available commands
+## Available commands & examples
 
+The full api is [here](https://github.com/fraserxu/react-native-couchbase-lite/blob/master/index.js)
+
+### createDatabase
+Example: Create a local Couchbase Lite database named 'dbname'
 ```
-promise database.createDatabase();
-promise database.createDesignDocument(string designDocumentName, object designDocumentViews);
-promise database.createDocument(object json);
-promise database.modifyDocuments(object json);
-promise database.updateDocument(object json, string documentRevision);
-promise database.getDesignDocument(string designDocumentName);
-promise database.queryView(string designDocumentName, string viewName);
-promise database.deleteDocument(string documentId, string documentRevision);
-promise database.getAllDocuments();
-promise database.getDocument();
-promise database.replicate(string source, string target, boolean continuous);
-void    database.listen();
+let localDbPort = 5984;
+let localDbAppName = 'dbname';
+let localDbUserId = 'local_user';
+let localDbPassword = 'password';
+let localDatabaseUrl = `http://${localDbUserId}:${localDbPassword}@localhost:${localDbPort}`;
+
+this.database = new manager(localDatabaseUrl + "/", localDbAppName);
+
+this.database.createDatabase()
+  .then((res) => {
+    if(res.status == 412) {
+      console.log('database already exists', res);
+    } else {
+      console.log('created database!', res);
+    }
+  }
 ```
+
+### deleteDatabase
+```
+this.database.deleteDatabase()
+  .then((res) => {
+    console.log('deleted database!', res);
+  }
+```
+
+### createDocument(jsonDocument) {
+Example: Create a _person_ document
+```
+this.database.createDocument({
+  type: 'person',
+  age: 26,
+  gender: 'female',
+  firstname: 'Linda',
+  lastname: 'McCartney'
+}).then((res) => {
+  let documentId = res.id;
+  console.log("created document!", documentId);
+});
+```
+
+### getDocument(documentId, revision)
+Example: get the latest document by id (revision is optional and if ommitted the latest revision is returned)
+```
+this.database.getDocument(documentId)
+  .then((personDocument) => {
+    let docId = personDocument._id;
+    let documentRevision = personDocument._rev;
+
+    console.log("Get document", docId, documentRevision, personDocument);
+  });
+```
+
+### updateDocument(jsonDocument, documentRevision)
+Example: Update a _person_ document, change the _gender_ field
+```
+personDocument.gender = 'male';
+
+this.database.updateDocument(document, documentRevision)
+  then((res) => {
+    console.log("Updated document", res);
+  });
+```
+
+### deleteDocument(documentId, documentRevision)
+Example: delete a document revision
+```
+this.database.deleteDocument(documentId, documentRevision)
+  then((res) => {
+    console.log("Updated document", res);
+  });
+```
+
+### modifyDocuments(jsonDocuments)
+```
+let docs = [docA, docB, docC];
+
+this.database.modifyDocuments(docs)
+  then((res) => {
+    console.log("Updated documents", res);
+  });
+```
+
+### getAllDocuments()
+Example: just run the \_all\_docs query
+```
+this.database.getAllDocuments()
+  .then((res) => {
+    console.log("all-docs", res);
+  });
+```
+
+### getChanges(options)
+Example: request changes since the start of time, and subsequently only get changes since the last request 
+```
+if(this.since) {
+  let options = {
+    since: this.since
+  };
+}
+
+let self = this;
+
+this.database.getChanges(options)
+  .then((res) => {
+    self.since = res.last_seq;
+
+    res.results.forEach((row) => {
+      console.log(row);
+    });
+}
+```
+
+### createDesignDocument(name, views)
+Example: create a design document called _my_design_doc_ containing 2 views, one that indexes _person_ documents by *firstname* and *lastname* and the other by *age* coupled with *gender*
+```
+let designDoc = {
+  person_name_view: {
+    "map": function (doc) {
+      if(doc.type === 'person') {
+        emit(doc.firstname.toLowerCase(), null);
+        emit(doc.lastname.toLowerCase(), null);
+      }
+  }.toString(),
+
+  person_age_view: {
+    "map": function (doc) {
+      if(doc.type === 'person') {
+        emit([doc.gender, doc.age], null);
+      }
+  }.toString()
+}
+
+this.database.createDesignDocument('my_design_doc', designDocument)
+  .then((res) => {
+    console.log("created design doc", res);
+  });
+```
+
+### getDesignDocument(name)
+Example: this will return the views of the the design document called _my_design_doc_ (created above)
+```
+this.database.getDesignDocument('my_design_doc')
+  then((res) => {
+    console.log("retreived a design document", res);
+  });
+```
+
+### deleteDesignDocument(name, revision)
+Example: this will delete revision _1_ of the the design document called _my_design_doc_ (created above)
+```
+let rev = 1;// must query the db to get this value
+this.database.getDesignDocument('my_design_doc', rev)
+  then((res) => {
+    console.log("deleted design document", res);
+  });
+```
+
+### queryView(designDocumentName, viewName, queryStringParameters)
+Example: find all person documents who have a _firstname_ or _lastname_ field that match any of 'john', 'paul', 'ringo' or 'george'
+```
+let options = {
+    keys: ['john', 'paul', 'ringo', 'george']
+};
+
+this.database.queryView('my_design_doc', 'person_name_view', options)
+  then((res) => {
+    res.rows.forEach((row) => {
+      console.log("docId", row.id);
+    });
+  });
+```
+Example: find all person documents that have _gender_ 'male' and _age_ under 25
+```
+let options = {
+  descending: true,
+  startkey: ['male', 25],
+  endkey: ['male', {}]
+};
+
+this.database.queryView('my_design_doc', 'person_age_view', options)
+  then((res) => {
+    res.rows.forEach((row) => {
+      console.log("docId", row.id);
+    });
+  });
+```
+
+### getAllDocumentConflicts()
+```
+this.database.getAllDocumentConflicts()
+  .then((res) => {
+    console.log('documents in conflict', res);
+  }
+```
+
+### replicate(source, target, continuous) 
+Example: set continuous up bi-directional sync using a session cookie acquired from the sync gateway
+```
+let userId = 'user1';
+let passowrd = 'password1';
+let dbName = 'dbname';
+let remoteDatabaseUrl = 'http://localhost:4984';
+let remoteBucketName = 'sync_gateway_bucket';
+let url = `${remoteDatabaseUrl}/${remoteBucketName}/_session`;
+
+let self = this;
+
+let settings = {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({name: userId, password: password})
+};
+
+return fetch(url, settings)
+  .then((res) => {
+    switch (res.status) {
+      case 200: {
+        let sessionCookie = res.headers.map['set-cookie'][0];
+
+        this.database.replicate(
+          dbName,
+          {headers: {Cookie: sessionCookie}, url: remoteDbUrl},
+          true
+        );
+
+        this.database.replicate(
+          {headers: {Cookie: sessionCookie}, url: remoteDbUrl},
+          dbName,
+          true
+        );
+      }
+      default: {
+        console.log("Bad user", res);
+      }
+    }
+  });
+```
+
+### makeRequest(method, url, queryStringParameters, data)
+Can be used to make any query to the Couchbase lite [rest api](http://developer.couchbase.com/documentation/mobile/1.2/develop/references/couchbase-lite/rest-api/database/index.html).
 
 #### LICENSE
 MIT
