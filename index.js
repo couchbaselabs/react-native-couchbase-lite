@@ -9,6 +9,11 @@ var manager = function (databaseUrl, databaseName) {
   this.databaseName = databaseName;
 };
 
+/**
+ * Wrapper around the CBL rest API.
+ *
+ * See: http://developer.couchbase.com/documentation/mobile/1.2/develop/references/couchbase-lite/rest-api/database/index.html
+ */
 manager.prototype = {
 
   /**
@@ -27,6 +32,15 @@ manager.prototype = {
    */
   deleteDatabase: function() {
     return this.makeRequest("DELETE", this.databaseUrl + this.databaseName, null, null);
+  },
+
+  /**
+   * Get the changes feed.
+   *
+   * @returns {*|promise}
+   */
+  getChanges: function(options) {
+    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_changes", options);
   },
 
   /**
@@ -50,7 +64,19 @@ manager.prototype = {
    * @return   promise
    */
   getDesignDocument: function(designDocumentName) {
-    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/" + designDocumentName);
+    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_design/" + designDocumentName);
+  },
+
+  /**
+   * Delete a particular design document based on its id and revision
+   *
+   * @param designDocumentName
+   * @param documentRevision
+   * @return promise
+   */
+  deleteDesignDocument: function(designDocumentName, documentRevision) {
+    var documentId = "_design/" + designDocumentName;
+    return this.deleteDocument(documentId, documentRevision);
   },
 
   /**
@@ -65,6 +91,8 @@ manager.prototype = {
    *  };
    *
    *  return queryView('design_doc_name', 'view_name', options);
+   *
+   * See http://developer.couchbase.com/documentation/mobile/1.2/develop/references/couchbase-lite/rest-api/design-document/get---db--design--design-doc--view--view-name-/index.html
    *
    * @param    string designDocumentName
    * @param    string viewName
@@ -220,15 +248,17 @@ manager.prototype = {
 
     var fullUrl = url + queryString;
 
+//    console.log(method, fullUrl);
+
     if (data) {
       settings.body = JSON.stringify(data);
     }
 
     return fetch(fullUrl, settings).then((res) => {
       if (res.status == 401) {
-        console.warn(res);
+        console.warn("cbl request failed", method, fullUrl, JSON.stringify(res));
 
-        throw new Error("Not authorized to access '" + fullUrl + "' [" + res.status + "]");
+        throw new Error("Not authorized to " + method + " to '" + fullUrl + "' [" + res.status + "]");
       }
       return res.json();
     }).catch((err) => {
