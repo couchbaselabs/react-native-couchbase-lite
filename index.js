@@ -9,6 +9,11 @@ var manager = function (databaseUrl, databaseName) {
   this.databaseName = databaseName;
 };
 
+/**
+ * Wrapper around the CBL rest API.
+ *
+ * See: http://developer.couchbase.com/documentation/mobile/1.2/develop/references/couchbase-lite/rest-api/database/index.html
+ */
 manager.prototype = {
 
   /**
@@ -27,6 +32,60 @@ manager.prototype = {
    */
   deleteDatabase: function() {
     return this.makeRequest("DELETE", this.databaseUrl + this.databaseName, null, null);
+  },
+
+  /**
+   * Get the changes feed.
+   *
+   * See http://developer.couchbase.com/documentation/mobile/1.2/develop/references/couchbase-lite/rest-api/database/get-changes/index.html
+   *
+   * @returns {*|promise}
+   */
+  getChanges: function(options) {
+    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_changes", options);
+  },
+
+  /**
+   * Get the latest revision
+   *
+   * @returns {*|promise}
+   */
+  latestRevision: function() {
+    return this.getInfo()
+        .then((res) => {
+            return res.update_seq;
+        });
+  },
+
+  /**
+   * Get the meta-information
+   *
+   * See http://developer.couchbase.com/documentation/mobile/1.2/develop/references/couchbase-lite/rest-api/server/get--/index.html
+   *
+   * @returns {*|promise}
+   */
+  getInfo: function() {
+    return this.makeRequest("GET", this.databaseUrl + this.databaseName)
+  },
+
+  /**
+   * Get the active tasks
+   *
+   * @returns {*|promise}
+   */
+  activeTasks: function() {
+    return this.makeRequest("GET", this.databaseUrl + "_active_tasks")
+  },
+
+  /**
+   * Get the databases
+   *
+   * See http://developer.couchbase.com/documentation/mobile/1.2/develop/references/couchbase-lite/rest-api/server/get-all-dbs/index.html
+   *
+   * @returns {*|promise}
+   */
+  getAllDatabases: function() {
+    return this.makeRequest("GET", this.databaseUrl + "_all_dbs")
   },
 
   /**
@@ -50,7 +109,19 @@ manager.prototype = {
    * @return   promise
    */
   getDesignDocument: function(designDocumentName) {
-    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/" + designDocumentName);
+    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_design/" + designDocumentName);
+  },
+
+  /**
+   * Delete a particular design document based on its id and revision
+   *
+   * @param designDocumentName
+   * @param documentRevision
+   * @return promise
+   */
+  deleteDesignDocument: function(designDocumentName, documentRevision) {
+    var documentId = "_design/" + designDocumentName;
+    return this.deleteDocument(documentId, documentRevision);
   },
 
   /**
@@ -58,7 +129,7 @@ manager.prototype = {
    * can be specified using query string parameters.  Query string values are json objects and are URL encoded within,
    * for example:
    *
-   *  let options = {
+   *  var options = {
    *    descending: true,
    *    startkey: [docId, {}],
    *    endkey: [docId]
@@ -66,17 +137,20 @@ manager.prototype = {
    *
    *  return queryView('design_doc_name', 'view_name', options);
    *
+   * See http://developer.couchbase.com/documentation/mobile/1.2/develop/references/couchbase-lite/rest-api/design-document/get---db--design--design-doc--view--view-name-/index.html
+   *
    * @param    string designDocumentName
    * @param    string viewName
    * @param    object queryStringParameters
    * @return   promise
    */
-  queryView: function(designDocumentName, viewName, queryStringParameters) {
+  queryView: function(designDocumentName, viewName, options) {
     var url = this.databaseUrl + this.databaseName + "/_design/" + designDocumentName + "/_view/" + viewName;
 
-    if(queryStringParameters) {
-      for(var key in queryStringParameters) {
-        var value = queryStringParameters[key];
+    var queryStringParameters = {};
+    if(options) {
+      for(var key in options) {
+        var value = options[key];
         queryStringParameters[key] = JSON.stringify(value);
       }
     }
@@ -140,11 +214,32 @@ manager.prototype = {
    * @return   promise
    */
   getDocument: function(documentId, rev) {
-    let options = {};
+    var options = {};
     if(rev) {
       options.rev = rev;
     }
     return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/" + documentId, options);
+  },
+
+  /**
+   * Get documents from the database using the _all_docs endpoint
+   *
+   * see http://developer.couchbase.com/documentation/mobile/1.2/develop/references/couchbase-lite/rest-api/database/get-all-docs/index.html
+   *
+   * @param   options
+   * @returns {*|promise}
+   */
+  getDocuments: function(options) {
+    var queryStringParameters = {}
+
+    if(options) {
+      for(var key in options) {
+        var value = options[key];
+        queryStringParameters[key] = JSON.stringify(value);
+      }
+    }
+
+    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_all_docs", queryStringParameters);
   },
 
   /**
@@ -193,6 +288,11 @@ manager.prototype = {
    * @returns {*|promise}
    */
   makeRequest: function(method, url, queryStringParameters, data) {
+    return this._makeRequest(method, url, queryStringParameters, data)
+        .then((res) => {return res.json()});
+  },
+
+  _makeRequest: function(method, url, queryStringParameters, data) {
     var settings = {
       method: method,
       headers: {
@@ -220,17 +320,19 @@ manager.prototype = {
 
     var fullUrl = url + queryString;
 
+//    console.log(method, fullUrl);
+
     if (data) {
       settings.body = JSON.stringify(data);
     }
 
     return fetch(fullUrl, settings).then((res) => {
       if (res.status == 401) {
-        console.warn(res);
+        console.warn("cbl request failed", method, fullUrl, JSON.stringify(res));
 
-        throw new Error("Not authorized to access '" + fullUrl + "' [" + res.status + "]");
+        throw new Error("Not authorized to " + method + " to '" + fullUrl + "' [" + res.status + "]");
       }
-      return res.json();
+      return res
     }).catch((err) => {
         throw new Error("http error for '" + fullUrl + "', caused by => " + err);
     });
