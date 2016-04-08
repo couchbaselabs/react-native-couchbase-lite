@@ -8,8 +8,13 @@ Couchbase Lite binding for react-native on both iOS and Android.
 $ npm install react-native-couchbase-lite --save
 ```
 
-## iOS
+**Note:**
 
+- For iOS, you may have created your React Native project through Cocoapods or using the `react-native init` command. 
+Make sure to follow the correct installation instructions below depending on which method you used.
+- For Android, see below on how to add the dependency in Android Studio.
+
+## iOS (react-native init)
 
 * XCode CouchbaseLite project dependency set up: Drag the ReactCBLite Xcode project as a dependency project into your React Native Xcode project.
 
