@@ -1,6 +1,6 @@
 {
   "name": "react-native-couchbase-lite",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "couchbase lite binding for react-native",
   "main": "index.js",
   "scripts": {
