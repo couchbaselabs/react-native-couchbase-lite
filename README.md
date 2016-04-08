@@ -4,27 +4,27 @@ Couchbase Lite binding for react-native on both iOS and Android.
 
 ### Installation
 
-```
-$ npm install react-native-couchbase-lite --save
-```
-
-**Note:**
-
 - For iOS, you may have created your React Native project through Cocoapods or using the `react-native init` command. 
 Make sure to follow the correct installation instructions below depending on which method you used.
 - For Android, see below on how to add the dependency in Android Studio.
 
 ## iOS (react-native init)
 
-* XCode CouchbaseLite project dependency set up: Drag the ReactCBLite Xcode project as a dependency project into your React Native Xcode project.
+```
+$ react-init RNTestProj
+$ cd RNTestProj
+$ npm install react-native-couchbase-lite --save
+```
+
+* Drag the ReactCBLite Xcode project in your React Native Xcode project:
 
 ![](http://cl.ly/image/0S133n1O3g3W/static-library.png)
 
-* XCode ReactCBLite library dependency set up: Add ReactCBLite.a (from Workspace location) to the required Libraries and Frameworks.
+* Add ReactCBLite.a (from Workspace location) to the required Libraries and Frameworks.
 
 ![](http://cl.ly/image/2c0Z2u0S0r1G/link.png)
 
-* From the `Link Binary With Libraries` section in the `Build Phases` of the top-level project, add the following frameworks in your Xcode project (they are dependencies for Couchbase Lite)
+* From the `Link Binary With Libraries` section in the `Build Phases` of the top-level project, add the following frameworks in your Xcode project (Couchbase Lite dependencies):
 
 	- libsqlite3.0.tbd
 	- libz.tbd
@@ -32,7 +32,7 @@ Make sure to follow the correct installation instructions below depending on whi
 	- CFNetwork.framework
 	- SystemConfiguration.framework
 
-* Download the Couchbase Lite iOS SDK from [here](http://www.couchbase.com/nosql-databases/downloads#) and drag CouchbaseLite.framework, CouchbaseLiteListener.framework, CBLRegisterJSViewCompiler.h and libCBLJSViewCompiler.a in the Xcode project.
+* Download the Couchbase Lite iOS SDK from [here](http://www.couchbase.com/nosql-databases/downloads#) and drag CouchbaseLite.framework, CouchbaseLiteListener.framework in the Xcode project:
 
 ![](http://cl.ly/image/3Z1b0n0W0i3w/sdk.png)
 
@@ -150,7 +150,9 @@ In your app entry, init and start the Couchbase Lite Listener
 ```JavaScript
 import {manager, ReactCBLite} from 'react-native-couchbase-lite'
 // init the Listener with a port and login credentials
-ReactCBLite.init(5984, 'admin', 'password')
+ReactCBLite.init(5984, 'admin', 'password', e => {
+	console.log('initialized');
+});
 
 // instantiate a new database
 var database = new manager('http://admin:password@localhost:5984/', 'myapp');
