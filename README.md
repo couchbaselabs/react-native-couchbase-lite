@@ -68,79 +68,65 @@ $ pod install
 
 ## Android
 
-* Add dependency to `android/settings.gradle`
+* Add the `react-native-couchbase-lite` project to your existing React Native project in `android/settings.gradle`
 
-```
-...
-include ':react-native-couchbase-lite'
-project(':react-native-couchbase-lite').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-couchbase-lite/android')
-```
+	```
+	...
+	include ':react-native-couchbase-lite'
+	project(':react-native-couchbase-lite').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-couchbase-lite/android')
+	```
 
-* Add `android/build.gradle`
+* Add the Couchbase Maven repository to `android/build.gradle`
 
-```
-allprojects {
-    repositories {
-        mavenLocal()
-        jcenter()
-
-        // add couchbase url
-        maven {
-            url "http://files.couchbase.com/maven2/"
-        }
-    }
-}
-```
+	```
+	allprojects {
+			repositories {
+					mavenLocal()
+					jcenter()
+	
+					// add couchbase url
+					maven {
+							url "http://files.couchbase.com/maven2/"
+					}
+			}
+	}
+	```
 
 * Add `android/app/build.gradle`
 
-```
-apply plugin: 'com.android.application'
+	```
+	apply plugin: 'com.android.application'
+	
+	android {
+			...
+	
+			packagingOptions {
+					exclude 'META-INF/ASL2.0'
+					exclude 'META-INF/LICENSE'
+					exclude 'META-INF/NOTICE'
+			}
+	}
+	
+	dependencies {
+			compile fileTree(dir: 'libs', include: ['*.jar'])
+			compile 'com.android.support:appcompat-v7:23.0.0'
+			compile 'com.facebook.react:react-native:0.12.+'
+	
+			// Add this line:
+			compile project(':react-native-couchbase-lite')
+	}
+	```
 
-android {
-    ...
-
-    packagingOptions {
-        exclude 'META-INF/ASL2.0'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/NOTICE'
-    }
-}
-
-dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:23.0.0'
-    compile 'com.facebook.react:react-native:0.12.+'
-
-    // Add this line:
-    compile project(':react-native-couchbase-lite')
-}
-```
-
-* Register module in `MainActivity.java`
+* Register the module in `getPackages` of `MainActivity.java`
 
   ```
-  import me.fraserxu.rncouchbaselite.*;  // <--- import
-
   @Override
-      protected void onCreate(Bundle savedInstanceState) {
-          super.onCreate(savedInstanceState);
-          mReactRootView = new ReactRootView(this);
-
-          mReactInstanceManager = ReactInstanceManager.builder()
-                  .setApplication(getApplication())
-                  .setBundleAssetName("index.android.bundle")
-                  .setJSMainModuleName("index.android")
-                  .addPackage(new ReactCBLiteManager())  // <------- here
-                  .addPackage(new MainReactPackage())
-                  .setUseDeveloperSupport(BuildConfig.DEBUG)
-                  .setInitialLifecycleState(LifecycleState.RESUMED)
-                  .build();
-
-          mReactRootView.startReactApplication(mReactInstanceManager, "MyApp", null);
-
-          setContentView(mReactRootView);
-      }
+  protected List<ReactPackage> getPackages() {
+      return Arrays.<ReactPackage>asList(
+          new MainReactPackage(),
+          new ReactCBLiteManager()				<----- Register the module
+      );
+  }
   ```
 
 #### Usage
