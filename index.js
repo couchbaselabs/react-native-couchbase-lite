@@ -263,18 +263,20 @@ manager.prototype = {
   /**
    * Replicate in a single direction whether that be remote from local or local to remote.
    *
-   * @param source
-   * @param target
-   * @param continuous
+   * @param string source
+   * @param string target
+   * @param boolean continuous
+   * @param boolean createTarget
    * @returns {*|promise}
    */
-  replicate: function(source, target, continuous) {
+  replicate: function(source, target, continuous, createTarget) {
     var replicateUrl = this.databaseUrl + "_replicate";
 
     return this.makeRequest("POST", replicateUrl, {}, {
       source: source,
       target: target,
-      continuous: continuous
+      continuous: continuous,
+      create_target: createTarget
     });
   },
 
