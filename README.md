@@ -189,7 +189,7 @@ this.database.deleteDatabase()
   }
 ```
 
-### createDocument(jsonDocument) {
+### createDocument(jsonDocument)
 Example: Create a _person_ document
 ```
 this.database.createDocument({
