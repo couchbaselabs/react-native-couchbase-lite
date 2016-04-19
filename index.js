@@ -182,17 +182,18 @@ manager.prototype = {
    * Creates a new document or creates a new revision of an existing document
    *
    * @param object jsonDocument
+   * @param string documentId
    * @param string documentRevision (optional)
    * @returns {*|promise}
    */
-  updateDocument: function (jsonDocument, documentRevision) {
+  updateDocument: function (jsonDocument, documentId, documentRevision) {
     var options = {}
 
     if(documentRevision) {
         options.rev = documentRevision;
     }
 
-    return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/" + jsonDocument._id, options, jsonDocument);
+    return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/" + documentId, options, jsonDocument);
   },
 
   /**
@@ -336,7 +337,7 @@ manager.prototype = {
       }
       return res
     }).catch((err) => {
-        throw new Error("http error for '" + fullUrl + "', caused by => " + err);
+        throw new Error("http error for " + method + " '" + fullUrl + "', caused by => " + err);
     });
   }
 };
