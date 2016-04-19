@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/fraserxu/react-native-couchbase-lite#readme",
   "dependencies": {
-    "base-64": "^0.1.0"
+    "base-64": "^0.1.0",
+    "events": "^1.1.0"
   }
 }
