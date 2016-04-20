@@ -1,12 +1,16 @@
 var { NativeModules } = require('react-native');
 var ReactCBLite = NativeModules.ReactCBLite;
 
-var base64 = require('base-64');
+var base64 = require('base-64')
+  , events = require('events');
+
+var CHANGE_EVENT_TYPE = 'changes';
 
 var manager = function (databaseUrl, databaseName) {
   this.authHeader = "Basic " + base64.encode(databaseUrl.split("//")[1].split('@')[0]);
   this.databaseUrl = databaseUrl;
   this.databaseName = databaseName;
+  this.changesEventEmitter = new events.EventEmitter();
 };
 
 /**
@@ -279,6 +283,29 @@ manager.prototype = {
       continuous: continuous,
       create_target: createTarget
     });
+  },
+
+  /**
+   * Listen for database changes
+   */
+  listen: function(initialSeq) {
+    var poller = function (databaseUrl, databaseName, cseq) {
+      var request = new XMLHttpRequest();
+      var self = this;
+      request.onload = (e) => {
+        var data = JSON.parse(request.responseText);
+        self.changesEventEmitter.emit(CHANGE_EVENT_TYPE, data);
+        poller(databaseUrl, databaseName, data.last_seq);
+      };
+      request.open('GET', databaseUrl + databaseName + '/_changes?feed=longpoll&since=' + cseq);
+      request.setRequestHeader('Authorization', this.authHeader);
+      request.send();
+    }.bind(this);
+    if (initialSeq) {
+      poller(this.databaseUrl, this.databaseName, initialSeq);
+    } else {
+      poller(this.databaseUrl, this.databaseName, 0);
+    }
   },
 
   /**

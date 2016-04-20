@@ -12,12 +12,13 @@ var {
   View,
   Image,
   ListView,
-  } = React;
+} = React;
 
 var ReactCBLite = require('react-native').NativeModules.ReactCBLite;
-ReactCBLite.init(5984, 'admin', 'password', (e) => {});
+ReactCBLite.init(5984, 'admin', 'password', (e) => {
+});
 
-var { manager } = require('react-native-couchbase-lite');
+var {manager} = require('react-native-couchbase-lite');
 
 var ReactNativeCouchbaseLiteExample = React.createClass({
   render: function () {
@@ -32,7 +33,8 @@ var Home = React.createClass({
     return {
       dataSource: new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2,
-      })
+      }),
+      sequence: ''
     }
   },
   componentDidMount() {
@@ -40,7 +42,14 @@ var Home = React.createClass({
 
     database.createDatabase()
       .then((res) => {
-        database.replicate('http://localhost:4984/moviesapp', 'myapp')
+        database.replicate('http://localhost:4984/moviesapp', 'myapp');
+        database.getInfo()
+          .then((res) => {
+            database.listen(res.update_seq - 1);
+            database.changesEventEmitter.on('changes', function (e) {
+              this.setState({sequence: e.last_seq});
+            }.bind(this));
+          });
       })
       .then((res) => {
         return database.getAllDocuments()
@@ -49,18 +58,23 @@ var Home = React.createClass({
         this.setState({
           dataSource: this.state.dataSource.cloneWithRows(res.rows)
         });
-        console.log(res.rows)
+        console.log(res.rows);
       })
       .catch((ex) => {
         console.log(ex)
-      })
+      });
   },
   render() {
     return (
+      <View>
+        <Text style={styles.seqTextLabel}>
+          The database sequence: {this.state.sequence}
+        </Text>
         <ListView
           dataSource={this.state.dataSource}
           renderRow={this.renderMovie}
           style={styles.listView}/>
+      </View>
     )
   },
   renderMovie(movie) {
@@ -103,9 +117,12 @@ var styles = StyleSheet.create({
     height: 81,
   },
   listView: {
-    paddingTop: 20,
     backgroundColor: '#F5FCFF',
   },
+  seqTextLabel: {
+    textAlign: 'center',
+    margin: 5
+  }
 });
 
 AppRegistry.registerComponent('ReactNativeCouchbaseLiteExample', () => ReactNativeCouchbaseLiteExample);

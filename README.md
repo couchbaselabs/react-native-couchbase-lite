@@ -359,6 +359,23 @@ this.database.getAllDocumentConflicts()
   }
 ```
 
+### listen
+
+Register for changes:
+
+```
+db.listen();
+```
+
+Receiving change notifications:
+
+```
+db.changesEventEmitter.on('changes', function (e) {
+	console.log(e);
+});
+```
+
+
 ### replicate(source, target, continuous) 
 Example: set continuous up bi-directional sync using a session cookie acquired from the sync gateway
 ```
