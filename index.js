@@ -288,20 +288,6 @@ manager.prototype = {
    * Listen for database changes
    */
   listen: function() {
-    var poller = function(databaseUrl, databaseName, cseq) {
-      var request = new XMLHttpRequest();
-      request.onload = (e) => {
-        var data = JSON.parse(request.responseText);
-        this.changesEventEmitter.emit(CHANGE_EVENT_TYPE, data);
-      };
-      request(this.databaseUrl, this.databaseName, 0);
-    }
-  },
-
-  /**
-   * Listen for database changes
-   */
-  listen: function() {
     var poller = function (databaseUrl, databaseName, cseq) {
       var request = new XMLHttpRequest();
       var self = this;
