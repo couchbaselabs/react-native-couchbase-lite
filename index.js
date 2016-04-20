@@ -56,9 +56,9 @@ manager.prototype = {
    */
   latestRevision: function() {
     return this.getInfo()
-        .then((res) => {
-            return res.update_seq;
-        });
+      .then((res) => {
+        return res.update_seq;
+      });
   },
 
   /**
@@ -99,11 +99,8 @@ manager.prototype = {
    * @param    object designDocumentViews
    * @return   promise
    */
-  createDesignDocument: function(designDocumentName, designDocumentViews) {
-    var data = {
-      views: designDocumentViews
-    };
-    return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/_design/" + designDocumentName, null, data);
+  createDesignDocument: function(designDocumentName, designDocumentBody) {
+    return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/_design/" + designDocumentName, null, designDocumentBody);
   },
 
   /**
@@ -194,7 +191,7 @@ manager.prototype = {
     var options = {}
 
     if(documentRevision) {
-        options.rev = documentRevision;
+      options.rev = documentRevision;
     }
 
     return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/" + documentId, options, jsonDocument);

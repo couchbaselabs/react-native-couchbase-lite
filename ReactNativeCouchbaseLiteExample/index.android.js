@@ -34,13 +34,24 @@ var Home = React.createClass({
       dataSource: new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2,
       }),
-      sequence: ''
+      sequence: '',
+      filteredMovies: ''
     }
   },
   componentDidMount() {
     var database = new manager('http://admin:password@localhost:5984/', 'myapp');
     database.createDatabase()
       .then((res) => {
+        database.createDesignDocument('main', {
+          'filters': {
+            'year': 'function (doc) { if (doc.year === 2004) {return true;} return false;}'
+          },
+          'views': {
+            'movies': {
+              'map': 'function (doc) {if (doc.year) {emit(doc._id, null);}}'
+            }
+          }
+        });
         database.replicate('http://localhost:4984/moviesapp', 'myapp');
         database.getInfo()
           .then((res) => {
@@ -48,16 +59,19 @@ var Home = React.createClass({
             database.changesEventEmitter.on('changes', function (e) {
               this.setState({sequence: e.last_seq});
             }.bind(this));
+            // database.listen({seq: 0, feed: 'longpoll', filter: 'main/year'});
+            // database.changesEventEmitter.on('changes', function (e) {
+            //   this.setState({filteredMovies: e.last_seq});
+            // }.bind(this));
           });
       })
       .then((res) => {
-        return database.getAllDocuments()
+        return database.queryView('main', 'movies', {include_docs: true});
       })
       .then((res) => {
         this.setState({
           dataSource: this.state.dataSource.cloneWithRows(res.rows)
         });
-        console.log(res.rows);
       })
       .catch((ex) => {
         console.log(ex)
@@ -68,6 +82,9 @@ var Home = React.createClass({
       <View>
         <Text style={styles.seqTextLabel}>
           The database sequence: {this.state.sequence}
+        </Text>
+        <Text>
+          Movies published in 2004: {this.state.filteredMovies}
         </Text>
         <ListView
           dataSource={this.state.dataSource}

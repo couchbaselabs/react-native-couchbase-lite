@@ -2,9 +2,11 @@ package me.fraserxu.rncouchbaselite;
 
 import android.content.Context;
 
+import com.couchbase.lite.Database;
 import com.couchbase.lite.Manager;
 import com.couchbase.lite.View;
 import com.couchbase.lite.android.AndroidContext;
+import com.couchbase.lite.javascript.JavaScriptReplicationFilterCompiler;
 import com.couchbase.lite.javascript.JavaScriptViewCompiler;
 import com.couchbase.lite.listener.Credentials;
 import com.couchbase.lite.listener.LiteListener;
@@ -45,6 +47,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
             allowedCredentials = new Credentials(login, password);
 
             View.setCompiler(new JavaScriptViewCompiler());
+            Database.setFilterCompiler(new JavaScriptReplicationFilterCompiler());
 
             AndroidContext context = new AndroidContext(this.context);
             Manager.enableLogging(Log.TAG, Log.VERBOSE);
