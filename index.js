@@ -287,7 +287,7 @@ manager.prototype = {
   /**
    * Listen for database changes
    */
-  listen: function() {
+  listen: function(initialSeq) {
     var poller = function (databaseUrl, databaseName, cseq) {
       var request = new XMLHttpRequest();
       var self = this;
@@ -297,9 +297,14 @@ manager.prototype = {
         poller(databaseUrl, databaseName, data.last_seq);
       };
       request.open('GET', databaseUrl + databaseName + '/_changes?feed=longpoll&since=' + cseq);
+      request.setRequestHeader('Authorization', this.authHeader);
       request.send();
     }.bind(this);
-    poller(this.databaseUrl, this.databaseName, 0);
+    if (initialSeq) {
+      poller(this.databaseUrl, this.databaseName, initialSeq);
+    } else {
+      poller(this.databaseUrl, this.databaseName, 0);
+    }
   },
 
   /**
