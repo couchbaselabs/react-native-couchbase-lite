@@ -12,12 +12,13 @@ var {
   View,
   Image,
   ListView,
-  } = React;
+} = React;
 
 var ReactCBLite = require('react-native').NativeModules.ReactCBLite;
-ReactCBLite.init(5984, 'admin', 'password', (e) => {});
+ReactCBLite.init(5984, 'admin', 'password', (e) => {
+});
 
-var { manager } = require('react-native-couchbase-lite');
+var {manager} = require('react-native-couchbase-lite');
 
 var ReactNativeCouchbaseLiteExample = React.createClass({
   render: function () {
@@ -57,10 +58,10 @@ var Home = React.createClass({
   },
   render() {
     return (
-        <ListView
-          dataSource={this.state.dataSource}
-          renderRow={this.renderMovie}
-          style={styles.listView}/>
+      <ListView
+        dataSource={this.state.dataSource}
+        renderRow={this.renderMovie}
+        style={styles.listView}/>
     )
   },
   renderMovie(movie) {
