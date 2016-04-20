@@ -39,13 +39,12 @@ var Home = React.createClass({
   },
   componentDidMount() {
     var database = new manager('http://admin:password@localhost:5984/', 'myapp');
-
     database.createDatabase()
       .then((res) => {
         database.replicate('http://localhost:4984/moviesapp', 'myapp');
         database.getInfo()
           .then((res) => {
-            database.listen(res.update_seq - 1);
+            database.listen({seq: res.update_seq - 1, feed: 'longpoll'});
             database.changesEventEmitter.on('changes', function (e) {
               this.setState({sequence: e.last_seq});
             }.bind(this));

@@ -288,24 +288,21 @@ manager.prototype = {
   /**
    * Listen for database changes
    */
-  listen: function(initialSeq) {
-    var poller = function (databaseUrl, databaseName, cseq) {
+  listen: function(queryStringParams) {
+    var poller = function (databaseUrl, databaseName, params) {
       var request = new XMLHttpRequest();
       var self = this;
       request.onload = (e) => {
         var data = JSON.parse(request.responseText);
         self.changesEventEmitter.emit(CHANGE_EVENT_TYPE, data);
-        poller(databaseUrl, databaseName, data.last_seq);
+        params.seq = data.last_seq;
+        poller(databaseUrl, databaseName, params);
       };
-      request.open('GET', databaseUrl + databaseName + '/_changes?feed=longpoll&since=' + cseq);
+      request.open('GET', databaseUrl + databaseName + '/_changes' + this._getFullUrl(params));
       request.setRequestHeader('Authorization', this.authHeader);
       request.send();
     }.bind(this);
-    if (initialSeq) {
-      poller(this.databaseUrl, this.databaseName, initialSeq);
-    } else {
-      poller(this.databaseUrl, this.databaseName, 0);
-    }
+    poller(this.databaseUrl, this.databaseName, queryStringParams);
   },
 
   /**
@@ -319,19 +316,10 @@ manager.prototype = {
    */
   makeRequest: function(method, url, queryStringParameters, data) {
     return this._makeRequest(method, url, queryStringParameters, data)
-        .then((res) => {return res.json()});
+      .then((res) => {return res.json()});
   },
 
-  _makeRequest: function(method, url, queryStringParameters, data) {
-    var settings = {
-      method: method,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': this.authHeader
-      }
-    };
-
+  _getFullUrl: function (queryStringParameters) {
     var queryString = "";
 
     if(queryStringParameters) {
@@ -344,13 +332,24 @@ manager.prototype = {
       }
 
       if(parts.length > 0) {
-          queryString = "?" + parts.join("&");
+        queryString = "?" + parts.join("&");
       }
     }
 
-    var fullUrl = url + queryString;
+    return queryString;
+  },
 
-//    console.log(method, fullUrl);
+  _makeRequest: function(method, url, queryStringParameters, data) {
+    var settings = {
+      method: method,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': this.authHeader
+      }
+    };
+
+    var fullUrl = url + this._getFullUrl(queryStringParameters);
 
     if (data) {
       settings.body = JSON.stringify(data);
@@ -364,7 +363,7 @@ manager.prototype = {
       }
       return res
     }).catch((err) => {
-        throw new Error("http error for " + method + " '" + fullUrl + "', caused by => " + err);
+      throw new Error("http error for '" + fullUrl + "', caused by => " + err);
     });
   }
 };
