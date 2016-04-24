@@ -1,7 +1,5 @@
 package me.fraserxu.rncouchbaselite;
 
-import android.content.Context;
-
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Manager;
 import com.couchbase.lite.View;
@@ -11,12 +9,24 @@ import com.couchbase.lite.javascript.JavaScriptViewCompiler;
 import com.couchbase.lite.listener.Credentials;
 import com.couchbase.lite.listener.LiteListener;
 import com.couchbase.lite.util.Log;
-import com.couchbase.lite.android.*;
-
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Callback;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class ReactCBLite extends ReactContextBaseJavaModule {
 
@@ -40,6 +50,61 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
     @ReactMethod
     public void init(int listenPort, String login, String password, Callback errorCallback) {
         initCBLite(listenPort, login, password, errorCallback);
+    }
+
+    @ReactMethod
+    public void upload(String method, String authHeader, String sourceUri, String targetUri, Callback callback) {
+        try {
+            InputStream input;
+            if (sourceUri.startsWith("/")) {
+                input = new FileInputStream(new File(sourceUri));
+            } else {
+                URLConnection urlConnection = new URL(targetUri).openConnection();
+                input = urlConnection.getInputStream();
+            }
+
+            try {
+                HttpURLConnection conn = (HttpURLConnection) new URL(targetUri).openConnection();
+                conn.setRequestProperty("Content-Type", "application/octet-stream");
+                conn.setRequestProperty("Authorization", authHeader);
+                conn.setReadTimeout(100000);
+                conn.setConnectTimeout(100000);
+                conn.setRequestMethod(method);
+                conn.setDoInput(true);
+                conn.setDoOutput(true);
+
+                OutputStream os = conn.getOutputStream();
+                try {
+                    byte[] buffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = input.read(buffer)) != -1) {
+                        os.write(buffer, 0, bytesRead);
+                    }
+                } finally {
+                    os.close();
+                }
+
+                StringBuilder responseText = new StringBuilder();
+                int responseCode = conn.getResponseCode();
+
+                String line;
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                try {
+                    while ((line = br.readLine()) != null) {
+                        responseText.append(line);
+                    }
+                } finally {
+                    br.close();
+                }
+
+                callback.invoke(responseText.toString());
+            } finally {
+                input.close();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initCBLite(int listenPort, String login, String password, Callback errorCallback) {
@@ -70,11 +135,11 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
                     allowedCredentials.getLogin(),
                     allowedCredentials.getPassword(),
                     listenPort));
-          errorCallback.invoke();
+            errorCallback.invoke();
 
         } catch (final Exception e) {
             e.printStackTrace();
-          errorCallback.invoke(e.getMessage());
+            errorCallback.invoke(e.getMessage());
         }
     }
 
