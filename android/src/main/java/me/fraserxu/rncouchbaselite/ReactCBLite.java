@@ -53,7 +53,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void upload(String method, String authHeader, String sourceUri, String targetUri, Callback callback) {
+    public void upload(String method, String authHeader, String sourceUri, String targetUri, String contentType, Callback callback) {
         try {
             InputStream input;
             if (sourceUri.startsWith("/")) {
@@ -65,7 +65,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
 
             try {
                 HttpURLConnection conn = (HttpURLConnection) new URL(targetUri).openConnection();
-                conn.setRequestProperty("Content-Type", "application/octet-stream");
+                conn.setRequestProperty("Content-Type", contentType);
                 conn.setRequestProperty("Authorization", authHeader);
                 conn.setReadTimeout(100000);
                 conn.setConnectTimeout(100000);
