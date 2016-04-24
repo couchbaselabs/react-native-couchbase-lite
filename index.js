@@ -21,63 +21,23 @@ var manager = function (databaseUrl, databaseName) {
  */
 manager.prototype = {
 
-  getAttachment: function(documentId, name, rev) {
-    var options = {};
-    if(rev) {
-      options.rev = rev;
+  getAttachmentUri: function(documentId, name, documentRevision) {
+    var url = encodeURI(this.databaseUrl + this.databaseName + "/" + documentId + "/" + name);
+
+    if(documentRevision) {
+        url += "?rev=" + encodeURIComponent(documentRevision);
     }
 
-    var settings = {
-      method: "GET",
-      headers: {
-        'Authorization': this.authHeader
-      }
-    };
-
-    var url = this.databaseUrl + this.databaseName + "/" + documentId + "/" + name;
-    console.log("attachment url", url);
-
-    return this._makeRequest(settings, url, options)
-        .then((res) => {
-            return res.blob();
-        });
+    return url;
   },
 
   saveAttachment: function(documentId, documentRevision, name, path, contentType) {
+    var uploadUrl = encodeURI(this.databaseUrl + this.databaseName + "/" + documentId + "/" + name) + "?rev=" + encodeURIComponent(documentRevision);
+
     return new Promise((resolve, reject) => {
-        var uploadUrl = encodeURI(this.databaseUrl + this.databaseName + "/" + documentId + "/" + name) + "?rev=" + encodeURIComponent(documentRevision);
-
-        console.log("uploading", path, "to", uploadUrl);
-
-        var obj = {
-            uploadUrl: uploadUrl,
-            method: 'PUT',
-            headers: {
-              'Authorization': this.authHeader,
-              'Accept': 'application/json',
-            },
-            files: [
-              {
-                name: name,
-                filename: name,
-                filepath: path,
-              },
-            ],
-            fields: {}
-        };
-
-        FileUpload.upload(obj, function(err, result) {
-            console.log("upload res", err, result);
-
-            if(err) {
-                reject(err);
-            } else if (result) {
-                if(result && result.status && result.status >= 300) {
-                    reject(result);
-                } else {
-                    resolve(result);
-                }
-            }
+        ReactCBLite.upload("PUT", this.authHeader, path, uploadUrl, contentType, (text) => {
+            //todo: handle the error case
+            resolve(text);
         });
     });
   },
@@ -274,14 +234,10 @@ manager.prototype = {
    * Get a document with optional revision from the database
    *
    * @param    string documentId
-   * @param    string revision (optional)
+   * @param    object options
    * @return   promise
    */
-  getDocument: function(documentId, rev) {
-    var options = {};
-    if(rev) {
-      options.rev = rev;
-    }
+  getDocument: function(documentId, options) {
     return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/" + documentId, options);
   },
 
@@ -420,7 +376,9 @@ manager.prototype = {
 
   _makeRequest: function(settings, url, queryStringParameters) {
 
-    var fullUrl = url + this._encodeParams(queryStringParameters);
+    var fullUrl = encodeURI(url) + this._encodeParams(queryStringParameters);
+
+//    console.log("fullUrl", fullUrl);
 
     return fetch(fullUrl, settings).then((res) => {
       if (res.status == 401) {
