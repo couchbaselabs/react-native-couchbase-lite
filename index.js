@@ -1,5 +1,6 @@
 var { NativeModules } = require('react-native');
 var ReactCBLite = NativeModules.ReactCBLite;
+var FileUpload = require('NativeModules').FileUpload;
 
 var base64 = require('base-64')
   , events = require('events');
@@ -19,6 +20,63 @@ var manager = function (databaseUrl, databaseName) {
  * See: http://developer.couchbase.com/documentation/mobile/1.2/develop/references/couchbase-lite/rest-api/database/index.html
  */
 manager.prototype = {
+
+  getAttachment: function(documentId, name, rev) {
+    var options = {};
+    if(rev) {
+      options.rev = rev;
+    }
+
+    var settings = {
+      method: "GET",
+      headers: {
+        'Authorization': this.authHeader
+      }
+    };
+
+    return this._makeRequest(settings, this.databaseUrl + this.databaseName + "/" + documentId + "/" + name, options)
+        .then((res) => {
+            return res.blob();
+        });
+  },
+
+  saveAttachment: function(documentId, documentRevision, name, path) {
+    return new Promise((resolve, reject) => {
+        var uploadUrl = encodeURI(this.databaseUrl + this.databaseName + "/" + documentId + "/" + name) + "?rev=" + encodeURIComponent(documentRevision);
+
+        console.log("uploading", path, "to", uploadUrl);
+
+        var obj = {
+            uploadUrl: uploadUrl,
+            method: 'PUT',
+            headers: {
+              'Accept': 'application/json',
+            },
+            files: [
+              {
+                name: 'attachment',
+                filename: name,
+                filepath: path,
+              },
+            ],
+            fields: {}
+        };
+
+        FileUpload.upload(obj, function(err, result) {
+            console.log("upload res", err, result);
+
+            if(err) {
+                reject(err);
+            } else if (result) {
+                if(result && result.status && result.status >= 300) {
+                    reject(result);
+                } else {
+                    resolve(result);
+                }
+            }
+        });
+    });
+  },
 
   /**
    * Construct a new Couchbase object given a database URL and database name
@@ -247,10 +305,12 @@ manager.prototype = {
   /**
    * Get all documents from the database
    *
+   * @param object options
+   *
    * @returns {*|promise}
    */
-  getAllDocuments: function() {
-    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_all_docs", {include_docs: true});
+  getAllDocuments: function(options) {
+    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_all_docs", options);
   },
 
   /**
@@ -295,28 +355,14 @@ manager.prototype = {
         params.seq = data.last_seq;
         poller(databaseUrl, databaseName, params);
       };
-      request.open('GET', databaseUrl + databaseName + '/_changes' + this._getFullUrl(params));
+      request.open('GET', databaseUrl + databaseName + '/_changes' + this._encodeParams(params));
       request.setRequestHeader('Authorization', this.authHeader);
       request.send();
     }.bind(this);
     poller(this.databaseUrl, this.databaseName, queryStringParams);
   },
 
-  /**
-   * Make a RESTful request to an endpoint while providing parameters or data or both
-   *
-   * @param string method
-   * @param string url
-   * @param object params
-   * @param object data
-   * @returns {*|promise}
-   */
-  makeRequest: function(method, url, queryStringParameters, data) {
-    return this._makeRequest(method, url, queryStringParameters, data)
-      .then((res) => {return res.json()});
-  },
-
-  _getFullUrl: function (queryStringParameters) {
+  _encodeParams: function (queryStringParameters) {
     var queryString = "";
 
     if(queryStringParameters) {
@@ -336,7 +382,21 @@ manager.prototype = {
     return queryString;
   },
 
-  _makeRequest: function(method, url, queryStringParameters, data) {
+  /**
+   * Make a RESTful request to an endpoint while providing parameters or data or both
+   *
+   * @param string method
+   * @param string url
+   * @param object params
+   * @param object data
+   * @returns {*|promise}
+   */
+  makeRequest: function(method, url, queryStringParameters, data) {
+    var body;
+    if(data) {
+        body = JSON.stringify(data);
+    }
+
     var settings = {
       method: method,
       headers: {
@@ -346,21 +406,27 @@ manager.prototype = {
       }
     };
 
-    var fullUrl = url + this._getFullUrl(queryStringParameters);
-
     if (data) {
-      settings.body = JSON.stringify(data);
+      settings.body = body;
     }
+
+    return this._makeRequest(settings, url, queryStringParameters, body)
+        .then((res) => {return res.json()});
+  },
+
+  _makeRequest: function(settings, url, queryStringParameters) {
+
+    var fullUrl = url + this._encodeParams(queryStringParameters);
 
     return fetch(fullUrl, settings).then((res) => {
       if (res.status == 401) {
-        console.warn("cbl request failed", method, fullUrl, JSON.stringify(res));
+        console.warn("cbl request failed", settings.method, fullUrl, JSON.stringify(res));
 
-        throw new Error("Not authorized to " + method + " to '" + fullUrl + "' [" + res.status + "]");
+        throw new Error("Not authorized to " + settings.method + " to '" + fullUrl + "' [" + res.status + "]");
       }
       return res
     }).catch((err) => {
-      throw new Error("http error for '" + fullUrl + "', caused by => " + err);
+      throw new Error("http error for " + settings.method + " '" + fullUrl + "', caused by => " + err);
     });
   }
 };
