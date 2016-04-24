@@ -34,13 +34,16 @@ manager.prototype = {
       }
     };
 
-    return this._makeRequest(settings, this.databaseUrl + this.databaseName + "/" + documentId + "/" + name, options)
+    var url = this.databaseUrl + this.databaseName + "/" + documentId + "/" + name;
+    console.log("attachment url", url);
+
+    return this._makeRequest(settings, url, options)
         .then((res) => {
             return res.blob();
         });
   },
 
-  saveAttachment: function(documentId, documentRevision, name, path) {
+  saveAttachment: function(documentId, documentRevision, name, path, contentType) {
     return new Promise((resolve, reject) => {
         var uploadUrl = encodeURI(this.databaseUrl + this.databaseName + "/" + documentId + "/" + name) + "?rev=" + encodeURIComponent(documentRevision);
 
@@ -50,11 +53,12 @@ manager.prototype = {
             uploadUrl: uploadUrl,
             method: 'PUT',
             headers: {
+              'Authorization': this.authHeader,
               'Accept': 'application/json',
             },
             files: [
               {
-                name: 'attachment',
+                name: name,
                 filename: name,
                 filepath: path,
               },
@@ -362,26 +366,6 @@ manager.prototype = {
     poller(this.databaseUrl, this.databaseName, queryStringParams);
   },
 
-  _encodeParams: function (queryStringParameters) {
-    var queryString = "";
-
-    if(queryStringParameters) {
-      var parts = [];
-
-      for(var key in queryStringParameters) {
-        var value = queryStringParameters[key];
-        var part = key + "=" + encodeURIComponent(value);
-        parts.push(part);
-      }
-
-      if(parts.length > 0) {
-        queryString = "?" + parts.join("&");
-      }
-    }
-
-    return queryString;
-  },
-
   /**
    * Make a RESTful request to an endpoint while providing parameters or data or both
    *
@@ -412,6 +396,26 @@ manager.prototype = {
 
     return this._makeRequest(settings, url, queryStringParameters, body)
         .then((res) => {return res.json()});
+  },
+
+  _encodeParams: function (queryStringParameters) {
+    var queryString = "";
+
+    if(queryStringParameters) {
+      var parts = [];
+
+      for(var key in queryStringParameters) {
+        var value = queryStringParameters[key];
+        var part = key + "=" + encodeURIComponent(value);
+        parts.push(part);
+      }
+
+      if(parts.length > 0) {
+        queryString = "?" + parts.join("&");
+      }
+    }
+
+    return queryString;
   },
 
   _makeRequest: function(settings, url, queryStringParameters) {
