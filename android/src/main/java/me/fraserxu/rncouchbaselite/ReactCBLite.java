@@ -86,7 +86,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
             errorCallback.invoke();
 
         } catch (final Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Couchbase init failed", e);
             errorCallback.invoke(e.getMessage());
         }
     }
