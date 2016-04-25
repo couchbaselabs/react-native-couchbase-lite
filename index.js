@@ -21,27 +21,6 @@ var manager = function (databaseUrl, databaseName) {
  */
 manager.prototype = {
 
-  getAttachmentUri: function(documentId, name, documentRevision) {
-    var url = encodeURI(this.databaseUrl + this.databaseName + "/" + documentId + "/" + name);
-
-    if(documentRevision) {
-        url += "?rev=" + encodeURIComponent(documentRevision);
-    }
-
-    return url;
-  },
-
-  saveAttachment: function(documentId, documentRevision, name, path, contentType) {
-    var uploadUrl = encodeURI(this.databaseUrl + this.databaseName + "/" + documentId + "/" + name) + "?rev=" + encodeURIComponent(documentRevision);
-
-    return new Promise((resolve, reject) => {
-        ReactCBLite.upload("PUT", this.authHeader, path, uploadUrl, contentType, (text) => {
-            //todo: handle the error case
-            resolve(text);
-        });
-    });
-  },
-
   /**
    * Construct a new Couchbase object given a database URL and database name
    *
@@ -323,6 +302,51 @@ manager.prototype = {
   },
 
   /**
+   * Construct a URI for retrieving attachments
+   *
+   * @param    string documentId
+   * @param    string attachmentName
+   * @param    string documentRevision (optional)
+   *
+   * @returns string
+   */
+  getAttachmentUri: function(documentId, name, documentRevision) {
+    var url = encodeURI(this.databaseUrl + this.databaseName + "/" + documentId + "/" + name);
+
+    if(documentRevision) {
+      url += "?rev=" + encodeURIComponent(documentRevision);
+    }
+
+    return url;
+  },
+
+  /**
+   * Save an attachment using a uri OR file path as input
+   *
+   * @param    string documentId
+   * @param    string documentRevision
+   * @param    string name
+   * @param    string path
+   * @param    string contentType
+   *
+   * @returns {*|promise}
+   */
+  saveAttachment: function(documentId, documentRevision, name, path, contentType) {
+    var uploadUrl = encodeURI(this.databaseUrl + this.databaseName + "/" + documentId + "/" + name) + "?rev=" + encodeURIComponent(documentRevision);
+
+    return new Promise((resolve, reject) => {
+      ReactCBLite.upload("PUT", this.authHeader, path, uploadUrl, contentType,
+        (text) => {
+          resolve(text);
+        },
+        (text) => {
+          reject(text);
+        },
+      );
+    });
+  },
+
+  /**
    * Make a RESTful request to an endpoint while providing parameters or data or both
    *
    * @param string method
@@ -354,6 +378,24 @@ manager.prototype = {
         .then((res) => {return res.json()});
   },
 
+  _makeRequest: function(settings, url, queryStringParameters) {
+
+    var fullUrl = encodeURI(url) + this._encodeParams(queryStringParameters);
+
+//    console.log("fullUrl", fullUrl);
+
+    return fetch(fullUrl, settings).then((res) => {
+      if (res.status == 401) {
+        console.warn("cbl request failed", settings.method, fullUrl, JSON.stringify(res));
+
+        throw new Error("Not authorized to " + settings.method + " to '" + fullUrl + "' [" + res.status + "]");
+      }
+      return res
+    }).catch((err) => {
+      throw new Error("http error for " + settings.method + " '" + fullUrl + "', caused by => " + err);
+    });
+  }
+
   _encodeParams: function (queryStringParameters) {
     var queryString = "";
 
@@ -373,24 +415,6 @@ manager.prototype = {
 
     return queryString;
   },
-
-  _makeRequest: function(settings, url, queryStringParameters) {
-
-    var fullUrl = encodeURI(url) + this._encodeParams(queryStringParameters);
-
-//    console.log("fullUrl", fullUrl);
-
-    return fetch(fullUrl, settings).then((res) => {
-      if (res.status == 401) {
-        console.warn("cbl request failed", settings.method, fullUrl, JSON.stringify(res));
-
-        throw new Error("Not authorized to " + settings.method + " to '" + fullUrl + "' [" + res.status + "]");
-      }
-      return res
-    }).catch((err) => {
-      throw new Error("http error for " + settings.method + " '" + fullUrl + "', caused by => " + err);
-    });
-  }
 };
 
 module.exports = {manager, ReactCBLite};
