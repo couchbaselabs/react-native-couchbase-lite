@@ -31,11 +31,8 @@ import java.util.Arrays;
 public class ReactCBLite extends ReactContextBaseJavaModule {
 
     public static final String REACT_CLASS = "ReactCBLite";
-    private static final int DEFAULT_LISTEN_PORT = 5984;
     private static final String TAG = "ReactCBLite";
     private ReactApplicationContext context;
-    private int listenPort;
-    private Credentials allowedCredentials;
 
     public ReactCBLite(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -60,7 +57,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
 
     private void initCBLite(int listenPort, String login, String password, Callback errorCallback) {
         try {
-            allowedCredentials = new Credentials(login, password);
+            Credentials allowedCredentials = new Credentials(login, password);
 
             View.setCompiler(new JavaScriptViewCompiler());
             Database.setFilterCompiler(new JavaScriptReplicationFilterCompiler());
