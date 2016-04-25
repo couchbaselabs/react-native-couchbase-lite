@@ -33,7 +33,6 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
     public static final String REACT_CLASS = "ReactCBLite";
     private static final String TAG = "ReactCBLite";
     private ReactApplicationContext context;
-
     public ReactCBLite(ReactApplicationContext reactContext) {
         super(reactContext);
         this.context = reactContext;
@@ -50,8 +49,33 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void upload(String method, String authHeader, String sourceUri, String targetUri, String contentType, Callback successCallback) {
-        SaveAttachmentTask saveAttachmentTask = new SaveAttachmentTask(method, authHeader, sourceUri, targetUri, contentType, successCallback);
+    public void upload(String method, String authHeader, String sourceUri, String targetUri, String contentType, Callback callback) {
+        if(method == null || !method.toUpperCase().equals("PUT")) {
+            callback.invoke("Bad parameter method: " + method);
+            return;
+        }
+        if(authHeader == null) {
+            callback.invoke("Bad parameter authHeader");
+            return;
+        }
+        if(sourceUri == null) {
+            callback.invoke("Bad parameter sourceUri");
+            return;
+        }
+        if(targetUri == null) {
+            callback.invoke("Bad parameter targetUri");
+            return;
+        }
+        if(contentType == null) {
+            callback.invoke("Bad parameter contentType");
+            return;
+        }
+        if(callback == null) {
+            Log.e(TAG, "no callback");
+            return;
+        }
+
+        SaveAttachmentTask saveAttachmentTask = new SaveAttachmentTask(method, authHeader, sourceUri, targetUri, contentType, callback);
         saveAttachmentTask.execute();
     }
 
@@ -169,8 +193,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
                 } finally {
                     input.close();
                 }
-
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Log.e(TAG, "Failed to save attachment", e);
                 return new UploadResult(-1, "Failed to save attachment " + e.getMessage());
             }
@@ -184,7 +207,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
         @Override
         protected void onPostExecute(UploadResult uploadResult) {
             int responseCode = uploadResult.statusCode;
-
+            //todo: proper json response, same as the IOS version
             if(responseCode == 200 || responseCode == 202)
                 callback.invoke(null, "Success " + responseCode + " " + uploadResult.response);
             else
