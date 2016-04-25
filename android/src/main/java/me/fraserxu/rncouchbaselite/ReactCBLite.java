@@ -1,5 +1,7 @@
 package me.fraserxu.rncouchbaselite;
 
+import android.os.AsyncTask;
+
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Manager;
 import com.couchbase.lite.View;
@@ -22,17 +24,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
-
-import javax.net.ssl.HttpsURLConnection;
+import java.util.Arrays;
 
 public class ReactCBLite extends ReactContextBaseJavaModule {
 
     public static final String REACT_CLASS = "ReactCBLite";
     private static final int DEFAULT_LISTEN_PORT = 5984;
-    private final String TAG = "ReactCBLite";
+    private static final String TAG = "ReactCBLite";
     private ReactApplicationContext context;
     private int listenPort;
     private Credentials allowedCredentials;
@@ -54,63 +54,8 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void upload(String method, String authHeader, String sourceUri, String targetUri, String contentType, Callback successCallback, Callback errorCallback) {
-        try {
-            InputStream input;
-            if (sourceUri.startsWith("/")) {
-                Log.i(TAG, "Uploading file attachment '" + sourceUri + "' to '" + targetUri + "'");
-                input = new FileInputStream(new File(sourceUri));
-            } else {
-                Log.i(TAG, "Uploading uri attachment '" + sourceUri + "' to '" + targetUri + "'");
-                URLConnection urlConnection = new URL(sourceUri).openConnection();
-                input = urlConnection.getInputStream();
-            }
-
-            try {
-                HttpURLConnection conn = (HttpURLConnection) new URL(targetUri).openConnection();
-                conn.setRequestProperty("Content-Type", contentType);
-                conn.setRequestProperty("Authorization", authHeader);
-                conn.setReadTimeout(100000);
-                conn.setConnectTimeout(100000);
-                conn.setRequestMethod(method);
-                conn.setDoInput(true);
-                conn.setDoOutput(true);
-
-                OutputStream os = conn.getOutputStream();
-                try {
-                    byte[] buffer = new byte[1024];
-                    int bytesRead;
-                    while ((bytesRead = input.read(buffer)) != -1) {
-                        os.write(buffer, 0, bytesRead);
-                    }
-                } finally {
-                    os.close();
-                }
-
-                int responseCode = conn.getResponseCode();
-
-                StringBuilder responseText = new StringBuilder();
-                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                try {
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        responseText.append(line);
-                    }
-                } finally {
-                    br.close();
-                }
-
-                if(responseCode == 200 || responseCode == 202)
-                    successCallback.invoke("Success " + responseCode + " " + responseText.toString());
-                else
-                    errorCallback.invoke("Failed " + responseCode + " " + responseText.toString());
-            } finally {
-                input.close();
-            }
-
-        } catch (IOException e) {
-            Log.e(TAG, "Failed to save attachment", e);
-            errorCallback.invoke("Failed to save attachment " + e.getMessage());
-        }
+        SaveAttachmentTask saveAttachmentTask = new SaveAttachmentTask(method, authHeader, sourceUri, targetUri, contentType, successCallback, errorCallback);
+        saveAttachmentTask.execute();
     }
 
     private void initCBLite(int listenPort, String login, String password, Callback errorCallback) {
@@ -155,5 +100,110 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
         Thread thread = new Thread(listener);
         thread.start();
         return boundPort;
+    }
+
+    private static class SaveAttachmentTask extends AsyncTask<URL, Integer, UploadResult> {
+        private final String method;
+        private final String authHeader;
+        private final String sourceUri;
+        private final String targetUri;
+        private final String contentType;
+        private final Callback successCallback;
+        private final Callback errorCallback;
+
+        private SaveAttachmentTask(String method, String authHeader, String sourceUri, String targetUri, String contentType, Callback successCallback, Callback errorCallback) {
+            this.method = method;
+            this.authHeader = authHeader;
+            this.sourceUri = sourceUri;
+            this.targetUri = targetUri;
+            this.contentType = contentType;
+            this.successCallback = successCallback;
+            this.errorCallback = errorCallback;
+        }
+
+        @Override
+        protected UploadResult doInBackground(URL... params) {
+            try {
+                InputStream input;
+                if (sourceUri.startsWith("/")) {
+                    Log.i(TAG, "Uploading file attachment '" + sourceUri + "' to '" + targetUri + "'");
+                    input = new FileInputStream(new File(sourceUri));
+                } else {
+                    Log.i(TAG, "Uploading uri attachment '" + sourceUri + "' to '" + targetUri + "'");
+                    URLConnection urlConnection = new URL(sourceUri).openConnection();
+                    input = urlConnection.getInputStream();
+                }
+
+                try {
+                    HttpURLConnection conn = (HttpURLConnection) new URL(targetUri).openConnection();
+                    conn.setRequestProperty("Content-Type", contentType);
+                    conn.setRequestProperty("Authorization", authHeader);
+                    conn.setReadTimeout(100000);
+                    conn.setConnectTimeout(100000);
+                    conn.setRequestMethod(method);
+                    conn.setDoInput(true);
+                    conn.setDoOutput(true);
+
+                    OutputStream os = conn.getOutputStream();
+                    try {
+                        byte[] buffer = new byte[1024];
+                        int bytesRead;
+                        while ((bytesRead = input.read(buffer)) != -1) {
+                            os.write(buffer, 0, bytesRead);
+                            publishProgress(bytesRead);
+                        }
+                    } finally {
+                        os.close();
+                    }
+
+                    int responseCode = conn.getResponseCode();
+
+                    StringBuilder responseText = new StringBuilder();
+                    BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    try {
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            responseText.append(line);
+                        }
+                    } finally {
+                        br.close();
+                    }
+
+                    return new UploadResult(responseCode, responseText.toString());
+                } finally {
+                    input.close();
+                }
+
+            } catch (IOException e) {
+                Log.e(TAG, "Failed to save attachment", e);
+                return new UploadResult(-1, "Failed to save attachment " + e.getMessage());
+            }
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            Log.d(TAG, "Uploaded", Arrays.toString(values));
+        }
+
+        @Override
+        protected void onPostExecute(UploadResult uploadResult) {
+            int responseCode = uploadResult.statusCode;
+
+            if(responseCode == 200 || responseCode == 202)
+                successCallback.invoke("Success " + responseCode + " " + uploadResult.response);
+            else
+                errorCallback.invoke("Failed " + responseCode + " " + uploadResult.response);
+        }
+
+    }
+
+    private static class UploadResult {
+        public final int statusCode;
+        public final String response;
+
+        public UploadResult(int statusCode, String response) {
+            this.statusCode = statusCode;
+            this.response = response;
+        }
     }
 }
