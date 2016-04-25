@@ -81,11 +81,14 @@ RCT_EXPORT_METHOD(upload:(NSString *)method
             NSString *responeString = [[NSString alloc] initWithData:receivedData encoding:NSUTF8StringEncoding];
             NSLog(@"responeString %@", responeString);
             
-            [returnStuff setObject: responeString forKey:@"resp"];
+            NSData *data = [responeString dataUsingEncoding:NSUTF8StringEncoding];
+            id json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+            
+            [returnStuff setObject: json forKey:@"resp"];
             
             if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
                 NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
-                NSLog(@"responeString %@", httpResponse.statusCode);
+                NSLog(@"status code %ld", (long)httpResponse.statusCode);
                 
                 [returnStuff setObject: [NSNumber numberWithFloat:httpResponse.statusCode] forKey:@"statusCode"];
             }
