@@ -55,7 +55,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
         saveAttachmentTask.execute();
     }
 
-    private void initCBLite(int listenPort, String login, String password, Callback errorCallback) {
+    private void initCBLite(int listenPort, String login, String password, Callback callback) {
         try {
             Credentials allowedCredentials = new Credentials(login, password);
 
@@ -83,11 +83,12 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
                     allowedCredentials.getLogin(),
                     allowedCredentials.getPassword(),
                     listenPort));
-            errorCallback.invoke();
+
+            callback.invoke();
 
         } catch (final Exception e) {
-            e.printStackTrace();
-            errorCallback.invoke(e.getMessage());
+            Log.e(TAG, "Couchbase init failed", e);
+            callback.invoke(e.getMessage());
         }
     }
 
