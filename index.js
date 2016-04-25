@@ -394,7 +394,7 @@ manager.prototype = {
     }).catch((err) => {
       throw new Error("http error for " + settings.method + " '" + fullUrl + "', caused by => " + err);
     });
-  }
+  },
 
   _encodeParams: function (queryStringParameters) {
     var queryString = "";
