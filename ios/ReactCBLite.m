@@ -37,14 +37,19 @@ RCT_EXPORT_METHOD(upload:(NSString *)method
                   sourceUri:(NSString *)sourceUri
                   targetUri:(NSString *)targetUri
                   contentType:(NSString *)contentType
-                  callback:(RCTResponseSenderBlock)callback)
+                  successCallback:(RCTResponseSenderBlock)successCallback
+                  errorCallback:(RCTResponseSenderBlock)errorCallback)
 {
-    NSLog(@"Uploading attachment");
 
-    NSData *data = [NSData dataWithContentsOfFile:sourceUri];
-    //todo: make this work with URLs
-    //NSData *data = [NSData dataWithContentsOfURL:sourceUri];
-
+    NSData *data;
+    if([sourceUri hasPrefix:@"/"]) {
+        NSLog(@"Uploading attachment from file %s to %s", sourceUri, targetUri);
+        data = [NSData dataWithContentsOfFile:sourceUri];
+    } else {
+        NSLog(@"Uploading attachment from uri %s to %s", sourceUri, targetUri);
+        data = [NSData dataWithContentsOfURL:sourceUri];
+    }
+    
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:targetUri]];
 
     [request setHTTPMethod:method];
@@ -52,14 +57,20 @@ RCT_EXPORT_METHOD(upload:(NSString *)method
     [request setValue:authHeader forHTTPHeaderField:@"Authorization"];
     [request setHTTPBody:data];
     
+    //todo: much better error and success handling
+    // need to monitor the response properly
+    // https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/URLLoadingSystem/Tasks/UsingNSURLConnection.html#//apple_ref/doc/uid/20001836-BAJEAIEE
+    
     NSURLConnection *conn = [[NSURLConnection alloc]initWithRequest:request delegate:self];
     if(conn) {
         NSLog(@"Connection Successful");
     } else {
         NSLog(@"Connection could not be made");
+        errorCallback(@[[NSNull null]]);
+        return;
     }
     
-    callback(@[[NSNull null]]);
+    successCallback(@[[NSNull null]]);
 }
 
 @end

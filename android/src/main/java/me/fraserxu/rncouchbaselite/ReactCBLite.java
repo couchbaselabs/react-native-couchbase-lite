@@ -53,13 +53,15 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void upload(String method, String authHeader, String sourceUri, String targetUri, String contentType, Callback callback) {
+    public void upload(String method, String authHeader, String sourceUri, String targetUri, String contentType, Callback successCallback, Callback errorCallback) {
         try {
             InputStream input;
             if (sourceUri.startsWith("/")) {
+                Log.i(TAG, "Uploading file attachment '" + sourceUri + "' to '" + targetUri + "'");
                 input = new FileInputStream(new File(sourceUri));
             } else {
-                URLConnection urlConnection = new URL(targetUri).openConnection();
+                Log.i(TAG, "Uploading uri attachment '" + sourceUri + "' to '" + targetUri + "'");
+                URLConnection urlConnection = new URL(sourceUri).openConnection();
                 input = urlConnection.getInputStream();
             }
 
@@ -84,12 +86,12 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
                     os.close();
                 }
 
-                StringBuilder responseText = new StringBuilder();
                 int responseCode = conn.getResponseCode();
 
-                String line;
+                StringBuilder responseText = new StringBuilder();
                 BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 try {
+                    String line;
                     while ((line = br.readLine()) != null) {
                         responseText.append(line);
                     }
@@ -97,13 +99,17 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
                     br.close();
                 }
 
-                callback.invoke(responseText.toString());
+                if(responseCode == 200 || responseCode == 202)
+                    successCallback.invoke("Success " + responseCode + " " + responseText.toString());
+                else
+                    errorCallback.invoke("Failed " + responseCode + " " + responseText.toString());
             } finally {
                 input.close();
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to save attachment", e);
+            errorCallback.invoke("Failed to save attachment " + e.getMessage());
         }
     }
 
