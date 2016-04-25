@@ -336,12 +336,13 @@ manager.prototype = {
 
     return new Promise((resolve, reject) => {
       ReactCBLite.upload("PUT", this.authHeader, path, uploadUrl, contentType,
-        (text) => {
-          resolve(text);
-        },
-        (text) => {
-          reject(text);
-        },
+        (err, success) => {
+          if(err) {
+            reject(err);
+          } else {
+            resolve(success);
+          }
+        }
       );
     });
   },

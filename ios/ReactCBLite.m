@@ -37,40 +37,62 @@ RCT_EXPORT_METHOD(upload:(NSString *)method
                   sourceUri:(NSString *)sourceUri
                   targetUri:(NSString *)targetUri
                   contentType:(NSString *)contentType
-                  successCallback:(RCTResponseSenderBlock)successCallback
-                  errorCallback:(RCTResponseSenderBlock)errorCallback)
+                  successCallback:(RCTResponseSenderBlock)callback)
 {
-
+    
     NSData *data;
     if([sourceUri hasPrefix:@"/"]) {
-        NSLog(@"Uploading attachment from file %s to %s", sourceUri, targetUri);
+        NSLog(@"Uploading attachment from file %@ to %@", sourceUri, targetUri);
         data = [NSData dataWithContentsOfFile:sourceUri];
     } else {
-        NSLog(@"Uploading attachment from uri %s to %s", sourceUri, targetUri);
-        data = [NSData dataWithContentsOfURL:sourceUri];
+        NSLog(@"Uploading attachment from uri %@ to %@", sourceUri, targetUri);
+        data = [NSData dataWithContentsOfURL:[NSURL URLWithString:sourceUri]];
     }
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:targetUri]];
-
+    
     [request setHTTPMethod:method];
     [request setValue:contentType forHTTPHeaderField:@"Content-Type"];
     [request setValue:authHeader forHTTPHeaderField:@"Authorization"];
     [request setHTTPBody:data];
     
-    //todo: much better error and success handling
-    // need to monitor the response properly
-    // https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/URLLoadingSystem/Tasks/UsingNSURLConnection.html#//apple_ref/doc/uid/20001836-BAJEAIEE
-    
-    NSURLConnection *conn = [[NSURLConnection alloc]initWithRequest:request delegate:self];
-    if(conn) {
-        NSLog(@"Connection Successful");
-    } else {
-        NSLog(@"Connection could not be made");
-        errorCallback(@[[NSNull null]]);
-        return;
-    }
-    
-    successCallback(@[[NSNull null]]);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSMutableDictionary* returnStuff = [NSMutableDictionary dictionary];
+        
+        NSURLResponse *response;
+        NSError *error = nil;
+        NSData *receivedData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+        
+        if (error) {
+            if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
+                NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
+                
+                NSLog(@"HTTP Error: %ld %@", (long)httpResponse.statusCode, error);
+                
+                [returnStuff setObject: error forKey:@"error"];
+                [returnStuff setObject: [NSNumber numberWithFloat:httpResponse.statusCode] forKey:@"statusCode"];
+            } else {
+                NSLog(@"Error %@", error);
+                [returnStuff setObject: error forKey:@"error"];
+            }
+            
+            callback(@[returnStuff, [NSNull null]]);
+        } else {
+            NSString *responeString = [[NSString alloc] initWithData:receivedData encoding:NSUTF8StringEncoding];
+            NSLog(@"responeString %@", responeString);
+            
+            [returnStuff setObject: responeString forKey:@"resp"];
+            
+            if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
+                NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
+                NSLog(@"responeString %@", httpResponse.statusCode);
+                
+                [returnStuff setObject: [NSNumber numberWithFloat:httpResponse.statusCode] forKey:@"statusCode"];
+            }
+            
+            callback(@[[NSNull null], returnStuff]);
+        }
+    });
 }
 
 @end

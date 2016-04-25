@@ -50,8 +50,8 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void upload(String method, String authHeader, String sourceUri, String targetUri, String contentType, Callback successCallback, Callback errorCallback) {
-        SaveAttachmentTask saveAttachmentTask = new SaveAttachmentTask(method, authHeader, sourceUri, targetUri, contentType, successCallback, errorCallback);
+    public void upload(String method, String authHeader, String sourceUri, String targetUri, String contentType, Callback successCallback) {
+        SaveAttachmentTask saveAttachmentTask = new SaveAttachmentTask(method, authHeader, sourceUri, targetUri, contentType, successCallback);
         saveAttachmentTask.execute();
     }
 
@@ -106,17 +106,15 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
         private final String sourceUri;
         private final String targetUri;
         private final String contentType;
-        private final Callback successCallback;
-        private final Callback errorCallback;
+        private final Callback callback;
 
-        private SaveAttachmentTask(String method, String authHeader, String sourceUri, String targetUri, String contentType, Callback successCallback, Callback errorCallback) {
+        private SaveAttachmentTask(String method, String authHeader, String sourceUri, String targetUri, String contentType, Callback callback) {
             this.method = method;
             this.authHeader = authHeader;
             this.sourceUri = sourceUri;
             this.targetUri = targetUri;
             this.contentType = contentType;
-            this.successCallback = successCallback;
-            this.errorCallback = errorCallback;
+            this.callback = callback;
         }
 
         @Override
@@ -188,11 +186,10 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
             int responseCode = uploadResult.statusCode;
 
             if(responseCode == 200 || responseCode == 202)
-                successCallback.invoke("Success " + responseCode + " " + uploadResult.response);
+                callback.invoke(null, "Success " + responseCode + " " + uploadResult.response);
             else
-                errorCallback.invoke("Failed " + responseCode + " " + uploadResult.response);
+                callback.invoke("Failed " + responseCode + " " + uploadResult.response, null);
         }
-
     }
 
     private static class UploadResult {
