@@ -11,10 +11,17 @@ import com.couchbase.lite.javascript.JavaScriptViewCompiler;
 import com.couchbase.lite.listener.Credentials;
 import com.couchbase.lite.listener.LiteListener;
 import com.couchbase.lite.util.Log;
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,7 +33,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import static me.fraserxu.rncouchbaselite.ReactNativeJson.convertJsonToMap;
 
 public class ReactCBLite extends ReactContextBaseJavaModule {
 
@@ -207,11 +221,23 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
         @Override
         protected void onPostExecute(UploadResult uploadResult) {
             int responseCode = uploadResult.statusCode;
-            //todo: proper json response, same as the IOS version
-            if(responseCode == 200 || responseCode == 202)
-                callback.invoke(null, "Success " + responseCode + " " + uploadResult.response);
-            else
-                callback.invoke("Failed " + responseCode + " " + uploadResult.response, null);
+            WritableMap map = Arguments.createMap();
+            map.putInt("statusCode", responseCode);
+
+            if(responseCode == 200 || responseCode == 202) {
+                try {
+                    JSONObject jsonObject = new JSONObject(uploadResult.response);
+                    map.putMap("resp", convertJsonToMap(jsonObject));
+                    callback.invoke(null, map);
+                } catch (JSONException e) {
+                    map.putString("error", uploadResult.response);
+                    callback.invoke(map, null);
+                    Log.e(TAG, "Failed to parse response from clb: " + uploadResult.response, e);
+                }
+            } else {
+                map.putString("error", uploadResult.response);
+                callback.invoke(map, null);
+            }
         }
     }
 
