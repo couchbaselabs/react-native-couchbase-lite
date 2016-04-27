@@ -1,5 +1,6 @@
 var { NativeModules } = require('react-native');
 var ReactCBLite = NativeModules.ReactCBLite;
+var FileUpload = require('NativeModules').FileUpload;
 
 var base64 = require('base-64')
   , events = require('events');
@@ -212,14 +213,10 @@ manager.prototype = {
    * Get a document with optional revision from the database
    *
    * @param    string documentId
-   * @param    string revision (optional)
+   * @param    object options
    * @return   promise
    */
-  getDocument: function(documentId, rev) {
-    var options = {};
-    if(rev) {
-      options.rev = rev;
-    }
+  getDocument: function(documentId, options) {
     return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/" + documentId, options);
   },
 
@@ -247,10 +244,12 @@ manager.prototype = {
   /**
    * Get all documents from the database
    *
+   * @param object options
+   *
    * @returns {*|promise}
    */
-  getAllDocuments: function() {
-    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_all_docs", {include_docs: true});
+  getAllDocuments: function(options) {
+    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_all_docs", options);
   },
 
   /**
@@ -295,11 +294,57 @@ manager.prototype = {
         params.seq = data.last_seq;
         poller(databaseUrl, databaseName, params);
       };
-      request.open('GET', databaseUrl + databaseName + '/_changes' + this._getFullUrl(params));
+      request.open('GET', databaseUrl + databaseName + '/_changes' + this._encodeParams(params));
       request.setRequestHeader('Authorization', this.authHeader);
       request.send();
     }.bind(this);
     poller(this.databaseUrl, this.databaseName, queryStringParams);
+  },
+
+  /**
+   * Construct a URI for retrieving attachments
+   *
+   * @param    string documentId
+   * @param    string attachmentName
+   * @param    string documentRevision (optional)
+   *
+   * @returns string
+   */
+  getAttachmentUri: function(documentId, name, documentRevision) {
+    var url = encodeURI(this.databaseUrl + this.databaseName + "/" + documentId + "/" + name);
+
+    if(documentRevision) {
+      url += "?rev=" + encodeURIComponent(documentRevision);
+    }
+
+    return url;
+  },
+
+  /**
+   * Save an attachment using a uri OR file path as input
+   *
+   * @param    string documentId
+   * @param    string documentRevision
+   * @param    string name
+   * @param    string path
+   * @param    string contentType
+   *
+   * @returns {*|promise}
+   */
+  saveAttachment: function(documentId, documentRevision, name, path, contentType) {
+    var uploadUrl = encodeURI(this.databaseUrl + this.databaseName + "/" + documentId + "/" + name) + "?rev=" + encodeURIComponent(documentRevision);
+
+    return new Promise((resolve, reject) => {
+      ReactCBLite.upload("PUT", this.authHeader, path, uploadUrl, contentType,
+        (err, success) => {
+          if(err) {
+            reject(err);
+          } else {
+            resolve(success);
+          }
+        }
+      );
+    });
   },
 
   /**
@@ -312,11 +357,47 @@ manager.prototype = {
    * @returns {*|promise}
    */
   makeRequest: function(method, url, queryStringParameters, data) {
-    return this._makeRequest(method, url, queryStringParameters, data)
-      .then((res) => {return res.json()});
+    var body;
+    if(data) {
+        body = JSON.stringify(data);
+    }
+
+    var settings = {
+      method: method,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': this.authHeader
+      }
+    };
+
+    if (data) {
+      settings.body = body;
+    }
+
+    return this._makeRequest(settings, url, queryStringParameters, body)
+        .then((res) => {return res.json()});
   },
 
-  _getFullUrl: function (queryStringParameters) {
+  _makeRequest: function(settings, url, queryStringParameters) {
+
+    var fullUrl = encodeURI(url) + this._encodeParams(queryStringParameters);
+
+//    console.log("fullUrl", fullUrl);
+
+    return fetch(fullUrl, settings).then((res) => {
+      if (res.status == 401) {
+        console.warn("cbl request failed", settings.method, fullUrl, JSON.stringify(res));
+
+        throw new Error("Not authorized to " + settings.method + " to '" + fullUrl + "' [" + res.status + "]");
+      }
+      return res
+    }).catch((err) => {
+      throw new Error("http error for " + settings.method + " '" + fullUrl + "', caused by => " + err);
+    });
+  },
+
+  _encodeParams: function (queryStringParameters) {
     var queryString = "";
 
     if(queryStringParameters) {
@@ -335,34 +416,6 @@ manager.prototype = {
 
     return queryString;
   },
-
-  _makeRequest: function(method, url, queryStringParameters, data) {
-    var settings = {
-      method: method,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': this.authHeader
-      }
-    };
-
-    var fullUrl = url + this._getFullUrl(queryStringParameters);
-
-    if (data) {
-      settings.body = JSON.stringify(data);
-    }
-
-    return fetch(fullUrl, settings).then((res) => {
-      if (res.status == 401) {
-        console.warn("cbl request failed", method, fullUrl, JSON.stringify(res));
-
-        throw new Error("Not authorized to " + method + " to '" + fullUrl + "' [" + res.status + "]");
-      }
-      return res
-    }).catch((err) => {
-      throw new Error("http error for '" + fullUrl + "', caused by => " + err);
-    });
-  }
 };
 
 module.exports = {manager, ReactCBLite};
