@@ -13,6 +13,7 @@
 #import "CouchbaseLite/CouchbaseLite.h"
 #import "CouchbaseLiteListener/CouchbaseLiteListener.h"
 #import "CBLRegisterJSViewCompiler.h"
+#import <AssetsLibrary/AssetsLibrary.h>
 
 @implementation ReactCBLite
 
@@ -37,18 +38,51 @@ RCT_EXPORT_METHOD(upload:(NSString *)method
                   sourceUri:(NSString *)sourceUri
                   targetUri:(NSString *)targetUri
                   contentType:(NSString *)contentType
-                  successCallback:(RCTResponseSenderBlock)callback)
+                  callback:(RCTResponseSenderBlock)callback)
 {
     
-    NSData *data;
-    if([sourceUri hasPrefix:@"/"]) {
+    if([sourceUri hasPrefix:@"assets-library"]){
+        NSLog(@"Uploading attachment from asset %@ to %@", sourceUri, targetUri);
+        
+        // thanks to
+        // * https://github.com/kamilkp/react-native-file-transfer/blob/master/RCTFileTransfer.m
+        // * http://stackoverflow.com/questions/26057394/how-to-convert-from-alassets-to-nsdata
+        
+        ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+        
+        [library assetForURL:[NSURL URLWithString:sourceUri] resultBlock:^(ALAsset *asset) {
+            
+            ALAssetRepresentation *rep = [asset defaultRepresentation];
+            
+            Byte *buffer = (Byte*)malloc(rep.size);
+            NSUInteger buffered = [rep getBytes:buffer fromOffset:0.0 length:rep.size error:nil];
+            NSData *data = [NSData dataWithBytesNoCopy:buffer length:buffered freeWhenDone:YES];
+            
+            [self sendData:method authHeader:authHeader data:data targetUri:targetUri contentType:contentType callback:callback];
+        } failureBlock:^(NSError *error) {
+            NSLog(@"Error: %@",[error localizedDescription]);
+            NSMutableDictionary* returnStuff = [NSMutableDictionary dictionary];
+            [returnStuff setObject: [error localizedDescription] forKey:@"error"];
+            callback(@[returnStuff, [NSNull null]]);
+        }];
+    } else if ([sourceUri isAbsolutePath]) {
         NSLog(@"Uploading attachment from file %@ to %@", sourceUri, targetUri);
-        data = [NSData dataWithContentsOfFile:sourceUri];
+        NSData *data = [NSData dataWithContentsOfFile:sourceUri];
+        [self sendData:method authHeader:authHeader data:data targetUri:targetUri contentType:contentType callback:callback];
     } else {
         NSLog(@"Uploading attachment from uri %@ to %@", sourceUri, targetUri);
-        data = [NSData dataWithContentsOfURL:[NSURL URLWithString:sourceUri]];
+        NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:sourceUri]];
+        [self sendData:method authHeader:authHeader data:data targetUri:targetUri contentType:contentType callback:callback];
     }
-    
+}
+
+- (void) sendData:(NSString *)method
+       authHeader:(NSString *)authHeader
+             data:(NSData *)data
+        targetUri:(NSString *)targetUri
+      contentType:(NSString *)contentType
+         callback:(RCTResponseSenderBlock)callback
+{
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:targetUri]];
     
     [request setHTTPMethod:method];
@@ -56,8 +90,9 @@ RCT_EXPORT_METHOD(upload:(NSString *)method
     [request setValue:authHeader forHTTPHeaderField:@"Authorization"];
     [request setHTTPBody:data];
     
+    NSMutableDictionary* returnStuff = [NSMutableDictionary dictionary];
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSMutableDictionary* returnStuff = [NSMutableDictionary dictionary];
         
         NSURLResponse *response;
         NSError *error = nil;
