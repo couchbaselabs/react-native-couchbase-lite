@@ -216,12 +216,12 @@ this.database.getDocument(documentId)
   });
 ```
 
-### updateDocument(jsonDocument, documentRevision)
+### updateDocument(jsonDocument, documentId, documentRevision)
 Example: Update a _person_ document, change the _gender_ field
 ```
 personDocument.gender = 'male';
 
-this.database.updateDocument(document, documentRevision)
+this.database.updateDocument(personDocument, documentId, documentRevision)
   then((res) => {
     console.log("Updated document", res);
   });

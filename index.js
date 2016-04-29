@@ -184,7 +184,7 @@ manager.prototype = {
    *
    * @param object jsonDocument
    * @param string documentId
-   * @param string documentRevision (optional)
+   * @param string documentRevision (required if updating an existing document)
    * @returns {*|promise}
    */
   updateDocument: function (jsonDocument, documentId, documentRevision) {
