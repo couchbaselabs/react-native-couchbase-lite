@@ -292,7 +292,7 @@ manager.prototype = {
       request.onload = (e) => {
         var data = JSON.parse(request.responseText);
         self.changesEventEmitter.emit(CHANGE_EVENT_TYPE, data);
-        params.seq = data.last_seq;
+        params.since = data.last_seq;
         poller(databaseUrl, databaseName, params);
       };
       request.open('GET', databaseUrl + databaseName + '/_changes' + this._getFullUrl(params));

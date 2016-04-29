@@ -364,15 +364,18 @@ this.database.getAllDocumentConflicts()
 Register for changes:
 
 ```
-db.listen();
+db.getInfo()
+  .then((res) => {
+    db.listen({since: res.update_seq - 1, feed: 'longpoll'});
+  });
 ```
 
 Receiving change notifications:
 
 ```
 db.changesEventEmitter.on('changes', function (e) {
-	console.log(e);
-});
+  console.log(e);
+}.bind(this));
 ```
 
 
