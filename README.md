@@ -437,6 +437,26 @@ return fetch(url, settings)
   });
 ```
 
+### saveAttachment(method, authHeader, sourceUri, targetUri, contentType, callback)
+Example: Save a `thumbnail` image from the Internet on the `movie` document given a URI or file path
+```
+var sourceUri = 'http://resizing.flixster.com/DeLpPTAwX3O2LszOpeaMHjbzuAw=/53x77/dkpu1ddg7pbsk.cloudfront.net/movie/11/16/47/11164719_ori.jpg';
+database.createDocument({"_id": "movie"})
+  .then(doc => {
+    database.saveAttachment(doc.id, doc.rev, 'thumbnail', sourceUri, 'image/jpg')
+      .then((res) => {
+        console.log(res);
+      });
+  });
+```
+
+### getAttachmentUri(documentId, name, documentRevision)
+Example: Get URI of attachment named `thumbnail` on the `movie` document
+```
+var uri = database.getAttachmentUri('movie', 'thumbnail', '2-c0cdd75b2b6871995a10eb3f8ce904d6');
+console.log(uri);
+```
+
 ### makeRequest(method, url, queryStringParameters, data)
 Can be used to make any query to the Couchbase lite [rest api](http://developer.couchbase.com/documentation/mobile/1.2/develop/references/couchbase-lite/rest-api/database/index.html).
 
