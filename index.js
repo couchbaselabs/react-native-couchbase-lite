@@ -210,6 +210,18 @@ manager.prototype = {
   },
 
   /**
+   * Delete a named attachment of a particular document
+   *
+   * @param documentId
+   * @param attachmentName
+   * @param documentRevision
+   * @return promise
+   */
+  deleteAttachment: function(documentId, documentRevision, attachmentName) {
+    return this.makeRequest("DELETE", this.databaseUrl + this.databaseName + "/" + documentId + "/" + attachmentName, {rev: documentRevision});
+  },
+
+  /**
    * Get a document with optional revision from the database
    *
    * @param    string documentId
@@ -379,17 +391,24 @@ manager.prototype = {
         .then((res) => {return res.json()});
   },
 
-  _makeRequest: function(settings, url, queryStringParameters) {
+  _makeRequest: function(settings, url, queryStringParameters, attemptNumber) {
 
     var fullUrl = encodeURI(url) + this._encodeParams(queryStringParameters);
 
 //    console.log("fullUrl", fullUrl);
+    var self = this;
 
     return fetch(fullUrl, settings).then((res) => {
       if (res.status == 401) {
-        console.warn("cbl request failed", settings.method, fullUrl, JSON.stringify(res));
+        console.log("cbl request failed", settings.method, fullUrl, JSON.stringify(res));
 
-        throw new Error("Not authorized to " + settings.method + " to '" + fullUrl + "' [" + res.status + "]");
+        // work-around for a bug in CBL that erroneously sends back a 401
+        if(attemptNumber > 1) {
+            throw new Error("Not authorized to " + settings.method + " to '" + fullUrl + "' [" + res.status + "]");
+        } else {
+            var attempt = attemptNumber ? attemptNumber++ : 1;
+            return self._makeRequest(settings, url, queryStringParameters, attempt)
+        }
       }
       return res
     }).catch((err) => {
