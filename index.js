@@ -1,6 +1,5 @@
 var { NativeModules } = require('react-native');
 var ReactCBLite = NativeModules.ReactCBLite;
-var FileUpload = require('NativeModules').FileUpload;
 
 var base64 = require('base-64')
   , events = require('events');
