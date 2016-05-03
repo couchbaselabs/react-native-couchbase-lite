@@ -204,10 +204,25 @@ this.database.createDocument({
 });
 ```
 
-### getDocument(documentId, revision)
-Example: get the latest document by id (revision is optional and if ommitted the latest revision is returned)
+### getDocument(documentId, options)
+Example: get specific revision of a document
 ```
-this.database.getDocument(documentId)
+var options = {rev: "1234"}
+
+this.database.getDocument(documentId, options)
+  .then((personDocument) => {
+    let docId = personDocument._id;
+    let documentRevision = personDocument._rev;
+
+    console.log("Get document", docId, documentRevision, personDocument);
+  });
+```
+
+Example: get the latest revision of a document along with it's conflicts
+```
+var options = {conflicts: true}
+
+this.database.getDocument(documentId, options)
   .then((personDocument) => {
     let docId = personDocument._id;
     let documentRevision = personDocument._rev;
