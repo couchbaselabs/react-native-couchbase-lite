@@ -184,7 +184,7 @@ manager.prototype = {
    *
    * @param object jsonDocument
    * @param string documentId
-   * @param string documentRevision (optional)
+   * @param string documentRevision (required if updating an existing document)
    * @returns {*|promise}
    */
   updateDocument: function (jsonDocument, documentId, documentRevision) {
@@ -302,7 +302,7 @@ manager.prototype = {
       request.onload = (e) => {
         var data = JSON.parse(request.responseText);
         self.changesEventEmitter.emit(CHANGE_EVENT_TYPE, data);
-        params.seq = data.last_seq;
+        params.since = data.last_seq;
         poller(databaseUrl, databaseName, params);
       };
       request.open('GET', databaseUrl + databaseName + '/_changes' + this._encodeParams(params));

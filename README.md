@@ -231,12 +231,12 @@ this.database.getDocument(documentId, options)
   });
 ```
 
-### updateDocument(jsonDocument, documentRevision)
+### updateDocument(jsonDocument, documentId, documentRevision)
 Example: Update a _person_ document, change the _gender_ field
 ```
 personDocument.gender = 'male';
 
-this.database.updateDocument(document, documentRevision)
+this.database.updateDocument(personDocument, documentId, documentRevision)
   then((res) => {
     console.log("Updated document", res);
   });
@@ -379,15 +379,18 @@ this.database.getAllDocumentConflicts()
 Register for changes:
 
 ```
-db.listen();
+db.getInfo()
+  .then((res) => {
+    db.listen({since: res.update_seq - 1, feed: 'longpoll'});
+  });
 ```
 
 Receiving change notifications:
 
 ```
 db.changesEventEmitter.on('changes', function (e) {
-	console.log(e);
-});
+  console.log(e);
+}.bind(this));
 ```
 
 

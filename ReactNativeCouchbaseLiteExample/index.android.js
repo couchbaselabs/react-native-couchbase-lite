@@ -55,7 +55,7 @@ var Home = React.createClass({
         database.replicate('http://localhost:4984/moviesapp', 'myapp');
         database.getInfo()
           .then((res) => {
-            database.listen({seq: res.update_seq - 1, feed: 'longpoll'});
+            database.listen({since: res.update_seq - 1, feed: 'longpoll'});
             database.changesEventEmitter.on('changes', function (e) {
               this.setState({sequence: e.last_seq});
             }.bind(this));
