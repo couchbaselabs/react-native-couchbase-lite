@@ -5,6 +5,7 @@
 .DS_Store
 /build
 /captures
+node_modules
 
 .DS_Store
 *.swp
