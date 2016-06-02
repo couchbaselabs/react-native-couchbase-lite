@@ -1,4 +1,4 @@
-var { NativeModules } = require('react-native');
+var {NativeModules} = require('react-native');
 var ReactCBLite = NativeModules.ReactCBLite;
 
 var base64 = require('base-64')
@@ -25,7 +25,7 @@ manager.prototype = {
    *
    * @returns {*|promise}
    */
-  createDatabase: function() {
+  createDatabase: function () {
     return this.makeRequest("PUT", this.databaseUrl + this.databaseName, null, null);
   },
 
@@ -34,7 +34,7 @@ manager.prototype = {
    *
    * @returns {*|promise}
    */
-  deleteDatabase: function() {
+  deleteDatabase: function () {
     return this.makeRequest("DELETE", this.databaseUrl + this.databaseName, null, null);
   },
 
@@ -45,7 +45,7 @@ manager.prototype = {
    *
    * @returns {*|promise}
    */
-  getChanges: function(options) {
+  getChanges: function (options) {
     return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_changes", options);
   },
 
@@ -54,7 +54,7 @@ manager.prototype = {
    *
    * @returns {*|promise}
    */
-  latestRevision: function() {
+  latestRevision: function () {
     return this.getInfo()
       .then((res) => {
         return res.update_seq;
@@ -68,7 +68,7 @@ manager.prototype = {
    *
    * @returns {*|promise}
    */
-  getInfo: function() {
+  getInfo: function () {
     return this.makeRequest("GET", this.databaseUrl + this.databaseName)
   },
 
@@ -77,7 +77,7 @@ manager.prototype = {
    *
    * @returns {*|promise}
    */
-  activeTasks: function() {
+  activeTasks: function () {
     return this.makeRequest("GET", this.databaseUrl + "_active_tasks")
   },
 
@@ -88,7 +88,7 @@ manager.prototype = {
    *
    * @returns {*|promise}
    */
-  getAllDatabases: function() {
+  getAllDatabases: function () {
     return this.makeRequest("GET", this.databaseUrl + "_all_dbs")
   },
 
@@ -99,7 +99,7 @@ manager.prototype = {
    * @param    object designDocumentViews
    * @return   promise
    */
-  createDesignDocument: function(designDocumentName, designDocumentBody) {
+  createDesignDocument: function (designDocumentName, designDocumentBody) {
     return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/_design/" + designDocumentName, null, designDocumentBody);
   },
 
@@ -109,7 +109,7 @@ manager.prototype = {
    * @param    string designDocumentName
    * @return   promise
    */
-  getDesignDocument: function(designDocumentName) {
+  getDesignDocument: function (designDocumentName) {
     return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_design/" + designDocumentName);
   },
 
@@ -120,7 +120,7 @@ manager.prototype = {
    * @param documentRevision
    * @return promise
    */
-  deleteDesignDocument: function(designDocumentName, documentRevision) {
+  deleteDesignDocument: function (designDocumentName, documentRevision) {
     var documentId = "_design/" + designDocumentName;
     return this.deleteDocument(documentId, documentRevision);
   },
@@ -145,12 +145,12 @@ manager.prototype = {
    * @param    object queryStringParameters
    * @return   promise
    */
-  queryView: function(designDocumentName, viewName, options) {
+  queryView: function (designDocumentName, viewName, options) {
     var url = this.databaseUrl + this.databaseName + "/_design/" + designDocumentName + "/_view/" + viewName;
 
     var queryStringParameters = {};
-    if(options) {
-      for(var key in options) {
+    if (options) {
+      for (var key in options) {
         var value = options[key];
         queryStringParameters[key] = JSON.stringify(value);
       }
@@ -188,9 +188,9 @@ manager.prototype = {
    * @returns {*|promise}
    */
   updateDocument: function (jsonDocument, documentId, documentRevision) {
-    var options = {}
+    var options = {};
 
-    if(documentRevision) {
+    if (documentRevision) {
       options.rev = documentRevision;
     }
 
@@ -204,7 +204,7 @@ manager.prototype = {
    * @param documentRevision
    * @return promise
    */
-  deleteDocument: function(documentId, documentRevision) {
+  deleteDocument: function (documentId, documentRevision) {
     return this.makeRequest("DELETE", this.databaseUrl + this.databaseName + "/" + documentId, {rev: documentRevision});
   },
 
@@ -216,7 +216,7 @@ manager.prototype = {
    * @param documentRevision
    * @return promise
    */
-  deleteAttachment: function(documentId, documentRevision, attachmentName) {
+  deleteAttachment: function (documentId, documentRevision, attachmentName) {
     return this.makeRequest("DELETE", this.databaseUrl + this.databaseName + "/" + documentId + "/" + attachmentName, {rev: documentRevision});
   },
 
@@ -227,7 +227,7 @@ manager.prototype = {
    * @param    object options
    * @return   promise
    */
-  getDocument: function(documentId, options) {
+  getDocument: function (documentId, options) {
     return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/" + documentId, options);
   },
 
@@ -239,11 +239,11 @@ manager.prototype = {
    * @param   options
    * @returns {*|promise}
    */
-  getDocuments: function(options) {
-    var queryStringParameters = {}
+  getDocuments: function (options) {
+    var queryStringParameters = {};
 
-    if(options) {
-      for(var key in options) {
+    if (options) {
+      for (var key in options) {
         var value = options[key];
         queryStringParameters[key] = JSON.stringify(value);
       }
@@ -259,7 +259,7 @@ manager.prototype = {
    *
    * @returns {*|promise}
    */
-  getAllDocuments: function(options) {
+  getAllDocuments: function (options) {
     return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_all_docs", options);
   },
 
@@ -268,7 +268,7 @@ manager.prototype = {
    *
    * @returns {*|promise}
    */
-  getAllDocumentConflicts: function() {
+  getAllDocumentConflicts: function () {
     return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_all_docs", {only_conflicts: true});
   },
 
@@ -281,7 +281,7 @@ manager.prototype = {
    * @param boolean createTarget
    * @returns {*|promise}
    */
-  replicate: function(source, target, continuous, createTarget) {
+  replicate: function (source, target, continuous, createTarget) {
     var replicateUrl = this.databaseUrl + "_replicate";
 
     return this.makeRequest("POST", replicateUrl, {}, {
@@ -295,7 +295,7 @@ manager.prototype = {
   /**
    * Listen for database changes
    */
-  listen: function(queryStringParams) {
+  listen: function (queryStringParams) {
     var poller = function (databaseUrl, databaseName, params) {
       var request = new XMLHttpRequest();
       var self = this;
@@ -321,10 +321,10 @@ manager.prototype = {
    *
    * @returns string
    */
-  getAttachmentUri: function(documentId, name, documentRevision) {
+  getAttachmentUri: function (documentId, name, documentRevision) {
     var url = encodeURI(this.databaseUrl + this.databaseName + "/" + documentId + "/" + name);
 
-    if(documentRevision) {
+    if (documentRevision) {
       url += "?rev=" + encodeURIComponent(documentRevision);
     }
 
@@ -342,13 +342,13 @@ manager.prototype = {
    *
    * @returns {*|promise}
    */
-  saveAttachment: function(documentId, documentRevision, name, path, contentType) {
+  saveAttachment: function (documentId, documentRevision, name, path, contentType) {
     var uploadUrl = encodeURI(this.databaseUrl + this.databaseName + "/" + documentId + "/" + name) + "?rev=" + encodeURIComponent(documentRevision);
 
     return new Promise((resolve, reject) => {
       ReactCBLite.upload("PUT", this.authHeader, path, uploadUrl, contentType,
         (err, success) => {
-          if(err) {
+          if (err) {
             reject(err);
           } else {
             resolve(success);
@@ -367,10 +367,10 @@ manager.prototype = {
    * @param object data
    * @returns {*|promise}
    */
-  makeRequest: function(method, url, queryStringParameters, data) {
+  makeRequest: function (method, url, queryStringParameters, data) {
     var body;
-    if(data) {
-        body = JSON.stringify(data);
+    if (data) {
+      body = JSON.stringify(data);
     }
 
     var settings = {
@@ -387,10 +387,12 @@ manager.prototype = {
     }
 
     return this._makeRequest(settings, url, queryStringParameters, body)
-        .then((res) => {return res.json()});
+      .then((res) => {
+        return res.json()
+      });
   },
 
-  _makeRequest: function(settings, url, queryStringParameters, attemptNumber) {
+  _makeRequest: function (settings, url, queryStringParameters, attemptNumber) {
 
     var fullUrl = encodeURI(url) + this._encodeParams(queryStringParameters);
 
@@ -402,11 +404,11 @@ manager.prototype = {
         console.log("cbl request failed", settings.method, fullUrl, JSON.stringify(res));
 
         // work-around for a bug in CBL that erroneously sends back a 401
-        if(attemptNumber > 1) {
-            throw new Error("Not authorized to " + settings.method + " to '" + fullUrl + "' [" + res.status + "]");
+        if (attemptNumber > 1) {
+          throw new Error("Not authorized to " + settings.method + " to '" + fullUrl + "' [" + res.status + "]");
         } else {
-            var attempt = attemptNumber ? attemptNumber++ : 1;
-            return self._makeRequest(settings, url, queryStringParameters, attempt)
+          var attempt = attemptNumber ? attemptNumber++ : 1;
+          return self._makeRequest(settings, url, queryStringParameters, attempt)
         }
       }
       return res
@@ -418,22 +420,22 @@ manager.prototype = {
   _encodeParams: function (queryStringParameters) {
     var queryString = "";
 
-    if(queryStringParameters) {
+    if (queryStringParameters) {
       var parts = [];
 
-      for(var key in queryStringParameters) {
+      for (var key in queryStringParameters) {
         var value = queryStringParameters[key];
         var part = key + "=" + encodeURIComponent(value);
         parts.push(part);
       }
 
-      if(parts.length > 0) {
+      if (parts.length > 0) {
         queryString = "?" + parts.join("&");
       }
     }
 
     return queryString;
-  },
+  }
 };
 
 module.exports = {manager, ReactCBLite};
