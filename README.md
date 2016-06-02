@@ -301,14 +301,16 @@ let designDoc = {
         emit(doc.firstname.toLowerCase(), null);
         emit(doc.lastname.toLowerCase(), null);
       }
-  }.toString(),
+    }.toString(),
+  }
 
   person_age_view: {
     "map": function (doc) {
       if(doc.type === 'person') {
         emit([doc.gender, doc.age], null);
       }
-  }.toString()
+    }.toString(),
+  }
 }
 
 this.database.createDesignDocument('my_design_doc', designDocument)
