@@ -1,3 +1,9 @@
+# Couchbase Lite
+ios/CBLRegisterJSViewCompiler.h
+ios/CouchbaseLite.framework
+ios/CouchbaseLiteListener.framework
+ios/libCBLJSViewCompiler.a
+
 # OSX
 #
 .DS_Store
