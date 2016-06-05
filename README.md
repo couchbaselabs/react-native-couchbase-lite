@@ -2,13 +2,44 @@
 
 Couchbase Lite binding for react-native on both iOS and Android.
 
-### Installation
+## Using rnpm
 
-- For iOS, you may have created your React Native project through Cocoapods or using the `react-native init` command. 
-Make sure to follow the correct installation instructions below depending on which method you used.
-- For Android, see below on how to add the dependency in Android Studio.
+Create a new React Native project:
+```
+react-native init UntitledApp
+cd UntitledApp
+```
+Install the React Native Couchbase Lite module:
+```
+npm install --save react-native-couchbase-lite
+```
+Link the module using rnpm:
+```
+rnpm link react-native-couchbase-lite
+```
 
-## iOS (react-native init)
+Follow the steps below to finish the installation.
+
+### iOS
+
+* Download the Couchbase Lite iOS SDK from [here](http://www.couchbase.com/nosql-databases/downloads#) and drag CouchbaseLite.framework, CouchbaseLiteListener.framework in the Xcode project:
+
+![](http://cl.ly/image/3Z1b0n0W0i3w/sdk.png)
+
+### Android
+
+Add the following in `android/app/build.gradle` under the `android` section:
+```
+packagingOptions {
+		exclude 'META-INF/ASL2.0'
+		exclude 'META-INF/LICENSE'
+		exclude 'META-INF/NOTICE'
+}
+```
+
+## Install manually
+
+### iOS (react-native init)
 
 ```
 $ react-init RNTestProj
@@ -36,7 +67,7 @@ $ npm install react-native-couchbase-lite --save
 
 ![](http://cl.ly/image/3Z1b0n0W0i3w/sdk.png)
 
-## iOS (Cocoapods)
+### iOS (Cocoapods)
 
 * Install both npm modules:
 
@@ -66,7 +97,7 @@ $ pod install
 
 ![](http://cl.ly/2G1L392h0b1Z/Image%202016-01-27%20at%2010.30.32%20pm.png)
 
-## Android
+### Android
 
 * Add the `react-native-couchbase-lite` project to your existing React Native project in `android/settings.gradle`
 
