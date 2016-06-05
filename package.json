@@ -1,29 +1,32 @@
 {
   "name": "react-native-couchbase-lite",
   "version": "0.3.0",
-  "description": "couchbase lite binding for react-native",
+  "description": "Install Couchbase Lite in your app to enable JSON sync.",
+  "homepage": "http://developer.couchbase.com/mobile/",
+  "keywords": [
+    "sync",
+    "json",
+    "database",
+    "sqlite",
+    "react-component",
+    "react-native"
+  ],
+  "author": {
+    "name": "Couchbase Mobile",
+    "email": "mobile@couchbase.com",
+    "url": "http://developer.couchbase.com/mobile/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/couchbaselabs/react-native-couchbase-lite.git"
+  },
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/fraserxu/react-native-couchbase-lite.git"
-  },
-  "keywords": [
-    "react-component",
-    "react-native",
-    "android"
-  ],
-  "peerDependencies": {
-    "react-native": ">=0.14"
-  },
-  "author": "Fraser Xu",
-  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/fraserxu/react-native-couchbase-lite/issues"
+    "url": "https://github.com/couchbaselabs/react-native-couchbase-lite/issues"
   },
-  "homepage": "https://github.com/fraserxu/react-native-couchbase-lite#readme",
   "dependencies": {
     "base-64": "^0.1.0",
     "events": "^1.1.0"
