@@ -16,29 +16,22 @@ import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 
 import static me.fraserxu.rncouchbaselite.ReactNativeJson.convertJsonToMap;
 
@@ -47,6 +40,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
     public static final String REACT_CLASS = "ReactCBLite";
     private static final String TAG = "ReactCBLite";
     private ReactApplicationContext context;
+
     public ReactCBLite(ReactApplicationContext reactContext) {
         super(reactContext);
         this.context = reactContext;
@@ -58,44 +52,10 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void init(int listenPort, String login, String password, Callback errorCallback) {
-        initCBLite(listenPort, login, password, errorCallback);
-    }
-
-    @ReactMethod
-    public void upload(String method, String authHeader, String sourceUri, String targetUri, String contentType, Callback callback) {
-        if(method == null || !method.toUpperCase().equals("PUT")) {
-            callback.invoke("Bad parameter method: " + method);
-            return;
-        }
-        if(authHeader == null) {
-            callback.invoke("Bad parameter authHeader");
-            return;
-        }
-        if(sourceUri == null) {
-            callback.invoke("Bad parameter sourceUri");
-            return;
-        }
-        if(targetUri == null) {
-            callback.invoke("Bad parameter targetUri");
-            return;
-        }
-        if(contentType == null) {
-            callback.invoke("Bad parameter contentType");
-            return;
-        }
-        if(callback == null) {
-            Log.e(TAG, "no callback");
-            return;
-        }
-
-        SaveAttachmentTask saveAttachmentTask = new SaveAttachmentTask(method, authHeader, sourceUri, targetUri, contentType, callback);
-        saveAttachmentTask.execute();
-    }
-
-    private void initCBLite(int listenPort, String login, String password, Callback callback) {
+    public void init(Callback callback) {
         try {
-            Credentials allowedCredentials = new Credentials(login, password);
+            int suggestedPort = 5984;
+            Credentials allowedCredentials = new Credentials("admin", UUID.randomUUID().toString());
 
             View.setCompiler(new JavaScriptViewCompiler());
             Database.setFilterCompiler(new JavaScriptReplicationFilterCompiler());
@@ -114,20 +74,54 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
             Manager.enableLogging(Log.TAG_ROUTER, Log.VERBOSE);
             Manager manager = new Manager(context, Manager.DEFAULT_OPTIONS);
 
-            listenPort = startCBLListener(listenPort, manager, allowedCredentials);
+            int actualPort = startCBLListener(suggestedPort, manager, allowedCredentials);
 
-            Log.i(TAG, "initCBLite() completed successfully with: " + String.format(
+            String url = String.format(
                     "http://%s:%s@localhost:%d/",
                     allowedCredentials.getLogin(),
                     allowedCredentials.getPassword(),
-                    listenPort));
+                    actualPort
+            );
 
-            callback.invoke();
+            Log.i(TAG, "CBLite init completed successfully with: " + url);
+
+            callback.invoke(url, null);
 
         } catch (final Exception e) {
             Log.e(TAG, "Couchbase init failed", e);
-            callback.invoke(e.getMessage());
+            callback.invoke(null, e.getMessage());
         }
+    }
+
+    @ReactMethod
+    public void upload(String method, String authHeader, String sourceUri, String targetUri, String contentType, Callback callback) {
+        if (method == null || !method.toUpperCase().equals("PUT")) {
+            callback.invoke("Bad parameter method: " + method);
+            return;
+        }
+        if (authHeader == null) {
+            callback.invoke("Bad parameter authHeader");
+            return;
+        }
+        if (sourceUri == null) {
+            callback.invoke("Bad parameter sourceUri");
+            return;
+        }
+        if (targetUri == null) {
+            callback.invoke("Bad parameter targetUri");
+            return;
+        }
+        if (contentType == null) {
+            callback.invoke("Bad parameter contentType");
+            return;
+        }
+        if (callback == null) {
+            Log.e(TAG, "no callback");
+            return;
+        }
+
+        SaveAttachmentTask saveAttachmentTask = new SaveAttachmentTask(method, authHeader, sourceUri, targetUri, contentType, callback);
+        saveAttachmentTask.execute();
     }
 
     private int startCBLListener(int listenPort, Manager manager, Credentials allowedCredentials) {
@@ -224,7 +218,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
             WritableMap map = Arguments.createMap();
             map.putInt("statusCode", responseCode);
 
-            if(responseCode == 200 || responseCode == 202) {
+            if (responseCode == 200 || responseCode == 202) {
                 try {
                     JSONObject jsonObject = new JSONObject(uploadResult.response);
                     map.putMap("resp", convertJsonToMap(jsonObject));
