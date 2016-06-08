@@ -1,14 +1,50 @@
 # react-native-couchbase-lite
 
+* [Using rnpm](#using-rnpm)
+* [Install manually](#install-manually)
+* [Usage](#usage)
+* [Examples](#examples)
+
 Couchbase Lite binding for react-native on both iOS and Android.
 
-### Installation
+## Using rnpm
 
-- For iOS, you may have created your React Native project through Cocoapods or using the `react-native init` command. 
-Make sure to follow the correct installation instructions below depending on which method you used.
-- For Android, see below on how to add the dependency in Android Studio.
+Create a new React Native project:
+```
+react-native init UntitledApp
+cd UntitledApp
+```
+Install the React Native Couchbase Lite module:
+```
+npm install --save react-native-couchbase-lite
+```
+Link the module using rnpm:
+```
+rnpm link react-native-couchbase-lite
+```
 
-## iOS (react-native init)
+Follow the steps below to finish the installation.
+
+### iOS
+
+* Download the Couchbase Lite iOS SDK from [here](http://www.couchbase.com/nosql-databases/downloads#) and drag CouchbaseLite.framework, CouchbaseLiteListener.framework in the Xcode project:
+
+![](http://cl.ly/image/3Z1b0n0W0i3w/sdk.png)
+
+### Android
+
+Add the following in `android/app/build.gradle` under the `android` section:
+```
+packagingOptions {
+		exclude 'META-INF/ASL2.0'
+		exclude 'META-INF/LICENSE'
+		exclude 'META-INF/NOTICE'
+}
+```
+
+## Install manually
+
+### iOS (react-native init)
 
 ```
 $ react-init RNTestProj
@@ -36,7 +72,7 @@ $ npm install react-native-couchbase-lite --save
 
 ![](http://cl.ly/image/3Z1b0n0W0i3w/sdk.png)
 
-## iOS (Cocoapods)
+### iOS (Cocoapods)
 
 * Install both npm modules:
 
@@ -66,7 +102,7 @@ $ pod install
 
 ![](http://cl.ly/2G1L392h0b1Z/Image%202016-01-27%20at%2010.30.32%20pm.png)
 
-## Android
+### Android
 
 * Add the `react-native-couchbase-lite` project to your existing React Native project in `android/settings.gradle`
 
@@ -129,11 +165,11 @@ $ pod install
   }
   ```
 
-#### Usage
+## Usage
 
 In your app entry, init and start the Couchbase Lite Listener
 
-```JavaScript
+```js
 import {manager, ReactCBLite} from 'react-native-couchbase-lite'
 // init the Listener with a port and login credentials
 ReactCBLite.init(5984, 'admin', 'password', e => {
@@ -156,13 +192,13 @@ See the [example project](https://github.com/fraserxu/react-native-couchbase-lit
 
 
 
-## Available commands & examples
+## Examples
 
 The full api is [here](https://github.com/fraserxu/react-native-couchbase-lite/blob/master/index.js)
 
 ### createDatabase
 Example: Create a local Couchbase Lite database named 'dbname'
-```
+```js
 let localDbPort = 5984;
 let localDbAppName = 'dbname';
 let localDbUserId = 'local_user';
@@ -182,7 +218,7 @@ this.database.createDatabase()
 ```
 
 ### deleteDatabase
-```
+```js
 this.database.deleteDatabase()
   .then((res) => {
     console.log('deleted database!', res);
@@ -191,7 +227,7 @@ this.database.deleteDatabase()
 
 ### createDocument(jsonDocument)
 Example: Create a _person_ document
-```
+```js
 this.database.createDocument({
   type: 'person',
   age: 26,
@@ -206,7 +242,7 @@ this.database.createDocument({
 
 ### getDocument(documentId, options)
 Example: get specific revision of a document
-```
+```js
 var options = {rev: "1234"}
 
 this.database.getDocument(documentId, options)
@@ -219,7 +255,7 @@ this.database.getDocument(documentId, options)
 ```
 
 Example: get the latest revision of a document along with it's conflicts
-```
+```js
 var options = {conflicts: true}
 
 this.database.getDocument(documentId, options)
@@ -233,7 +269,7 @@ this.database.getDocument(documentId, options)
 
 ### updateDocument(jsonDocument, documentId, documentRevision)
 Example: Update a _person_ document, change the _gender_ field
-```
+```js
 personDocument.gender = 'male';
 
 this.database.updateDocument(personDocument, documentId, documentRevision)
@@ -244,7 +280,7 @@ this.database.updateDocument(personDocument, documentId, documentRevision)
 
 ### deleteDocument(documentId, documentRevision)
 Example: delete a document revision
-```
+```js
 this.database.deleteDocument(documentId, documentRevision)
   then((res) => {
     console.log("Updated document", res);
@@ -252,7 +288,7 @@ this.database.deleteDocument(documentId, documentRevision)
 ```
 
 ### modifyDocuments(jsonDocuments)
-```
+```js
 let docs = [docA, docB, docC];
 
 this.database.modifyDocuments(docs)
@@ -263,7 +299,7 @@ this.database.modifyDocuments(docs)
 
 ### getAllDocuments()
 Example: just run the \_all\_docs query
-```
+```js
 this.database.getAllDocuments()
   .then((res) => {
     console.log("all-docs", res);
@@ -272,7 +308,7 @@ this.database.getAllDocuments()
 
 ### getChanges(options)
 Example: request changes since the start of time, and subsequently only get changes since the last request 
-```
+```js
 if(this.since) {
   let options = {
     since: this.since
@@ -293,7 +329,7 @@ this.database.getChanges(options)
 
 ### createDesignDocument(name, views)
 Example: create a design document called _my_design_doc_ containing 2 views, one that indexes _person_ documents by *firstname* and *lastname* and the other by *age* coupled with *gender*
-```
+```js
 let designDoc = {
   person_name_view: {
     "map": function (doc) {
@@ -321,7 +357,7 @@ this.database.createDesignDocument('my_design_doc', designDocument)
 
 ### getDesignDocument(name)
 Example: this will return the views of the the design document called _my_design_doc_ (created above)
-```
+```js
 this.database.getDesignDocument('my_design_doc')
   then((res) => {
     console.log("retreived a design document", res);
@@ -330,7 +366,7 @@ this.database.getDesignDocument('my_design_doc')
 
 ### deleteDesignDocument(name, revision)
 Example: this will delete revision _1_ of the the design document called _my_design_doc_ (created above)
-```
+```js
 let rev = 1;// must query the db to get this value
 this.database.getDesignDocument('my_design_doc', rev)
   then((res) => {
@@ -340,7 +376,7 @@ this.database.getDesignDocument('my_design_doc', rev)
 
 ### queryView(designDocumentName, viewName, queryStringParameters)
 Example: find all person documents who have a _firstname_ or _lastname_ field that match any of 'john', 'paul', 'ringo' or 'george'
-```
+```js
 let options = {
     keys: ['john', 'paul', 'ringo', 'george']
 };
@@ -353,7 +389,7 @@ this.database.queryView('my_design_doc', 'person_name_view', options)
   });
 ```
 Example: find all person documents that have _gender_ 'male' and _age_ under 25
-```
+```js
 let options = {
   descending: true,
   startkey: ['male', 25],
@@ -369,7 +405,7 @@ this.database.queryView('my_design_doc', 'person_age_view', options)
 ```
 
 ### getAllDocumentConflicts()
-```
+```js
 this.database.getAllDocumentConflicts()
   .then((res) => {
     console.log('documents in conflict', res);
@@ -380,7 +416,7 @@ this.database.getAllDocumentConflicts()
 
 Register for changes:
 
-```
+```js
 db.getInfo()
   .then((res) => {
     db.listen({since: res.update_seq - 1, feed: 'longpoll'});
@@ -389,7 +425,7 @@ db.getInfo()
 
 Receiving change notifications:
 
-```
+```js
 db.changesEventEmitter.on('changes', function (e) {
   console.log(e);
 }.bind(this));
@@ -398,7 +434,7 @@ db.changesEventEmitter.on('changes', function (e) {
 
 ### replicate(source, target, continuous) 
 Example: set continuous up bi-directional sync using a session cookie acquired from the sync gateway
-```
+```js
 let userId = 'user1';
 let passowrd = 'password1';
 let dbName = 'dbname';
@@ -441,7 +477,7 @@ return fetch(url, settings)
 
 ### saveAttachment(method, authHeader, sourceUri, targetUri, contentType, callback)
 Example: Save a `thumbnail` image from the Internet on the `movie` document given a URI or file path
-```
+```js
 var sourceUri = 'http://resizing.flixster.com/DeLpPTAwX3O2LszOpeaMHjbzuAw=/53x77/dkpu1ddg7pbsk.cloudfront.net/movie/11/16/47/11164719_ori.jpg';
 database.createDocument({"_id": "movie"})
   .then(doc => {
@@ -454,7 +490,7 @@ database.createDocument({"_id": "movie"})
 
 ### getAttachmentUri(documentId, name, documentRevision)
 Example: Get URI of attachment named `thumbnail` on the `movie` document
-```
+```js
 var uri = database.getAttachmentUri('movie', 'thumbnail', '2-c0cdd75b2b6871995a10eb3f8ce904d6');
 console.log(uri);
 ```

@@ -29,6 +29,16 @@
   },
   "dependencies": {
     "base-64": "^0.1.0",
-    "events": "^1.1.0"
+    "events": "^1.1.0",
+    "rnpm": "1.6.5",
+    "xcode": "0.8.4"
+  },
+  "rnpm": {
+    "commands": {
+      "postlink": "node_modules/react-native-couchbase-lite/scripts/rnpm-postlink.js"
+    },
+    "ios": {
+      "project": "ios/ReactCBLite.xcodeproj"
+    }
   }
 }
