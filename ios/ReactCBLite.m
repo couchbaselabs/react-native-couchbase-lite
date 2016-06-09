@@ -19,18 +19,15 @@
 
 RCT_EXPORT_MODULE()
 
-RCT_EXPORT_METHOD(init:(float)port username:(NSString *)username password:(NSString *)password callback:(RCTResponseSenderBlock)callback)
+RCT_EXPORT_METHOD(init:(RCTResponseSenderBlock)callback)
 {
     NSLog(@"Launching Couchbase Lite...");
     CBLManager* dbmgr = [CBLManager sharedInstance];
     CBLRegisterJSViewCompiler();
     
-    CBLListener* listener = [[CBLListener alloc] initWithManager:dbmgr port:port];
-    [listener setPasswords:@{username: password}];
-    [listener start:nil];
-    
-    NSLog(@"Couchbase Lite url = %@", listener.URL);
-    callback(@[[NSNull null]]);
+    NSURL* url = dbmgr.internalURL;
+    NSLog(@"Couchbase Lite server url = %@", url);
+    callback(@[url.absoluteString]);
 }
 
 RCT_EXPORT_METHOD(upload:(NSString *)method
