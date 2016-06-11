@@ -171,10 +171,26 @@ In your app entry, init and start the Couchbase Lite Listener
 
 ```js
 import {manager, ReactCBLite} from 'react-native-couchbase-lite'
+import {Platform} from "react-native";
+
 // init the Listener with a port and login credentials
-ReactCBLite.init(5984, 'admin', 'password', e => {
-	console.log('initialized');
-});
+// temporarily for the current release, the IOS and android initialization differs:
+
+if (Platform.OS === 'android') {
+  // the callback passes a url that should be used to connect to the database
+  ReactCBLite.init((url, err) => {
+    if(err) {
+      console.log("cbl init failed", err);
+    } else {
+      console.log('initialized at', url);
+    }
+  });
+} else {
+  // use these parameters to create a url that should be used to connect to the database
+  ReactCBLite.init(5984, 'admin', 'password', () => {
+    console.log('initialized');
+  });
+}
 
 // instantiate a new database
 var database = new manager('http://admin:password@localhost:5984/', 'myapp');
