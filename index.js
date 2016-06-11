@@ -148,15 +148,7 @@ manager.prototype = {
   queryView: function (designDocumentName, viewName, options) {
     var url = this.databaseUrl + this.databaseName + "/_design/" + designDocumentName + "/_view/" + viewName;
 
-    var queryStringParameters = {};
-    if (options) {
-      for (var key in options) {
-        var value = options[key];
-        queryStringParameters[key] = JSON.stringify(value);
-      }
-    }
-
-    return this.makeRequest("GET", url, queryStringParameters);
+    return this.makeRequest("GET", url, options);
   },
 
   /**
@@ -240,16 +232,7 @@ manager.prototype = {
    * @returns {*|promise}
    */
   getDocuments: function (options) {
-    var queryStringParameters = {};
-
-    if (options) {
-      for (var key in options) {
-        var value = options[key];
-        queryStringParameters[key] = JSON.stringify(value);
-      }
-    }
-
-    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_all_docs", queryStringParameters);
+    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_all_docs", options);
   },
 
   /**
@@ -290,6 +273,20 @@ manager.prototype = {
       continuous: continuous,
       create_target: createTarget
     });
+  },
+
+  /**
+   * Cancel a replication task
+   *
+   * @param object task
+   * @returns {*|promise}
+   */
+  cancelReplicate: function (task) {
+    var replicateUrl = this.databaseUrl + "_replicate";
+
+    task.cancel = true;
+
+    return this.makeRequest("POST", replicateUrl, {}, task);
   },
 
   /**
@@ -401,16 +398,17 @@ manager.prototype = {
 
     return fetch(fullUrl, settings).then((res) => {
       if (res.status == 401) {
-        console.log("cbl request failed", settings.method, fullUrl, JSON.stringify(res));
+        console.log("cbl request failed auth", settings, fullUrl, res);
 
         // work-around for a bug in CBL that erroneously sends back a 401
         if (attemptNumber > 1) {
-          throw new Error("Not authorized to " + settings.method + " to '" + fullUrl + "' [" + res.status + "]");
+          throw new Error("Not authorized to " + settings + " to '" + fullUrl + "' [" + res.status + "]");
         } else {
           var attempt = attemptNumber ? attemptNumber++ : 1;
           return self._makeRequest(settings, url, queryStringParameters, attempt)
         }
       }
+
       return res
     }).catch((err) => {
       throw new Error("http error for " + settings.method + " '" + fullUrl + "', caused by => " + err);
