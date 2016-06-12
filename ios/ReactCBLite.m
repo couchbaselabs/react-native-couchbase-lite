@@ -28,6 +28,15 @@ RCT_EXPORT_METHOD(init:(RCTResponseSenderBlock)callback)
     NSURL* url = dbmgr.internalURL;
     NSLog(@"Couchbase Lite server url = %@", url);
     callback(@[url.absoluteString]);
+    
+    NSString *urlStr = @"http://lite.couchbase./";
+    NSURL *dbUrl = [NSURL URLWithString:urlStr];
+    NSURLRequest *request = [NSURLRequest requestWithURL:dbUrl];
+    NSURLResponse *response;
+    NSError *error;
+    NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    NSString *responseStr = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+    NSLog(@"responseStr = %@", responseStr);
 }
 
 RCT_EXPORT_METHOD(upload:(NSString *)method

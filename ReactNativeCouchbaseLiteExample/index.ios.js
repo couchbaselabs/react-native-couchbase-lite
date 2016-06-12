@@ -15,7 +15,8 @@ var {
 } = React;
 
 var ReactCBLite = require('react-native').NativeModules.ReactCBLite;
-ReactCBLite.init(5984, 'admin', 'password', (e) => {
+ReactCBLite.init((url) => {
+  console.log(url);
 });
 
 var {manager} = require('react-native-couchbase-lite');
@@ -39,7 +40,7 @@ var Home = React.createClass({
     }
   },
   componentDidMount() {
-    var database = new manager('http://admin:password@localhost:5984/', 'myapp');
+    var database = new manager('http://lite.couchbase./', 'myapp');
     database.createDatabase()
       .then((res) => {
         database.createDesignDocument('main', {
@@ -74,7 +75,7 @@ var Home = React.createClass({
         });
       })
       .catch((ex) => {
-        console.log(ex)
+        throw ex;
       });
   },
   render() {
