@@ -19,17 +19,21 @@
 
 RCT_EXPORT_MODULE()
 
-RCT_EXPORT_METHOD(init:(float)port username:(NSString *)username password:(NSString *)password callback:(RCTResponseSenderBlock)callback)
+RCT_EXPORT_METHOD(init:(RCTResponseSenderBlock)callback)
 {
     @try {
+
+        NSString* username = [NSString stringWithFormat:@"u%d", arc4random() % 100000000];
+        NSString* password = [NSString stringWithFormat:@"p%d", arc4random() % 100000000];
+
         NSLog(@"Launching Couchbase Lite...");
         CBLManager* dbmgr = [CBLManager sharedInstance];
         CBLRegisterJSViewCompiler();
 
         int suggestedPort = 5984;
-        
+
         listener = [self startListener:suggestedPort withUsername:username withPassword:password withCBLManager: dbmgr];
-        
+
         NSLog(@"Couchbase Lite listening on port <%@>", listener.URL.port);
         NSString *extenalUrl = [NSString stringWithFormat:@"http://%@:%@@localhost:%@/", username, password, listener.URL.port];
         callback(@[extenalUrl, [NSNull null]]);
@@ -44,23 +48,23 @@ RCT_EXPORT_METHOD(init:(float)port username:(NSString *)username password:(NSStr
                   withPassword: (NSString *) password
                 withCBLManager: (CBLManager*) cblManager
 {
-    
+
     CBLListener* listener = [[CBLListener alloc] initWithManager:cblManager port:port];
     [listener setPasswords:@{username: password}];
-    
+
     NSLog(@"Trying port %d", port);
-    
+
     NSError *err = nil;
     BOOL success = [listener start: &err];
-    
+
     if (success) {
         NSLog(@"Couchbase Lite running on %@", listener.URL);
         return listener;
     } else {
         NSLog(@"Could not start listener on port %d: %@", port, err);
-        
+
         port++;
-        
+
         return [self startListener:port withUsername:username withPassword:password withCBLManager: cblManager];
     }
 }
@@ -68,9 +72,8 @@ RCT_EXPORT_METHOD(init:(float)port username:(NSString *)username password:(NSStr
 // needed because the OS appears to kill the listener when the app becomes inactive (when the screen is locked, or its put in the background)
 RCT_EXPORT_METHOD(wake)
 {
-    [listener stop];
-
     NSError* error;
+    [listener stop];// not sure this does anything
     if ([listener start:&error]) {
         NSLog(@"Couchbase Lite listening at %@", listener.URL);
     } else {
