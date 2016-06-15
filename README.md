@@ -5,7 +5,7 @@
 * [Usage](#usage)
 * [Examples](#examples)
 
-Couchbase Lite binding for react-native on both iOS and Android.
+Couchbase Lite binding for react-native on both iOS and Android. It works by exposing some functionality to the native Couchcase Lite and the remaining actions are peformed via the REST API.
 
 ## Using rnpm
 
@@ -347,21 +347,23 @@ this.database.getChanges(options)
 Example: create a design document called _my_design_doc_ containing 2 views, one that indexes _person_ documents by *firstname* and *lastname* and the other by *age* coupled with *gender*
 ```js
 let designDoc = {
-  person_name_view: {
-    "map": function (doc) {
-      if(doc.type === 'person') {
-        emit(doc.firstname.toLowerCase(), null);
-        emit(doc.lastname.toLowerCase(), null);
-      }
-    }.toString(),
-  }
+  "views: {
+    person_name_view: {
+      "map": function (doc) {
+        if(doc.type === 'person') {
+          emit(doc.firstname.toLowerCase(), null);
+          emit(doc.lastname.toLowerCase(), null);
+        }
+      }.toString()
+    },
 
-  person_age_view: {
-    "map": function (doc) {
-      if(doc.type === 'person') {
-        emit([doc.gender, doc.age], null);
-      }
-    }.toString(),
+    person_age_view: {
+      "map": function (doc) {
+        if(doc.type === 'person') {
+          emit([doc.gender, doc.age], null);
+        }
+      }.toString(),
+    }
   }
 }
 
@@ -391,6 +393,11 @@ this.database.getDesignDocument('my_design_doc', rev)
 ```
 
 ### queryView(designDocumentName, viewName, queryStringParameters)
+
+queryView is a wrapper for the Couchbase Lite REST interface as such it's parametes are more limited than the native QueryView. A full list of supported parameters can be found here:
+
+http://developer.couchbase.com/documentation/mobile/1.2/develop/references/couchbase-lite/rest-api/design-document/get---db--design--design-doc--view--view-name-/index.html
+
 Example: find all person documents who have a _firstname_ or _lastname_ field that match any of 'john', 'paul', 'ringo' or 'george'
 ```js
 let options = {
