@@ -195,13 +195,12 @@ if (Platform.OS === 'android') {
 // instantiate a new database
 var database = new manager('http://admin:password@localhost:5984/', 'myapp');
 database.createDatabase()
-  .then((res) => {
-    database.getAllDocuments()
-      .then((res) => {
-        this.setState({
-          dataSource: this.state.dataSource.cloneWithRows(res.rows)
-        });
-      });
+  .then(() => database.getAllDocuments())
+  .then(res => {
+    this.setState({
+      dataSource: this.state.dataSource.cloneWithRows(res.rows)
+    });
+  });
 ```
 
 See the [example project](https://github.com/fraserxu/react-native-couchbase-lite/tree/master/ReactNativeCouchbaseLiteExample) for a more in-depth use case.
@@ -503,11 +502,9 @@ Example: Save a `thumbnail` image from the Internet on the `movie` document give
 ```js
 var sourceUri = 'http://resizing.flixster.com/DeLpPTAwX3O2LszOpeaMHjbzuAw=/53x77/dkpu1ddg7pbsk.cloudfront.net/movie/11/16/47/11164719_ori.jpg';
 database.createDocument({"_id": "movie"})
-  .then(doc => {
-    database.saveAttachment(doc.id, doc.rev, 'thumbnail', sourceUri, 'image/jpg')
-      .then((res) => {
-        console.log(res);
-      });
+  .then(doc => database.saveAttachment(doc.id, doc.rev, 'thumbnail', sourceUri, 'image/jpg'))
+  .then((res) => {
+    console.log(res);
   });
 ```
 
