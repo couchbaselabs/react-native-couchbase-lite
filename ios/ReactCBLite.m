@@ -25,14 +25,42 @@ RCT_EXPORT_METHOD(init:(float)port username:(NSString *)username password:(NSStr
     CBLManager* dbmgr = [CBLManager sharedInstance];
     CBLRegisterJSViewCompiler();
     
-    CBLListener* listener = [[CBLListener alloc] initWithManager:dbmgr port:port];
-    [listener setPasswords:@{username: password}];
-    [listener start:nil];
+    int suggestedPort = 5984;
+    
+    CBLListener* listener = [self startListener:suggestedPort withUsername:username withPassword:password withCBLManager: dbmgr];
     
     NSLog(@"Couchbase Lite listening on port <%@>", listener.URL.port);
     NSString *extenalUrl = [NSString stringWithFormat:@"http://%@:%@@localhost:%@/", username, password, listener.URL.port];
     callback(@[extenalUrl, [NSNull null]]);
 }
+
+- (CBLListener*) startListener: (int) port
+                  withUsername: (NSString *) username
+                  withPassword: (NSString *) password
+                withCBLManager: (CBLManager*) cblManager
+{
+    
+    CBLListener* listener = [[CBLListener alloc] initWithManager:cblManager port:port];
+    [listener setPasswords:@{username: password}];
+    
+    NSLog(@"Trying port %d", port);
+    
+    NSError *err = nil;
+    BOOL success = [listener start: &err];
+    
+    if (success) {
+        NSLog(@"Couchbase Lite running on %@", listener.URL);
+        return listener;
+    } else {
+        NSLog(@"Could not start listener on port %d: %@", port, err);
+        
+        port++;
+        
+        return [self startListener:port withUsername:username withPassword:password withCBLManager: cblManager];
+    }
+}
+
+
 
 RCT_EXPORT_METHOD(upload:(NSString *)method
                   authHeader:(NSString *)authHeader
