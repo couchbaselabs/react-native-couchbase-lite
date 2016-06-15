@@ -7,7 +7,10 @@
 //
 
 #import <RCTBridgeModule.h>
+#import <CouchbaseLiteListener/CBLListener.h>
 
 @interface ReactCBLite : NSObject <RCTBridgeModule>
-
+{
+    CBLListener *listener;
+}
 @end

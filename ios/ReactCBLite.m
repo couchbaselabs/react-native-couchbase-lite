@@ -21,17 +21,22 @@ RCT_EXPORT_MODULE()
 
 RCT_EXPORT_METHOD(init:(float)port username:(NSString *)username password:(NSString *)password callback:(RCTResponseSenderBlock)callback)
 {
-    NSLog(@"Launching Couchbase Lite...");
-    CBLManager* dbmgr = [CBLManager sharedInstance];
-    CBLRegisterJSViewCompiler();
-    
-    int suggestedPort = 5984;
-    
-    CBLListener* listener = [self startListener:suggestedPort withUsername:username withPassword:password withCBLManager: dbmgr];
-    
-    NSLog(@"Couchbase Lite listening on port <%@>", listener.URL.port);
-    NSString *extenalUrl = [NSString stringWithFormat:@"http://%@:%@@localhost:%@/", username, password, listener.URL.port];
-    callback(@[extenalUrl, [NSNull null]]);
+    @try {
+        NSLog(@"Launching Couchbase Lite...");
+        CBLManager* dbmgr = [CBLManager sharedInstance];
+        CBLRegisterJSViewCompiler();
+
+        int suggestedPort = 5984;
+        
+        listener = [self startListener:suggestedPort withUsername:username withPassword:password withCBLManager: dbmgr];
+        
+        NSLog(@"Couchbase Lite listening on port <%@>", listener.URL.port);
+        NSString *extenalUrl = [NSString stringWithFormat:@"http://%@:%@@localhost:%@/", username, password, listener.URL.port];
+        callback(@[extenalUrl, [NSNull null]]);
+    } @catch (NSException *e) {
+        NSLog(@"Failed to start Couchbase lite: %@", e);
+        callback(@[[NSNull null], e.reason]);
+    }
 }
 
 - (CBLListener*) startListener: (int) port
@@ -60,7 +65,18 @@ RCT_EXPORT_METHOD(init:(float)port username:(NSString *)username password:(NSStr
     }
 }
 
+// needed because the OS appears to kill the listener when the app becomes inactive (when the screen is locked, or its put in the background)
+RCT_EXPORT_METHOD(wake)
+{
+    [listener stop];
 
+    NSError* error;
+    if ([listener start:&error]) {
+        NSLog(@"Couchbase Lite listening at %@", listener.URL);
+    } else {
+        NSLog(@"Couchbase Lite couldn't start listener at %@: %@", listener.URL, error.localizedDescription);
+    }
+}
 
 RCT_EXPORT_METHOD(upload:(NSString *)method
                   authHeader:(NSString *)authHeader

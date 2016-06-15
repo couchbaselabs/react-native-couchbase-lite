@@ -55,7 +55,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
     public void init(Callback callback) {
         try {
             int suggestedPort = 5984;
-            Credentials allowedCredentials = new Credentials("admin", UUID.randomUUID().toString());
+            Credentials allowedCredentials = new Credentials();
 
             View.setCompiler(new JavaScriptViewCompiler());
             Database.setFilterCompiler(new JavaScriptReplicationFilterCompiler());
@@ -91,6 +91,13 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
             Log.e(TAG, "Couchbase init failed", e);
             callback.invoke(null, e.getMessage());
         }
+    }
+
+    /**
+     * no-op only here so the interface mirrors the IOS implementation which needs this method
+     */
+    @ReactMethod
+    public void wake() {
     }
 
     @ReactMethod
