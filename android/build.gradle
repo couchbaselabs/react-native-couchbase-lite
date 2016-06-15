@@ -36,8 +36,9 @@ allprojects {
 }
 
 dependencies {
-    compile 'com.couchbase.lite:couchbase-lite-android:1.2.1'
-    compile 'com.couchbase.lite:couchbase-lite-java-listener:1.2.1'
-    compile 'com.couchbase.lite:couchbase-lite-java-javascript:1.2.1'
+    // using this version temporarily as it fixes an important issue that prevent views from working if documents have more than 1 revision
+    compile 'com.couchbase.lite:couchbase-lite-android:0.0.0-710'
+    compile 'com.couchbase.lite:couchbase-lite-java-listener:0.0.0-710'
+    compile 'com.couchbase.lite:couchbase-lite-java-javascript:0.0.0-710'
     compile 'com.facebook.react:react-native:0.14.+'
 }
