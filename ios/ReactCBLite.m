@@ -29,8 +29,9 @@ RCT_EXPORT_METHOD(init:(float)port username:(NSString *)username password:(NSStr
     [listener setPasswords:@{username: password}];
     [listener start:nil];
     
-    NSLog(@"Couchbase Lite url = %@", listener.URL);
-    callback(@[[NSNull null]]);
+    NSLog(@"Couchbase Lite listening on port <%@>", listener.URL.port);
+    NSString *extenalUrl = [NSString stringWithFormat:@"http://%@:%@@localhost:%@/", username, password, listener.URL.port];
+    callback(@[extenalUrl, [NSNull null]]);
 }
 
 RCT_EXPORT_METHOD(upload:(NSString *)method
