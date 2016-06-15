@@ -346,7 +346,7 @@ this.database.getChanges(options)
 Example: create a design document called _my_design_doc_ containing 2 views, one that indexes _person_ documents by *firstname* and *lastname* and the other by *age* coupled with *gender*
 ```js
 let designDoc = {
-  "views: {
+  "views": {
     person_name_view: {
       "map": function (doc) {
         if(doc.type === 'person') {
