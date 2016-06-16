@@ -32,7 +32,7 @@ RCT_EXPORT_METHOD(init:(RCTResponseSenderBlock)callback)
 
         int suggestedPort = 5984;
 
-        listener = [self startListener:suggestedPort withUsername:username withPassword:password withCBLManager: dbmgr];
+        listener = [self createListener:suggestedPort withUsername:username withPassword:password withCBLManager: dbmgr];
 
         NSLog(@"Couchbase Lite listening on port <%@>", listener.URL.port);
         NSString *extenalUrl = [NSString stringWithFormat:@"http://%@:%@@localhost:%@/", username, password, listener.URL.port];
@@ -43,7 +43,7 @@ RCT_EXPORT_METHOD(init:(RCTResponseSenderBlock)callback)
     }
 }
 
-- (CBLListener*) startListener: (int) port
+- (CBLListener*) createListener: (int) port
                   withUsername: (NSString *) username
                   withPassword: (NSString *) password
                 withCBLManager: (CBLManager*) cblManager
@@ -65,20 +65,26 @@ RCT_EXPORT_METHOD(init:(RCTResponseSenderBlock)callback)
 
         port++;
 
-        return [self startListener:port withUsername:username withPassword:password withCBLManager: cblManager];
+        return [self createListener:port withUsername:username withPassword:password withCBLManager: cblManager];
     }
 }
 
-// needed because the OS appears to kill the listener when the app becomes inactive (when the screen is locked, or its put in the background)
-RCT_EXPORT_METHOD(wake)
+// stop and start are needed because the OS appears to kill the listener when the app becomes inactive (when the screen is locked, or its put in the background)
+RCT_EXPORT_METHOD(startListener)
 {
+    NSLog(@"Starting Couchbase Lite listener process");
     NSError* error;
-    [listener stop];// not sure this does anything
     if ([listener start:&error]) {
         NSLog(@"Couchbase Lite listening at %@", listener.URL);
     } else {
         NSLog(@"Couchbase Lite couldn't start listener at %@: %@", listener.URL, error.localizedDescription);
     }
+}
+
+RCT_EXPORT_METHOD(stopListener)
+{
+    NSLog(@"Stopping Couchbase Lite listener process");
+    [listener stop];
 }
 
 RCT_EXPORT_METHOD(upload:(NSString *)method

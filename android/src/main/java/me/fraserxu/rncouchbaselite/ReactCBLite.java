@@ -97,7 +97,14 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
      * no-op only here so the interface mirrors the IOS implementation which needs this method
      */
     @ReactMethod
-    public void wake() {
+    public void stopListener() {
+    }
+
+    /**
+     * no-op only here so the interface mirrors the IOS implementation which needs this method
+     */
+    @ReactMethod
+    public void startListener() {
     }
 
     @ReactMethod
