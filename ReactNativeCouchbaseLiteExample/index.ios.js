@@ -15,10 +15,8 @@ var {
 } = React;
 
 var ReactCBLite = require('react-native').NativeModules.ReactCBLite;
-ReactCBLite.init(5984, 'admin', 'password', (e) => {
-});
 
-var {manager} = require('react-native-couchbase-lite');
+var Swagger = require('swagger-client');
 
 var ReactNativeCouchbaseLiteExample = React.createClass({
   render: function () {
@@ -39,43 +37,27 @@ var Home = React.createClass({
     }
   },
   componentDidMount() {
-    var database = new manager('http://admin:password@localhost:5984/', 'myapp');
-    database.createDatabase()
-      .then((res) => {
-        database.createDesignDocument('main', {
-          'filters': {
-            'year': 'function (doc) { if (doc.year === 2004) {return true;} return false;}'
-          },
-          'views': {
-            'movies': {
-              'map': 'function (doc) {if (doc.year) {emit(doc._id, null);}}'
-            }
-          }
+    ReactCBLite.init((url) => {
+      fetch('http://docs.couchbasemobile.com/couchbase-lite/lite.json')
+        .then(res => res.json())
+        .then(res => {
+          console.log(res);
+          var spec = res;
+          spec.host = url.split('/')[2];
+
+          new Swagger({
+            spec: spec,
+            usePromise: true
+          })
+            .then(client => {
+              client.server.allDbs({})
+                .then(res => {
+                  console.log(res.data);
+                })
+                .catch(err => {throw err;});
+            });
         });
-        database.replicate('http://localhost:4984/moviesapp', 'myapp');
-        database.getInfo()
-          .then((res) => {
-            database.listen({since: res.update_seq - 1, feed: 'longpoll'});
-            database.changesEventEmitter.on('changes', function (e) {
-              this.setState({sequence: e.last_seq});
-            }.bind(this));
-            // database.listen({seq: 0, feed: 'longpoll', filter: 'main/year'});
-            // database.changesEventEmitter.on('changes', function (e) {
-            //   this.setState({filteredMovies: e.last_seq});
-            // }.bind(this));
-          });
-      })
-      .then((res) => {
-        return database.queryView('main', 'movies', {include_docs: true});
-      })
-      .then((res) => {
-        this.setState({
-          dataSource: this.state.dataSource.cloneWithRows(res.rows)
-        });
-      })
-      .catch((ex) => {
-        console.log(ex)
-      });
+    });     
   },
   render() {
     return (

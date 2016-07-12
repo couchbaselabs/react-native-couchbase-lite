@@ -518,5 +518,10 @@ console.log(uri);
 ### makeRequest(method, url, queryStringParameters, data)
 Can be used to make any query to the Couchbase lite [rest api](http://developer.couchbase.com/documentation/mobile/1.2/develop/references/couchbase-lite/rest-api/database/index.html).
 
+## SwaggerJS (WIP)
+
+SwaggerJS is a library that generates a JavaScript wrapper based on the Swagger Spec ([http://docs.couchbasemobile.com/couchbase-lite](http://docs.couchbasemobile.com/couchbase-lite)). `ReactNativeCouchbaseLiteExample/index.ios.js` uses SwaggerJS for
+ example. You can use the SwaggerJS library to perform all operations listed in the Swagger spec.
+
 #### LICENSE
 MIT
