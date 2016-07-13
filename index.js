@@ -173,6 +173,7 @@ manager.prototype = {
 
   /**
    * Creates a new document or creates a new revision of an existing document
+   * documentId and documentRevision may be omitted if present in jsonDocument
    *
    * @param object jsonDocument
    * @param string documentId
@@ -184,10 +185,19 @@ manager.prototype = {
 
     if (documentRevision) {
       options.rev = documentRevision;
+    } else if (jsonDocument.hasOwnProperty('_rev')) {
+      options.rev = jsonDocument._rev;
+      jsonDocument._rev = undefined;
+    }
+
+    if (!documentId && jsonDocument.hasOwnProperty('_id')) {
+      documentId = jsonDocument._id;
+      jsonDocument._id = undefined;
     }
 
     return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/" + documentId, options, jsonDocument);
   },
+
 
   /**
    * Delete a particular document based on its id and revision
