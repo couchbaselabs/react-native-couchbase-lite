@@ -38,6 +38,7 @@ var Home = React.createClass({
   },
   componentDidMount() {
     ReactCBLite.init((url) => {
+      console.log(url);
       fetch('http://docs.couchbasemobile.com/couchbase-lite/lite.json')
         .then(res => res.json())
         .then(res => {
@@ -55,6 +56,24 @@ var Home = React.createClass({
                   console.log(res.data);
                 })
                 .catch(err => {throw err;});
+
+              client.server.post_replicate(
+                {
+                  body: {
+                    create_target: true,
+                    source: {
+                      url: 'cities'
+                    },
+                    target: {
+                      url: 'http://localhost:59840/cities'
+                    },
+                    filter: 'app/bycity',
+                    continuous: true
+                  }
+                })
+                .then(res => {
+                  console.log(res);
+                });
             });
         });
     });     
