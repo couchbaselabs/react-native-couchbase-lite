@@ -29,6 +29,10 @@ manager.prototype = {
     return this.makeRequest("PUT", this.databaseUrl + this.databaseName, null, null);
   },
 
+  compact: function () {
+    return this.makeRequest("POST", this.databaseUrl + this.databaseName + "/_compact", null, null);
+  },
+
   /**
    * Delete the database
    *
@@ -79,6 +83,18 @@ manager.prototype = {
    */
   activeTasks: function () {
     return this.makeRequest("GET", this.databaseUrl + "_active_tasks")
+  },
+
+  /**
+   * Permanently removes references to specified deleted documents from the database.
+   *
+   * @param    string deleted document id
+   * @param    array document revisions
+   *
+   * @returns {*|promise}
+   */
+  purge: function (deletedDocumentId, revs) {
+    return this.makeRequest("POST", this.databaseUrl + "/_purge/", null, {deletedDocumentId: revs})
   },
 
   /**
@@ -155,10 +171,15 @@ manager.prototype = {
    * Create a new database document
    *
    * @param object jsonDocument
+   * @param string jsonDocument (optional)
    * @returns {*|promise}
    */
-  createDocument: function (jsonDocument) {
-    return this.makeRequest("POST", this.databaseUrl + this.databaseName, null, jsonDocument);
+  createDocument: function (jsonDocument, id) {
+    if (id) {
+      return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/" + id, null, jsonDocument);
+    } else {
+      return this.makeRequest("POST", this.databaseUrl + this.databaseName, null, jsonDocument);
+    }
   },
 
   /**
@@ -197,7 +218,6 @@ manager.prototype = {
 
     return this.makeRequest("PUT", this.databaseUrl + this.databaseName + "/" + documentId, options, jsonDocument);
   },
-
 
   /**
    * Delete a particular document based on its id and revision
@@ -400,6 +420,9 @@ manager.prototype = {
   },
 
   _makeRequest: function (settings, url, queryStringParameters, attemptNumber) {
+    if(!attemptNumber) {
+      attemptNumber = 1;
+    }
 
     var fullUrl = encodeURI(url) + this._encodeParams(queryStringParameters);
 
@@ -408,14 +431,13 @@ manager.prototype = {
 
     return fetch(fullUrl, settings).then((res) => {
       if (res.status == 401) {
-        console.log("cbl request failed auth", settings, fullUrl, res);
+        console.log("cbl request failed auth, attempt: " + attemptNumber, settings, fullUrl, res);
 
         // work-around for a bug in CBL that erroneously sends back a 401
         if (attemptNumber > 1) {
           throw new Error("Not authorized to " + settings + " to '" + fullUrl + "' [" + res.status + "]");
         } else {
-          var attempt = attemptNumber ? attemptNumber++ : 1;
-          return self._makeRequest(settings, url, queryStringParameters, attempt)
+          return self._makeRequest(settings, url, queryStringParameters, attemptNumber++)
         }
       }
 
