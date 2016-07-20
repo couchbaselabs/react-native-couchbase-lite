@@ -1,5 +1,6 @@
 package me.fraserxu.rncouchbaselite;
 
+import android.net.Uri;
 import android.os.AsyncTask;
 
 import com.couchbase.lite.Database;
@@ -28,6 +29,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
@@ -146,7 +148,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
         return boundPort;
     }
 
-    private static class SaveAttachmentTask extends AsyncTask<URL, Integer, UploadResult> {
+    private class SaveAttachmentTask extends AsyncTask<URL, Integer, UploadResult> {
         private final String method;
         private final String authHeader;
         private final String sourceUri;
@@ -166,12 +168,14 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
         @Override
         protected UploadResult doInBackground(URL... params) {
             try {
+                Log.i(TAG, "Uploading attachment '" + sourceUri + "' to '" + targetUri + "'");
+
                 InputStream input;
                 if (sourceUri.startsWith("/")) {
-                    Log.i(TAG, "Uploading file attachment '" + sourceUri + "' to '" + targetUri + "'");
                     input = new FileInputStream(new File(sourceUri));
+                } else if (sourceUri.startsWith("content://")){
+                    input = ReactCBLite.this.context.getContentResolver().openInputStream(Uri.parse(sourceUri));
                 } else {
-                    Log.i(TAG, "Uploading uri attachment '" + sourceUri + "' to '" + targetUri + "'");
                     URLConnection urlConnection = new URL(sourceUri).openConnection();
                     input = urlConnection.getInputStream();
                 }
