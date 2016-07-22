@@ -14,6 +14,7 @@
 #import "CouchbaseLiteListener/CouchbaseLiteListener.h"
 #import "CBLRegisterJSViewCompiler.h"
 #import <AssetsLibrary/AssetsLibrary.h>
+#import "ReactCBLiteRequestHandler.h"
 
 @implementation ReactCBLite
 
