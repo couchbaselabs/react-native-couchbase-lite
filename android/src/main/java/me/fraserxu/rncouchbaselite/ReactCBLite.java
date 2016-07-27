@@ -55,9 +55,19 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void init(Callback callback) {
+        Credentials allowedCredentials = new Credentials();
+        this.initWithCredentials(allowedCredentials, callback);
+    }
+
+    @ReactMethod
+    public void initWithAuth(String username, String password, Callback callback) {
+        Credentials allowedCredentials = new Credentials(username, password);
+        this.initWithCredentials(allowedCredentials, callback);
+    }
+
+    private void initWithCredentials(Credentials allowedCredentials, Callback callback) {
         try {
             int suggestedPort = 5984;
-            Credentials allowedCredentials = new Credentials();
 
             View.setCompiler(new JavaScriptViewCompiler());
             Database.setFilterCompiler(new JavaScriptReplicationFilterCompiler());

@@ -187,6 +187,15 @@ ReactCBLite.init((url) => {
 
 A username/password pair is automatically generated to protect access to the database endpoint.
 
+Or you can provide your own username/password pair:
+```js
+ReactCBLite.initWithAuth('admin', 'pass', (url) => {
+      // instantiate a new database
+      var database = new manager(url, 'myapp');
+      //...
+    });
+```
+
 See the [example project](https://github.com/fraserxu/react-native-couchbase-lite/tree/master/ReactNativeCouchbaseLiteExample) for a more in-depth use case.
 
 ## Examples

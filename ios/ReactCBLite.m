@@ -21,11 +21,14 @@ RCT_EXPORT_MODULE()
 
 RCT_EXPORT_METHOD(init:(RCTResponseSenderBlock)callback)
 {
+    NSString* username = [NSString stringWithFormat:@"u%d", arc4random() % 100000000];
+    NSString* password = [NSString stringWithFormat:@"p%d", arc4random() % 100000000];
+    [self initWithAuth:username password:password callback:callback];
+}
+
+RCT_EXPORT_METHOD(initWithAuth:(NSString*)username password:(NSString*)password callback:(RCTResponseSenderBlock)callback)
+{
     @try {
-
-        NSString* username = [NSString stringWithFormat:@"u%d", arc4random() % 100000000];
-        NSString* password = [NSString stringWithFormat:@"p%d", arc4random() % 100000000];
-
         NSLog(@"Launching Couchbase Lite...");
         CBLManager* dbmgr = [CBLManager sharedInstance];
         CBLRegisterJSViewCompiler();
