@@ -290,19 +290,16 @@ manager.prototype = {
    *
    * @param string source
    * @param string target
-   * @param boolean continuous
-   * @param boolean createTarget
+   * @param object options
    * @returns {*|promise}
    */
-  replicate: function (source, target, continuous, createTarget) {
+  replicate: function (source, target, options) {
     var replicateUrl = this.databaseUrl + "_replicate";
-
-    return this.makeRequest("POST", replicateUrl, {}, {
+    var reqOpts = Object.assign({}, {
       source: source,
       target: target,
-      continuous: continuous,
-      create_target: createTarget
-    });
+    }, options)
+    return this.makeRequest("POST", replicateUrl, {}, reqOpts);
   },
 
   /**
