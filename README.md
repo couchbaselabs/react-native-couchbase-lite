@@ -436,7 +436,8 @@ db.changesEventEmitter.on('changes', function (e) {
 ```
 
 
-### replicate(source, target, continuous) 
+### replicate(source, target, options) 
+Valid options listed here: http://developer.couchbase.com/documentation/mobile/1.2/develop/references/couchbase-lite/rest-api/server/post-replicate/index.html
 Example: set continuous up bi-directional sync using a session cookie acquired from the sync gateway
 ```js
 let userId = 'user1';
@@ -463,13 +464,13 @@ return fetch(url, settings)
         this.database.replicate(
           dbName,
           {headers: {Cookie: sessionCookie}, url: remoteDbUrl},
-          true
+          {continuous: true}
         );
 
         this.database.replicate(
           {headers: {Cookie: sessionCookie}, url: remoteDbUrl},
           dbName,
-          true
+          {continuous: true}
         );
       }
       default: {
