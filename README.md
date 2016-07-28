@@ -303,10 +303,10 @@ this.database.modifyDocuments(docs)
   });
 ```
 
-### getAllDocuments()
-Example: just run the \_all\_docs query
+### getDocuments()
+Example: runs the \_all\_docs query
 ```js
-this.database.getAllDocuments()
+this.database.getDocuments({include_docs: false})
   .then((res) => {
     console.log("all-docs", res);
   });

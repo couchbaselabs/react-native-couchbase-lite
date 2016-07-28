@@ -266,17 +266,6 @@ manager.prototype = {
   },
 
   /**
-   * Get all documents from the database
-   *
-   * @param object options
-   *
-   * @returns {*|promise}
-   */
-  getAllDocuments: function (options) {
-    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_all_docs", options);
-  },
-
-  /**
    * Get all conflicts
    *
    * @returns {*|promise}
