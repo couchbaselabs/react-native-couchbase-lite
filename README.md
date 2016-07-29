@@ -18,6 +18,10 @@ Install the React Native Couchbase Lite module:
 ```
 npm install --save react-native-couchbase-lite
 ```
+Run the following command to make the install script executable otherwise it won't work:
+```
+chmod +x node_modules/react-native-couchbase-lite/scripts/rnpm-postlink.js
+```
 Link the module using rnpm:
 ```
 rnpm link react-native-couchbase-lite
