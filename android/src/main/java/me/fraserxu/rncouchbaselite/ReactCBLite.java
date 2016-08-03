@@ -29,15 +29,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
-import java.util.UUID;
 
 import static me.fraserxu.rncouchbaselite.ReactNativeJson.convertJsonToMap;
 
 public class ReactCBLite extends ReactContextBaseJavaModule {
+    static {
+        setLogLevel(Log.WARN);
+    }
 
     public static final String REACT_CLASS = "ReactCBLite";
     private static final String TAG = "ReactCBLite";
@@ -60,6 +61,22 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public static void logLevel(String name) {
+        switch (name) {
+            case "DEBUG":
+                setLogLevel(Log.DEBUG);
+            case "INFO":
+                setLogLevel(Log.INFO);
+            case "WARN":
+                setLogLevel(Log.WARN);
+            case "ERROR":
+                setLogLevel(Log.ERROR);
+            case "ASSERT":
+                setLogLevel(Log.ASSERT);
+        }
+    }
+
+    @ReactMethod
     public void initWithAuth(String username, String password, Callback callback) {
         Credentials allowedCredentials = new Credentials(username, password);
         this.initWithCredentials(allowedCredentials, callback);
@@ -73,20 +90,11 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
             Database.setFilterCompiler(new JavaScriptReplicationFilterCompiler());
 
             AndroidContext context = new AndroidContext(this.context);
-            Manager.enableLogging(Log.TAG, Log.VERBOSE);
-            Manager.enableLogging(Log.TAG_SYNC, Log.VERBOSE);
-            Manager.enableLogging(Log.TAG_QUERY, Log.VERBOSE);
-            Manager.enableLogging(Log.TAG_VIEW, Log.VERBOSE);
-            Manager.enableLogging(Log.TAG_CHANGE_TRACKER, Log.VERBOSE);
-            Manager.enableLogging(Log.TAG_BLOB_STORE, Log.VERBOSE);
-            Manager.enableLogging(Log.TAG_DATABASE, Log.VERBOSE);
-            Manager.enableLogging(Log.TAG_LISTENER, Log.VERBOSE);
-            Manager.enableLogging(Log.TAG_MULTI_STREAM_WRITER, Log.VERBOSE);
-            Manager.enableLogging(Log.TAG_REMOTE_REQUEST, Log.VERBOSE);
-            Manager.enableLogging(Log.TAG_ROUTER, Log.VERBOSE);
+
             Manager manager = new Manager(context, Manager.DEFAULT_OPTIONS);
 
-            int actualPort = startCBLListener(suggestedPort, manager, allowedCredentials);
+            Credentials noCredentials = null;// turning off security because it prevents attachments from working
+            int actualPort = startCBLListener(suggestedPort, manager, noCredentials);
 
             String url = String.format(
                     "http://%s:%s@localhost:%d/",
@@ -103,6 +111,20 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
             Log.e(TAG, "Couchbase init failed", e);
             callback.invoke(null, e.getMessage());
         }
+    }
+
+    private static void setLogLevel(int level) {
+        Manager.enableLogging(Log.TAG, level);
+        Manager.enableLogging(Log.TAG_SYNC, level);
+        Manager.enableLogging(Log.TAG_QUERY, level);
+        Manager.enableLogging(Log.TAG_VIEW, level);
+        Manager.enableLogging(Log.TAG_CHANGE_TRACKER, level);
+        Manager.enableLogging(Log.TAG_BLOB_STORE, level);
+        Manager.enableLogging(Log.TAG_DATABASE, level);
+        Manager.enableLogging(Log.TAG_LISTENER, level);
+        Manager.enableLogging(Log.TAG_MULTI_STREAM_WRITER, level);
+        Manager.enableLogging(Log.TAG_REMOTE_REQUEST, level);
+        Manager.enableLogging(Log.TAG_ROUTER, level);
     }
 
     /**
@@ -183,7 +205,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
                 InputStream input;
                 if (sourceUri.startsWith("/")) {
                     input = new FileInputStream(new File(sourceUri));
-                } else if (sourceUri.startsWith("content://")){
+                } else if (sourceUri.startsWith("content://")) {
                     input = ReactCBLite.this.context.getContentResolver().openInputStream(Uri.parse(sourceUri));
                 } else {
                     URLConnection urlConnection = new URL(sourceUri).openConnection();
