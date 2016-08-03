@@ -131,18 +131,12 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
         Manager.enableLogging(Log.TAG_ROUTER, level);
     }
 
-    /**
-     * no-op only here so the interface mirrors the IOS implementation which needs this method
-     */
     @ReactMethod
     public void stopListener() {
         Log.i(TAG, "Stopping CBL listener on port " + listener.getListenPort());
         listener.stop();
     }
 
-    /**
-     * no-op only here so the interface mirrors the IOS implementation which needs this method
-     */
     @ReactMethod
     public void startListener() {
         if(listener == null) {
