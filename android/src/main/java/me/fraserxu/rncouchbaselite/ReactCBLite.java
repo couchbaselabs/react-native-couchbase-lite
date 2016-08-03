@@ -36,13 +36,18 @@ import java.util.Arrays;
 import static me.fraserxu.rncouchbaselite.ReactNativeJson.convertJsonToMap;
 
 public class ReactCBLite extends ReactContextBaseJavaModule {
+
     static {
         setLogLevel(Log.WARN);
     }
 
     public static final String REACT_CLASS = "ReactCBLite";
     private static final String TAG = "ReactCBLite";
+    private static final int SUGGESTED_PORT = 5984;
     private ReactApplicationContext context;
+    private Manager manager;
+    private Credentials allowedCredentials;
+    private LiteListener listener;
 
     public ReactCBLite(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -83,26 +88,23 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
     }
 
     private void initWithCredentials(Credentials allowedCredentials, Callback callback) {
-        try {
-            int suggestedPort = 5984;
+        this.allowedCredentials = allowedCredentials;
 
+        try {
             View.setCompiler(new JavaScriptViewCompiler());
             Database.setFilterCompiler(new JavaScriptReplicationFilterCompiler());
 
             AndroidContext context = new AndroidContext(this.context);
 
-            Manager manager = new Manager(context, Manager.DEFAULT_OPTIONS);
+            manager = new Manager(context, Manager.DEFAULT_OPTIONS);
 
-            LiteListener listener = new LiteListener(manager, suggestedPort, allowedCredentials);
-            int boundPort = listener.getListenPort();
-            Thread thread = new Thread(listener);
-            thread.start();
+            this.startListener();
 
             String url = String.format(
                     "http://%s:%s@localhost:%d/",
                     allowedCredentials.getLogin(),
                     allowedCredentials.getPassword(),
-                    boundPort
+                    listener.getListenPort()
             );
 
             Log.i(TAG, "CBLite init completed successfully with: " + url);
@@ -134,6 +136,8 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void stopListener() {
+        Log.i(TAG, "Stopping CBL listener on port " + listener.getListenPort());
+        listener.stop();
     }
 
     /**
@@ -141,6 +145,14 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
      */
     @ReactMethod
     public void startListener() {
+        if(listener == null) {
+            listener = new LiteListener(manager, SUGGESTED_PORT, allowedCredentials);
+            Log.i(TAG, "Starting CBL listener on port " + listener.getListenPort());
+        } else {
+            Log.i(TAG, "Restarting CBL listener on port " + listener.getListenPort());
+        }
+
+        listener.start();
     }
 
     @ReactMethod
