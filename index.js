@@ -277,6 +277,8 @@ manager.prototype = {
   /**
    * Replicate in a single direction whether that be remote from local or local to remote.
    *
+   * To cancel a replication task, call this with the same arguments but add a `cancel: true` to the options (see http://docs.couchdb.org/en/stable/api/server/common.html#post--_replicate)
+   *
    * @param string source
    * @param string target
    * @param object options
@@ -284,25 +286,13 @@ manager.prototype = {
    */
   replicate: function (source, target, options) {
     var replicateUrl = this.databaseUrl + "_replicate";
+
     var reqOpts = Object.assign({}, {
       source: source,
       target: target,
-    }, options)
+    }, options);
+
     return this.makeRequest("POST", replicateUrl, {}, reqOpts);
-  },
-
-  /**
-   * Cancel a replication task
-   *
-   * @param object task
-   * @returns {*|promise}
-   */
-  cancelReplicate: function (task) {
-    var replicateUrl = this.databaseUrl + "_replicate";
-
-    task.cancel = true;
-
-    return this.makeRequest("POST", replicateUrl, {}, task);
   },
 
   /**
@@ -406,7 +396,8 @@ manager.prototype = {
   },
 
   _makeRequest: function (settings, url, queryStringParameters, attemptNumber) {
-    if(!attemptNumber) {
+    // retrying queries is for the android implementation which seems to arbitarily reject calls from time to time
+    if (!attemptNumber) {
       attemptNumber = 1;
     }
 
@@ -423,13 +414,19 @@ manager.prototype = {
         if (attemptNumber > 1) {
           throw new Error("Not authorized to " + settings + " to '" + fullUrl + "' [" + res.status + "]");
         } else {
-          return self._makeRequest(settings, url, queryStringParameters, attemptNumber++)
+          return self._makeRequest(settings, url, queryStringParameters, ++attemptNumber)
         }
       }
 
       return res
     }).catch((err) => {
-      throw new Error("http error for " + settings.method + " '" + fullUrl + "', caused by => " + err);
+      console.log("cbl request failed, attempt: " + attemptNumber, err, settings, fullUrl);
+
+      if (attemptNumber > 1) {
+        throw new Error("http error for " + settings.method + " '" + fullUrl + "', caused by => " + err);
+      } else {
+        return self._makeRequest(settings, url, queryStringParameters, ++attemptNumber)
+      }
     });
   },
 
