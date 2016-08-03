@@ -93,14 +93,16 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
 
             Manager manager = new Manager(context, Manager.DEFAULT_OPTIONS);
 
-            Credentials noCredentials = null;// turning off security because it prevents attachments from working
-            int actualPort = startCBLListener(suggestedPort, manager, noCredentials);
+            LiteListener listener = new LiteListener(manager, suggestedPort, allowedCredentials);
+            int boundPort = listener.getListenPort();
+            Thread thread = new Thread(listener);
+            thread.start();
 
             String url = String.format(
                     "http://%s:%s@localhost:%d/",
                     allowedCredentials.getLogin(),
                     allowedCredentials.getPassword(),
-                    actualPort
+                    boundPort
             );
 
             Log.i(TAG, "CBLite init completed successfully with: " + url);
@@ -170,14 +172,6 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
 
         SaveAttachmentTask saveAttachmentTask = new SaveAttachmentTask(method, authHeader, sourceUri, targetUri, contentType, callback);
         saveAttachmentTask.execute();
-    }
-
-    private int startCBLListener(int listenPort, Manager manager, Credentials allowedCredentials) {
-        LiteListener listener = new LiteListener(manager, listenPort, allowedCredentials);
-        int boundPort = listener.getListenPort();
-        Thread thread = new Thread(listener);
-        thread.start();
-        return boundPort;
     }
 
     private class SaveAttachmentTask extends AsyncTask<URL, Integer, UploadResult> {
