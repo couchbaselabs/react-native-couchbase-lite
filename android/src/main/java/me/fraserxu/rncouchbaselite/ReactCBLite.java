@@ -83,12 +83,22 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void initWithAuth(String username, String password, Callback callback) {
-        Credentials allowedCredentials = new Credentials(username, password);
-        this.initWithCredentials(allowedCredentials, callback);
+        Credentials credentials;
+        if(username == null && password == null) {
+            credentials = null;
+            Log.w(TAG, "No credential specified, your listener is unsecured and you are putting your data at risk");
+        } else if(username == null || password == null) {
+            callback.invoke(null, "username and password must not be null");
+            return;
+        } else {
+            credentials = new Credentials(username, password);
+        }
+
+        this.initWithCredentials(credentials, callback);
     }
 
-    private void initWithCredentials(Credentials allowedCredentials, Callback callback) {
-        this.allowedCredentials = allowedCredentials;
+    private void initWithCredentials(Credentials credentials, Callback callback) {
+        this.allowedCredentials = credentials;
 
         try {
             View.setCompiler(new JavaScriptViewCompiler());
@@ -100,14 +110,20 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
 
             this.startListener();
 
-            String url = String.format(
-                    "http://%s:%s@localhost:%d/",
-                    allowedCredentials.getLogin(),
-                    allowedCredentials.getPassword(),
-                    listener.getListenPort()
-            );
-
-            Log.i(TAG, "CBLite init completed successfully with: " + url);
+            String url;
+            if(credentials != null) {
+                url = String.format(
+                        "http://%s:%s@localhost:%d/",
+                        credentials.getLogin(),
+                        credentials.getPassword(),
+                        listener.getListenPort()
+                );
+            } else {
+                url = String.format(
+                        "http://localhost:%d/",
+                        listener.getListenPort()
+                );
+            }
 
             callback.invoke(url, null);
 
