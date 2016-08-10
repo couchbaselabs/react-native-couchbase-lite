@@ -34,6 +34,9 @@ RCT_EXPORT_METHOD(initWithAuth:(NSString*)username password:(NSString*)password 
         CBLManager* dbmgr = [CBLManager sharedInstance];
         CBLRegisterJSViewCompiler();
 
+        //register the server with CBL_URLProtocol
+        [dbmgr internalURL];
+
         int suggestedPort = 5984;
 
         listener = [self createListener:suggestedPort withUsername:username withPassword:password withCBLManager: dbmgr];
