@@ -196,7 +196,7 @@ ReactCBLite.initWithAuth('admin', 'pass', (url) => {
     });
 ```
 
-CouchbaseLite iOS has a custom NSURLProtocol that is accessible ever after moving to the background. Otherwise you need to restart the listener eachtime you return from the background.
+CouchbaseLite iOS has a custom NSURLProtocol that is accessible even after moving the app to the background. It's also more secure as this internal URL is only accessible inside the application's process.
 ```js
 ReactCBLite.initWithAuth('admin', 'pass', (url) => {
       console.log("couchbase lite started at", url);
