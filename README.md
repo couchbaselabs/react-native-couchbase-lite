@@ -196,6 +196,21 @@ ReactCBLite.initWithAuth('admin', 'pass', (url) => {
     });
 ```
 
+CouchbaseLite iOS has a custom NSURLProtocol that is accessible ever after moving to the background. Otherwise you need to restart the listener eachtime you return from the background.
+```js
+ReactCBLite.initWithAuth('admin', 'pass', (url) => {
+      console.log("couchbase lite started at", url);
+
+      if(Platform.OS === 'ios') {
+        url = "http://lite.couchbase./";
+        console.log("Using couchbase lite internal url", url);
+      }
+
+      var database = new manager(url, 'myapp');
+      //...
+    });
+```
+
 See the [example project](https://github.com/fraserxu/react-native-couchbase-lite/tree/master/ReactNativeCouchbaseLiteExample) for a more in-depth use case.
 
 ## Examples

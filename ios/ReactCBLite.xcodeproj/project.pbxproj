@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BE8EFD451C0E6D9000627BBA /* ReactCBLite.m in Sources */ = {isa = PBXBuildFile; fileRef = BE8EFD441C0E6D9000627BBA /* ReactCBLite.m */; settings = {ASSET_TAGS = (); }; };
+		9D3FF82D1D422DE600C58878 /* ReactCBLiteRequestHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D3FF82C1D422DE600C58878 /* ReactCBLiteRequestHandler.m */; };
+		BE8EFD451C0E6D9000627BBA /* ReactCBLite.m in Sources */ = {isa = PBXBuildFile; fileRef = BE8EFD441C0E6D9000627BBA /* ReactCBLite.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -23,6 +24,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		9D3FF82B1D422DE600C58878 /* ReactCBLiteRequestHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReactCBLiteRequestHandler.h; sourceTree = "<group>"; };
+		9D3FF82C1D422DE600C58878 /* ReactCBLiteRequestHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReactCBLiteRequestHandler.m; sourceTree = "<group>"; };
 		BE8EFD251C0E6C6B00627BBA /* libReactCBLite.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libReactCBLite.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE8EFD431C0E6D9000627BBA /* ReactCBLite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReactCBLite.h; sourceTree = "<group>"; };
 		BE8EFD441C0E6D9000627BBA /* ReactCBLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReactCBLite.m; sourceTree = "<group>"; };
@@ -44,6 +47,8 @@
 			children = (
 				BE8EFD431C0E6D9000627BBA /* ReactCBLite.h */,
 				BE8EFD441C0E6D9000627BBA /* ReactCBLite.m */,
+				9D3FF82B1D422DE600C58878 /* ReactCBLiteRequestHandler.h */,
+				9D3FF82C1D422DE600C58878 /* ReactCBLiteRequestHandler.m */,
 				BE8EFD261C0E6C6B00627BBA /* Products */,
 			);
 			sourceTree = "<group>";
@@ -113,6 +118,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BE8EFD451C0E6D9000627BBA /* ReactCBLite.m in Sources */,
+				9D3FF82D1D422DE600C58878 /* ReactCBLiteRequestHandler.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -14,6 +14,7 @@
 #import "CouchbaseLiteListener/CouchbaseLiteListener.h"
 #import "CBLRegisterJSViewCompiler.h"
 #import <AssetsLibrary/AssetsLibrary.h>
+#import "ReactCBLiteRequestHandler.h"
 
 @implementation ReactCBLite
 
@@ -32,6 +33,9 @@ RCT_EXPORT_METHOD(initWithAuth:(NSString*)username password:(NSString*)password 
         NSLog(@"Launching Couchbase Lite...");
         CBLManager* dbmgr = [CBLManager sharedInstance];
         CBLRegisterJSViewCompiler();
+
+        //register the server with CBL_URLProtocol
+        [dbmgr internalURL];
 
         int suggestedPort = 5984;
 
