@@ -3,14 +3,18 @@ package me.fraserxu.rncouchbaselite;
 import android.net.Uri;
 import android.os.AsyncTask;
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Manager;
 import com.couchbase.lite.View;
 import com.couchbase.lite.android.AndroidContext;
+import com.couchbase.lite.auth.Authenticator;
+import com.couchbase.lite.auth.AuthenticatorFactory;
 import com.couchbase.lite.javascript.JavaScriptReplicationFilterCompiler;
 import com.couchbase.lite.javascript.JavaScriptViewCompiler;
 import com.couchbase.lite.listener.Credentials;
 import com.couchbase.lite.listener.LiteListener;
+import com.couchbase.lite.replicator.Replication;
 import com.couchbase.lite.util.Log;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
@@ -29,9 +33,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static me.fraserxu.rncouchbaselite.ReactNativeJson.convertJsonToMap;
 
@@ -68,14 +75,26 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
     @ReactMethod
     public static void logLevel(String name) {
         switch (name) {
-            case "DEBUG":
+            case "VERBOSE": {
+                setLogLevel(Log.VERBOSE);
+                break;
+            }
+            case "DEBUG": {
                 setLogLevel(Log.DEBUG);
-            case "INFO":
+                break;
+            }
+            case "INFO": {
                 setLogLevel(Log.INFO);
-            case "WARN":
+                break;
+            }
+            case "WARN": {
                 setLogLevel(Log.WARN);
-            case "ERROR":
+                break;
+            }
+            case "ERROR": {
                 setLogLevel(Log.ERROR);
+                break;
+            }
             case "ASSERT":
                 setLogLevel(Log.ASSERT);
         }
@@ -84,10 +103,10 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
     @ReactMethod
     public void initWithAuth(String username, String password, Callback callback) {
         Credentials credentials;
-        if(username == null && password == null) {
+        if (username == null && password == null) {
             credentials = null;
             Log.w(TAG, "No credential specified, your listener is unsecured and you are putting your data at risk");
-        } else if(username == null || password == null) {
+        } else if (username == null || password == null) {
             callback.invoke(null, "username and password must not be null");
             return;
         } else {
@@ -111,7 +130,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
             this.startListener();
 
             String url;
-            if(credentials != null) {
+            if (credentials != null) {
                 url = String.format(
                         "http://%s:%s@localhost:%d/",
                         credentials.getLogin(),
@@ -134,6 +153,8 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
     }
 
     private static void setLogLevel(int level) {
+        Log.i(TAG, "Setting log level to '" + level + "'");
+
         Manager.enableLogging(Log.TAG, level);
         Manager.enableLogging(Log.TAG_SYNC, level);
         Manager.enableLogging(Log.TAG_QUERY, level);
@@ -155,7 +176,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void startListener() {
-        if(listener == null) {
+        if (listener == null) {
             listener = new LiteListener(manager, SUGGESTED_PORT, allowedCredentials);
             Log.i(TAG, "Starting CBL listener on port " + listener.getListenPort());
         } else {
