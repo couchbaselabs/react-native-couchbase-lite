@@ -176,7 +176,7 @@ ReactCBLite.init((url) => {
       // instantiate a new database
       var database = new manager(url, 'myapp');
       database.createDatabase()
-        .then(() => database.getAllDocuments())
+        .then(() => database.getDocuments())
         .then(res => {
           this.setState({
             dataSource: this.state.dataSource.cloneWithRows(res.rows)
