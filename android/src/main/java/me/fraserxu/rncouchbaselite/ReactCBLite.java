@@ -3,18 +3,14 @@ package me.fraserxu.rncouchbaselite;
 import android.net.Uri;
 import android.os.AsyncTask;
 
-import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Manager;
 import com.couchbase.lite.View;
 import com.couchbase.lite.android.AndroidContext;
-import com.couchbase.lite.auth.Authenticator;
-import com.couchbase.lite.auth.AuthenticatorFactory;
 import com.couchbase.lite.javascript.JavaScriptReplicationFilterCompiler;
 import com.couchbase.lite.javascript.JavaScriptViewCompiler;
 import com.couchbase.lite.listener.Credentials;
 import com.couchbase.lite.listener.LiteListener;
-import com.couchbase.lite.replicator.Replication;
 import com.couchbase.lite.util.Log;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
@@ -30,15 +26,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.Properties;
+
+import Acme.Serve.Serve;
 
 import static me.fraserxu.rncouchbaselite.ReactNativeJson.convertJsonToMap;
 
@@ -177,7 +173,15 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
     @ReactMethod
     public void startListener() {
         if (listener == null) {
-            listener = new LiteListener(manager, SUGGESTED_PORT, allowedCredentials);
+            if (allowedCredentials == null) {
+                Log.i(TAG, "No credentials, so binding to localhost");
+                Properties props = new Properties();
+                props.put(Serve.ARG_BINDADDRESS, "localhost");
+                listener = new LiteListener(manager, SUGGESTED_PORT, allowedCredentials, props);
+            } else {
+                listener = new LiteListener(manager, SUGGESTED_PORT, allowedCredentials);
+            }
+
             Log.i(TAG, "Starting CBL listener on port " + listener.getListenPort());
         } else {
             Log.i(TAG, "Restarting CBL listener on port " + listener.getListenPort());
