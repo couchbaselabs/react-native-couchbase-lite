@@ -245,8 +245,11 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
 
                 InputStream input;
                 if (sourceUri.startsWith("/") || sourceUri.startsWith("file:/")) {
-                    // 'file:/' is ok, but 'file://' will not work
-                    input = new FileInputStream(new File(sourceUri.replace("file://", "/")));
+                    String path = sourceUri.replace("file://", "/")
+                            .replace("file:/", "/");
+                    File file = new File(path);
+
+                    input = new FileInputStream(file);
                 } else if (sourceUri.startsWith("content://")) {
                     input = ReactCBLite.this.context.getContentResolver().openInputStream(Uri.parse(sourceUri));
                 } else {
