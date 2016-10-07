@@ -244,8 +244,9 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
                 Log.i(TAG, "Uploading attachment '" + sourceUri + "' to '" + targetUri + "'");
 
                 InputStream input;
-                if (sourceUri.startsWith("/")) {
-                    input = new FileInputStream(new File(sourceUri));
+                if (sourceUri.startsWith("/") || sourceUri.startsWith("file:/")) {
+                    // 'file:/' is ok, but 'file://' will not work
+                    input = new FileInputStream(new File(sourceUri.replace("file://", "/")));
                 } else if (sourceUri.startsWith("content://")) {
                     input = ReactCBLite.this.context.getContentResolver().openInputStream(Uri.parse(sourceUri));
                 } else {
