@@ -15,8 +15,6 @@ var {
 } = React;
 
 var ReactCBLite = require('react-native').NativeModules.ReactCBLite;
-ReactCBLite.init(5984, 'admin', 'password', (e) => {
-});
 
 var {manager} = require('react-native-couchbase-lite');
 
@@ -24,6 +22,8 @@ var ReactNativeCouchbaseLiteExample = React.createClass({
   render: function () {
     return (
       <Home></Home>
+      
+      
     );
   }
 });
@@ -39,43 +39,52 @@ var Home = React.createClass({
     }
   },
   componentDidMount() {
-    var database = new manager('http://admin:password@localhost:5984/', 'myapp');
-    database.createDatabase()
-      .then((res) => {
-        database.createDesignDocument('main', {
-          'filters': {
-            'year': 'function (doc) { if (doc.year === 2004) {return true;} return false;}'
-          },
-          'views': {
-            'movies': {
-              'map': 'function (doc) {if (doc.year) {emit(doc._id, null);}}'
+
+    ReactCBLite.init((url) => {
+      console.log(url);
+      var res = url.replace('localhost', '10.0.2.2');
+      console.log(res);
+
+      var database = new manager('http://4a240135-d1f0-42f5-b6ed-fd2ff4aefbf6:32c758ef-959f-44f5-88ea-f625c8b3762d@localhost:5986/', 'myapp');
+      database.createDatabase()
+        .then((res) => {
+          database.createDesignDocument('main', {
+            'filters': {
+              'year': 'function (doc) { if (doc.year === 2004) {return true;} return false;}'
+            },
+            'views': {
+              'movies': {
+                'map': 'function (doc) {if (doc.year) {emit(doc._id, null);}}'
+              }
             }
-          }
-        });
-        database.replicate('http://localhost:4984/moviesapp', 'myapp');
-        database.getInfo()
-          .then((res) => {
-            database.listen({since: res.update_seq - 1, feed: 'longpoll'});
-            database.changesEventEmitter.on('changes', function (e) {
-              this.setState({sequence: e.last_seq});
-            }.bind(this));
-            // database.listen({seq: 0, feed: 'longpoll', filter: 'main/year'});
-            // database.changesEventEmitter.on('changes', function (e) {
-            //   this.setState({filteredMovies: e.last_seq});
-            // }.bind(this));
           });
-      })
-      .then((res) => {
-        return database.queryView('main', 'movies', {include_docs: true});
-      })
-      .then((res) => {
-        this.setState({
-          dataSource: this.state.dataSource.cloneWithRows(res.rows)
+          database.replicate('http://localhost:4984/moviesapp', 'myapp');
+          database.getInfo()
+            .then((res) => {
+              console.log(res);
+              database.listen({since: res.update_seq - 1, feed: 'longpoll'});
+              database.changesEventEmitter.on('changes', function (e) {
+                this.setState({sequence: e.last_seq});
+              }.bind(this));
+              // database.listen({seq: 0, feed: 'longpoll', filter: 'main/year'});
+              // database.changesEventEmitter.on('changes', function (e) {
+              //   this.setState({filteredMovies: e.last_seq});
+              // }.bind(this));
+            });
+        })
+        .then((res) => {
+          return database.queryView('main', 'movies', {include_docs: true});
+        })
+        .then((res) => {
+          this.setState({
+            dataSource: this.state.dataSource.cloneWithRows(res.rows)
+          });
+        })
+        .catch((ex) => {
+          console.log(ex)
         });
-      })
-      .catch((ex) => {
-        console.log(ex)
-      });
+      
+    });
   },
   render() {
     return (
@@ -84,7 +93,7 @@ var Home = React.createClass({
           The database sequence: {this.state.sequence}
         </Text>
         <Text>
-          Movies published in 2004: {this.state.filteredMovies}
+          Movies published in 200114: {this.state.filteredMovies}
         </Text>
         <ListView
           dataSource={this.state.dataSource}

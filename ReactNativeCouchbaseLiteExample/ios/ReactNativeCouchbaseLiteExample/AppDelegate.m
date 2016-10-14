@@ -11,6 +11,8 @@
 
 #import "RCTRootView.h"
 
+#import <CouchbaseLite/CouchbaseLite.h>
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -47,6 +49,14 @@
                                                       moduleName:@"ReactNativeCouchbaseLiteExample"
                                                initialProperties:nil
                                                    launchOptions:launchOptions];
+  
+  
+  CBLManager* manager = [CBLManager sharedInstance];
+  CBLDatabase* database = [manager existingDatabaseNamed:@"todo" error:nil];
+  if (database == nil) {
+    NSString* cannedDBPath = [[NSBundle mainBundle] pathForResource:@"todo" ofType:@"cblite2"];
+    [manager replaceDatabaseNamed:@"todo" withDatabaseDir:cannedDBPath error:nil];
+  }
 
   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
   UIViewController *rootViewController = [UIViewController new];

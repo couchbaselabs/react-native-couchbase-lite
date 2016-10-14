@@ -6,8 +6,15 @@
     "start": "react-native start"
   },
   "dependencies": {
+    "node-uuid": "^1.4.7",
     "react-native": "^0.23.0",
     "react-native-couchbase-lite": "*",
+    "react-native-image-picker": "^0.21.5",
+    "react-native-navbar": "^1.1.6",
+    "react-redux": "^4.4.5",
+    "redux": "^3.5.2",
+    "redux-promise": "^0.5.3",
+    "redux-thunk": "^2.1.0",
     "swagger-client": "^2.1.15"
   }
 }
