@@ -2,6 +2,8 @@
   "log": ["*"],
   "databases": {
     "moviesapp": {
+      "server": "walrus:",
+      "bucket": "moviesapp",
       "users": {
         "GUEST": {"disabled": false, "admin_channels": ["*"]}
       }

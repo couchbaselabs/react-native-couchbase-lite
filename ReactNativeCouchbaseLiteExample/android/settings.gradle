@@ -2,4 +2,4 @@ rootProject.name = 'ReactNativeCouchbaseLiteExample'
 
 include ':app'
 include ':react-native-couchbase-lite'
-project(':react-native-couchbase-lite').projectDir = new File(rootProject.projectDir, '../../android')
+project(':react-native-couchbase-lite').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-couchbase-lite/android')

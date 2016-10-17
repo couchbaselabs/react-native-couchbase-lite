@@ -3,11 +3,23 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "react-native start"
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
   },
   "dependencies": {
-    "react-native": "^0.23.0",
+    "react": "15.3.2",
     "react-native-couchbase-lite": "*",
-    "swagger-client": "^2.1.15"
+    "react-native": "0.35.0"
+  },
+  "jest": {
+    "preset": "jest-react-native"
+  },
+  "devDependencies": {
+    "babel-jest": "16.0.0",
+    "babel-preset-react-native": "1.9.0",
+    "jest": "16.0.1",
+    "jest-react-native": "16.0.0",
+    "react-test-renderer": "15.3.2",
+    "whatwg-fetch": "1.0.0"
   }
 }
