@@ -1,13 +1,13 @@
 # react-native-couchbase-lite
 
-* [Using rnpm](#using-rnpm)
+* [Automatic linking](#using-rnpm)
 * [Install manually](#install-manually)
 * [Usage](#usage)
 * [Examples](#examples)
 
 Couchbase Lite binding for react-native on both iOS and Android. It works by exposing some functionality to the native Couchcase Lite and the remaining actions are peformed via the REST API.
 
-## Using rnpm
+## Automatic linking
 
 Create a new React Native project:
 ```
@@ -18,9 +18,9 @@ Install the React Native Couchbase Lite module:
 ```
 npm install --save react-native-couchbase-lite
 ```
-Link the module using rnpm:
+Link the module:
 ```
-rnpm link react-native-couchbase-lite
+react-native link react-native-couchbase-lite
 ```
 
 Follow the steps below to finish the installation.
