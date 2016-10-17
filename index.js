@@ -6,9 +6,10 @@ var base64 = require('base-64')
 
 var CHANGE_EVENT_TYPE = 'changes';
 
-var manager = function (databaseUrl, databaseName) {
-  this.authHeader = "Basic " + base64.encode(databaseUrl.split("//")[1].split('@')[0]);
-  this.databaseUrl = databaseUrl;
+var manager = function (databaseUrl, databaseName, authHeader) {
+  const userPass = databaseUrl.split("//")[1].split('@')[0];
+  this.authHeader = authHeader ? authHeader : "Basic " + base64.encode(userPass);
+  this.databaseUrl = databaseUrl.replace(userPass + "@", "");
   this.databaseName = databaseName;
   this.changesEventEmitter = new events.EventEmitter();
 };
@@ -87,14 +88,15 @@ manager.prototype = {
 
   /**
    * Permanently removes references to specified deleted documents from the database.
+   * See http://developer.couchbase.com/documentation/mobile/current/develop/references/couchbase-lite/rest-api/index.html#operation---db--_purge-post
    *
    * @param    string deleted document id
-   * @param    array document revisions
+   * @param    array document revisions as an array
    *
    * @returns {*|promise}
    */
   purge: function (deletedDocumentId, revs) {
-    return this.makeRequest("POST", this.databaseUrl + "/_purge/", null, {deletedDocumentId: revs})
+    return this.makeRequest("POST", this.databaseUrl + this.databaseName + "/_purge/", null, {deletedDocumentId: revs})
   },
 
   /**
@@ -158,13 +160,24 @@ manager.prototype = {
    *
    * @param    string designDocumentName
    * @param    string viewName
-   * @param    object queryStringParameters
+   * @param    object parameters
    * @return   promise
    */
   queryView: function (designDocumentName, viewName, options) {
     var url = this.databaseUrl + this.databaseName + "/_design/" + designDocumentName + "/_view/" + viewName;
+    var method = "GET";
 
-    return this.makeRequest("GET", url, options);
+    var queryStringParameters = this._encodeKeysParameters(options);
+
+    // if the keys parameter is used we need to do a POST, otherwise the max length for a url is likely to be exceeded
+    var body = null;
+    if(options.hasOwnProperty("keys")) {
+      body = {keys: options.keys};
+      delete queryStringParameters['keys'];
+      method = "POST";
+    }
+
+    return this.makeRequest(method, url, queryStringParameters, body);
   },
 
   /**
@@ -262,7 +275,18 @@ manager.prototype = {
    * @returns {*|promise}
    */
   getDocuments: function (options) {
-    return this.makeRequest("GET", this.databaseUrl + this.databaseName + "/_all_docs", options);
+    var method = "GET";
+    var queryStringParameters = this._encodeKeysParameters(options);
+
+    // if the keys parameter is used we need to do a POST, otherwise the max length for a url is likely to be exceeded
+    var body = null;
+    if(options.hasOwnProperty("keys")) {
+      body = {keys: options.keys};
+      delete queryStringParameters['keys'];
+      method = "POST";
+    }
+
+    return this.makeRequest(method, this.databaseUrl + this.databaseName + "/_all_docs", queryStringParameters, body);
   },
 
   /**
@@ -276,8 +300,6 @@ manager.prototype = {
 
   /**
    * Replicate in a single direction whether that be remote from local or local to remote.
-   *
-   * To cancel a replication task, call this with the same arguments but add a `cancel: true` to the options (see http://docs.couchdb.org/en/stable/api/server/common.html#post--_replicate)
    *
    * @param string source
    * @param string target
@@ -293,6 +315,22 @@ manager.prototype = {
     }, options);
 
     return this.makeRequest("POST", replicateUrl, {}, reqOpts);
+  },
+
+  /**
+   * Cancel a replication task
+   *
+   * see http://docs.couchdb.org/en/stable/api/server/common.html#post--_replicate
+   *
+   * @param object task
+   * @returns {*|promise}
+   */
+  cancelReplicate: function (task) {
+    var replicateUrl = this.databaseUrl + "_replicate";
+
+    task.cancel = true;
+
+    return this.makeRequest("POST", replicateUrl, {}, task);
   },
 
   /**
@@ -395,38 +433,17 @@ manager.prototype = {
       });
   },
 
-  _makeRequest: function (settings, url, queryStringParameters, attemptNumber) {
-    // retrying queries is for the android implementation which seems to arbitarily reject calls from time to time
-    if (!attemptNumber) {
-      attemptNumber = 1;
-    }
-
+  _makeRequest: function (settings, url, queryStringParameters) {
     var fullUrl = encodeURI(url) + this._encodeParams(queryStringParameters);
 
-//    console.log("fullUrl", fullUrl);
-    var self = this;
-
     return fetch(fullUrl, settings).then((res) => {
-      if (res.status == 401) {
-        console.log("cbl request failed auth, attempt: " + attemptNumber, settings, fullUrl, res);
-
-        // work-around for a bug in CBL that erroneously sends back a 401
-        if (attemptNumber > 1) {
-          throw new Error("Not authorized to " + settings + " to '" + fullUrl + "' [" + res.status + "]");
-        } else {
-          return self._makeRequest(settings, url, queryStringParameters, ++attemptNumber)
-        }
+      if (res.status >= 400) {
+        console.warn("Error return from CBL at", settings.method, fullUrl, res);
       }
 
       return res
     }).catch((err) => {
-      console.log("cbl request failed, attempt: " + attemptNumber, err, settings, fullUrl);
-
-      if (attemptNumber > 1) {
-        throw new Error("http error for " + settings.method + " '" + fullUrl + "', caused by => " + err);
-      } else {
-        return self._makeRequest(settings, url, queryStringParameters, ++attemptNumber)
-      }
+      throw new Error("http error for " + settings.method + " '" + fullUrl + "', caused by => " + err);
     });
   },
 
@@ -448,7 +465,21 @@ manager.prototype = {
     }
 
     return queryString;
-  }
+  },
+
+  // certain parameters, all regarding keys, need to be passed as strings
+  _encodeKeysParameters(options) {
+    var queryStringParameters = {};
+    for (var key in options) {
+      var value = options[key];
+      if (key.toLowerCase() === 'key' || key.toLowerCase() === 'keys' || key.toLowerCase() === 'startkey' || key.toLowerCase() === 'endkey') {
+        queryStringParameters[key] = JSON.stringify(value);
+      } else {
+        queryStringParameters[key] = value;
+      }
+    }
+    return queryStringParameters;
+  },
 };
 
 module.exports = {manager, ReactCBLite};
