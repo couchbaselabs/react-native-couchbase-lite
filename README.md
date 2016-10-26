@@ -1,5 +1,12 @@
 # react-native-couchbase-lite
 
+## Disclaimer
+
+_This package is not an official couchbase plugin and is not supported in any way by couchbase.  If you have issues with it please **do not use
+the couchbase forums** but raise an issue [here](https://github.com/couchbaselabs/react-native-couchbase-lite/issues) instead.  Although
+this package does work as described it may not be fully featured and may not be suitable for your requirements.  This package is just a thin 
+layer over the CBL REST API, PRs and suggestions are welcome!_
+
 * [Using rnpm](#using-rnpm)
 * [Install manually](#install-manually)
 * [Usage](#usage)
