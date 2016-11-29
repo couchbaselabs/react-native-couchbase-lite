@@ -17,8 +17,8 @@ ReactCBLite.init(url => {
 });
 
 var rncblite = function(cb){
-  if(typeof foo != 'undefined'){
-    cb(manager); // If foo is already define, I don't wait.
+  if(typeof manager != 'undefined'){
+    cb(manager);
   } else {
     callback = cb;
   }
