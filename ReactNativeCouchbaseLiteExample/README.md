@@ -6,7 +6,7 @@
 4. Start Sync Gateway.
 
     ```bash
-    $ ~/Downloads/couchbase-sync-gateway/bin/sync-gateway sync-gateway-config.json
+    $ ~/Downloads/couchbase-sync-gateway/bin/sync_gateway sync-gateway-config.json
     ```
 
 5. From the current directory, run the following command to import documents.
