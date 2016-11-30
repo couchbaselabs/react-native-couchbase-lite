@@ -9,19 +9,21 @@ import {
 
 import {
   rncblite,
+  ReactCBLite
 } from 'react-native-couchbase-lite';
 
-import ListMovies from './components/listMovies';
+import List from './components/list';
 
 const SG_URL = 'http://localhost:4984/moviesapp';
-const DB_NAME = 'moviesapp';
+const DB_NAME = 'todo';
 const VIEWS = {
-  filters: {
-    year: 'function (doc) { if (doc.year === 2004) { return true;} return false;}'
-  },
   views: {
-    movies: {
-      map: 'function (doc) { if (doc.year) { emit(doc._id, null);}}'
+    tasksByCreatedAt: {
+      map: function (doc) {
+        if (doc.type == 'task') {
+          emit(doc.task, null);
+        }
+      }.toString()
     }
   }
 };
@@ -34,6 +36,7 @@ export default class Root extends Component {
   
   componentDidMount() {
     rncblite(manager => {
+      ReactCBLite.installPrebuiltDatabase(DB_NAME);
       this.setState({manager: manager});
     });
   }
@@ -65,12 +68,24 @@ class App extends Component {
     };
   }
 
-  setupDatabaseAndViews() {
+  setupDatabase() {
     let manager = this.props.manager;
     manager.database.put_db({db: DB_NAME})
-      .then(res => manager.query.put_db_design_ddoc({ddoc: 'main', db: DB_NAME, body: VIEWS}))
       .then(res => this.setupQuery())
       .catch(e => console.log('ERROR', e));
+  }
+  
+  setupViews(update) {
+    let manager = this.props.manager;
+    manager.query.get_db_design_ddoc({db: DB_NAME, ddoc: 'main'})
+      .catch(e => {
+        if (e.status == 404) {
+          manager.query.put_db_design_ddoc({ddoc: 'main', db: DB_NAME, body: VIEWS})
+            .then(res => {this.setupQuery()})
+            .catch(e => console.log('ERROR', e));
+        }
+      })
+      .then(res => {this.setupQuery()});
   }
   
   setupReplications() {
@@ -82,11 +97,15 @@ class App extends Component {
   
   setupQuery() {
     let manager = this.props.manager;
-    manager.query.get_db_design_ddoc_view_view({db: DB_NAME, ddoc: 'main', view: 'movies', include_docs: true})
+    manager.query.get_db_design_ddoc_view_view({db: DB_NAME, ddoc: 'main', view: 'tasksByCreatedAt', include_docs: true})
       .then(res => {
+        let rows = res.obj.rows;
+        for (var i = 0; i < rows.length; i++) {
+          rows[i].url = 'http://' + manager.host + '/' + DB_NAME + '/' + rows[i].id + '/image';
+        }
         this.setState({
-          data: res.obj.rows,
-          dataSource: this.state.dataSource.cloneWithRows(res.obj.rows),
+          data: rows,
+          dataSource: this.state.dataSource.cloneWithRows(rows),
         })
       })
       .catch(e => console.log('ERROR', e));
@@ -98,10 +117,10 @@ class App extends Component {
       .then(res => {
         let dbs = res.obj;
         if (dbs.indexOf(DB_NAME) == -1) {
-          this.setupDatabaseAndViews();
+          this.setupDatabase();
         } else {
+          this.setupViews();
           this.setupReplications();
-          this.setupQuery();
         }
       })
       .catch(e => console.log('ERROR', e));
@@ -118,7 +137,7 @@ class App extends Component {
             Movies published in 2004: {this.state.filteredMovies}
           </Text>
         }
-        <ListMovies
+        <List
           data={this.state.dataSource}
           style={styles.listView}
         />

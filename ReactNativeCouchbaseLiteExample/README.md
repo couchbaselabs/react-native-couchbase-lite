@@ -1,25 +1,22 @@
-## Getting Started (tested on iOS only)
+## Getting Started
 
-1. Open ios/ReactNativeCouchbaseLiteExample.xcodeproj for iOS.
+1. Open **ios/ReactNativeCouchbaseLiteExample.xcodeproj** in Xcode or **android/build.gradle** in Android Studio.
 2. Run `npm install` to install React Native dependencies.
 3. Run `npm install ./../` to install react-native-couchbase-lite from the parent directory.
-4. Start Sync Gateway.
+4. Build and run. You should see a list of groceries which is a pre-built database.
+
+	<img src="https://cl.ly/2t31350o0s3x/Simulator%20Screen%20Shot%2030%20Nov%202016,%2014.08.20.png" width="25%" />
+	<img src="https://cl.ly/163J0w0Z2w3q/sdk_phone_x86MASTER11302016140903.png" width="25%" />
+
+5. Start Sync Gateway.
 
     ```bash
     $ ~/Downloads/couchbase-sync-gateway/bin/sync_gateway sync-gateway-config.json
     ```
 
-5. From the current directory, run the following command to import documents.
+## Steps to add react-native-couchbase-lite from source
 
-    ```bash
-    curl -H 'Content-Type: application/json' -vX POST 'http://localhost:4984/moviesapp/_bulk_docs' -d @MoviesExample.json
-    ```
-
-6. You should now see the list of movies in the iOS app (you may have to reload the a few times using **⌘ + R**).
-
-## Steps to add react-native-couchbase-lite from source (tested on iOS only)
-
-You may prefer to clone this repo and use it in your project instead using what is published on npm. The steps below describe how to do that.
+You may prefer to clone this repo and use it in your project instead of using what is published on npm. The steps below describe how to do that.
 
 1. Create a new React Native project.
 

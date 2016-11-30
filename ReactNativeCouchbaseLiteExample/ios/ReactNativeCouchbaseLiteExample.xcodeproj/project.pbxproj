@@ -25,6 +25,7 @@
 		3B6628CA580A492E9820666D /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A84481207E68405D9A3E01D9 /* CFNetwork.framework */; };
 		6F17152F12254AA1A3EF34A2 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 570E34BAF22447CA9BB10B4A /* Security.framework */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
+		BE9AAE741DEEE4BA00C8EF2B /* todo.cblite2 in Resources */ = {isa = PBXBuildFile; fileRef = BE9AAE731DEEE4BA00C8EF2B /* todo.cblite2 */; };
 		BEF5C6BE1DB1037F00CCE770 /* CouchbaseLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF5C6BC1DB1037F00CCE770 /* CouchbaseLite.framework */; };
 		BEF5C6BF1DB1037F00CCE770 /* CouchbaseLiteListener.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF5C6BD1DB1037F00CCE770 /* CouchbaseLiteListener.framework */; };
 		BEF5C6C21DB1038D00CCE770 /* libCBLJSViewCompiler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF5C6C11DB1038D00CCE770 /* libCBLJSViewCompiler.a */; };
@@ -148,6 +149,7 @@
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		A84481207E68405D9A3E01D9 /* CFNetwork.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		B155233B939648DE83239CE2 /* libsqlite3.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
+		BE9AAE731DEEE4BA00C8EF2B /* todo.cblite2 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = todo.cblite2; sourceTree = "<group>"; };
 		BEF5C6BC1DB1037F00CCE770 /* CouchbaseLite.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CouchbaseLite.framework; sourceTree = "<group>"; };
 		BEF5C6BD1DB1037F00CCE770 /* CouchbaseLiteListener.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CouchbaseLiteListener.framework; sourceTree = "<group>"; };
 		BEF5C6C01DB1038D00CCE770 /* CBLRegisterJSViewCompiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLRegisterJSViewCompiler.h; sourceTree = "<group>"; };
@@ -326,6 +328,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				BE9AAE731DEEE4BA00C8EF2B /* todo.cblite2 */,
 				13B07FAE1A68108700A75B9A /* ReactNativeCouchbaseLiteExample */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* ReactNativeCouchbaseLiteExampleTests */,
@@ -582,6 +585,7 @@
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
+				BE9AAE741DEEE4BA00C8EF2B /* todo.cblite2 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

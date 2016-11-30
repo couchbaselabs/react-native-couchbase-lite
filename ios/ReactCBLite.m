@@ -194,4 +194,16 @@ RCT_EXPORT_METHOD(upload:(NSString *)method
     });
 }
 
+// MARK: - Database
+
+RCT_EXPORT_METHOD(installPrebuiltDatabase:(NSString *) databaseName)
+{
+    CBLManager* manager = [CBLManager sharedInstance];
+    CBLDatabase* db = [manager existingDatabaseNamed:databaseName error:nil];
+    if (db == nil) {
+        NSString* dbPath = [[NSBundle mainBundle] pathForResource:databaseName ofType:@"cblite2"];
+        [manager replaceDatabaseNamed:databaseName withDatabaseDir:dbPath error:nil];
+    }
+}
+
 @end
