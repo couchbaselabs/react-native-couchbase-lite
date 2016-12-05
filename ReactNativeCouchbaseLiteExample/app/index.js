@@ -7,10 +7,7 @@ import {
   ListView,
 } from 'react-native';
 
-import {
-  rncblite,
-  ReactCBLite
-} from 'react-native-couchbase-lite';
+import Couchbase from 'react-native-couchbase-lite';
 
 import List from './components/list';
 
@@ -35,8 +32,8 @@ export default class Root extends Component {
   }
   
   componentDidMount() {
-    rncblite(manager => {
-      ReactCBLite.installPrebuiltDatabase(DB_NAME);
+    Couchbase.initRESTClient(manager => {
+      Couchbase.installPrebuiltDatabase(DB_NAME);
       this.setState({manager: manager});
     });
   }
