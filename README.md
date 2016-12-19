@@ -91,8 +91,8 @@ $ npm install react-native-couchbase-lite
 * In the `Podfile`, add dependencies:
 
 ```
-pod 'React', :path => './node_modules/react-native'
-pod 'ReactNativeCouchbaseLite', :path => './node_modules/react-native-couchbase-lite'
+pod 'React', :path => '../node_modules/react-native'
+pod 'ReactNativeCouchbaseLite', :path => '../node_modules/react-native-couchbase-lite'
 ```
 
 * Install the Cocoapods dependencies:
