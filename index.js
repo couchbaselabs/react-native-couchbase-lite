@@ -1,24 +1,27 @@
-var {NativeModules} = require('react-native');
-var Couchbase = NativeModules.ReactCBLite;
+'use strict';
 
-var Swagger = require('swagger-client');
-var spec = require('./spec.json');
+import {NativeModules} from "react-native";
+import Swagger from "swagger-client";
+import spec from "./spec.json";
+const Couchbase = NativeModules.ReactCBLite;
 
-var manager, callback;
+let manager, callback;
+
 Couchbase.init(url => {
   spec.host = url.split('/')[2];
-  new Swagger({ spec: spec, usePromise: true })
+
+  new Swagger({spec: spec, usePromise: true})
     .then(client => {
       manager = client;
-      if(typeof callback == 'function'){
+      if (typeof callback == 'function') {
         callback(manager);
       }
     });
 });
 
-Couchbase.initRESTClient = function(cb){
-  if(typeof foo != 'undefined'){
-    cb(manager); // If manager is already define, don't wait.
+Couchbase.initRESTClient = function (cb) {
+  if (typeof manager !== 'undefined') {
+    cb(manager); // If manager is already defined, don't wait.
   } else {
     callback = cb;
   }

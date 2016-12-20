@@ -1,10 +1,7 @@
-import React, { Component } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-} from 'react-native';
+'use strict';
+
+import React, {Component} from "react";
+import {StyleSheet, Text, View, Image} from "react-native";
 
 export default class Task extends Component {
   render() {
@@ -22,7 +19,7 @@ export default class Task extends Component {
   }
 }
 
-var styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row',
