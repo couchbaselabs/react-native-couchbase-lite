@@ -39,7 +39,14 @@
       "postlink": "node_modules/react-native-couchbase-lite/scripts/rnpm-postlink.js"
     },
     "ios": {
-      "project": "ios/ReactCBLite.xcodeproj"
+      "project": "ios/ReactCBLite.xcodeproj",
+      "sharedLibraries": [
+        "libz",
+        "libsqlite3",
+        "SystemConfiguration",
+        "CFNetwork",
+        "Security"
+      ]
     }
   }
 }
