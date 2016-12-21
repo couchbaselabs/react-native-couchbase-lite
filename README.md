@@ -7,10 +7,10 @@ the couchbase forums** but raise an issue [here](https://github.com/couchbaselab
 this package does work as described it may not be fully featured and may not be suitable for your requirements.  This package is just a thin 
 layer over the CBL REST API, PRs and suggestions are welcome!_
 
-* [Using rnpm](#using-rnpm)
-* [Install manually](#install-manually)
+* [Installation](#using-rnpm)
 * [Usage](#usage)
-* [Examples](#examples)
+* [Documentation](#documentation)
+* [Install manually](#install-manually)
 
 Couchbase Lite binding for react-native on both iOS and Android. It works by exposing some functionality to the native Couchbase Lite and the remaining actions are peformed via the REST API.
 
@@ -39,20 +39,82 @@ Follow the steps below to finish the installation.
 
 ### iOS
 
-* Download the Couchbase Lite iOS SDK from [here](http://www.couchbase.com/nosql-databases/downloads#) and drag CouchbaseLite.framework, CouchbaseLiteListener.framework in the Xcode project:
+4. Download the Couchbase Lite iOS SDK from [here](http://www.couchbase.com/nosql-databases/downloads#) and drag **CouchbaseLite.framework**, **CouchbaseLiteListener.framework**, **CBLRegisterJSViewCompiler.h**, **libCBLJSViewCompiler.a** in the Xcode project.
 
-![](http://cl.ly/image/3Z1b0n0W0i3w/sdk.png)
+	![](http://cl.ly/image/3Z1b0n0W0i3w/sdk.png)
 
 ### Android
 
-Add the following in `android/app/build.gradle` under the `android` section:
-```
+4. Add the following in **android/app/build.gradle** under the `android` section:
+
+```groovy
 packagingOptions {
 		exclude 'META-INF/ASL2.0'
 		exclude 'META-INF/LICENSE'
 		exclude 'META-INF/NOTICE'
 }
 ```
+
+5. Start the React Native dev server.
+
+```bash
+react-native start
+```
+
+6. Build and run the app on Android or iOS.
+
+## Usage
+
+In your app's entrypoint file, import the plugin and initialize the Couchbase Lite Listener.
+
+```js
+import Couchbase from "react-native-couchbase-lite";
+
+Couchbase.initRESTClient(manager => {
+	// use manager to perform operations
+});
+```
+
+The manager is the Couchbase Lite entrypoint to perform different operations.
+
+## Documentation
+
+The full API is derived from the [Couchbase Lite Swagger spec](http://developer.couchbase.com/documentation/mobile/current/references/couchbase-lite/rest-api/index.html).
+
+The API is self documented through the `help()` method. You can print the list of tags for an endpoint.
+
+```javascript
+Couchbase.initRESTClient(manager => {
+	// use manager to perform operations
+	manager.help();    // prints all tags and endpoints
+});
+```
+
+![](https://cl.ly/0M2L2S2M1j1s/tags.png)
+
+Once you know the kind of operation to perform, you can print all the endpoints available on a particular tag.
+
+```javascript
+Couchbase.initRESTClient(manager => {
+	// use manager to perform operations
+	manager.database.help();    // prints all endpoints for the database tag
+});
+```
+
+![](https://cl.ly/3d1H281z1c1W/database.png)
+
+End finally drill down on a particular endpoint for the operation you wish to perform.
+
+```javascript
+Couchbase.initRESTClient(manager => {
+	// use manager to perform operations
+	manager.database.put_db.help(); // prints the list of parameters for PUT /{db}
+});
+```
+
+![](https://cl.ly/070z08081W0X/bulk_docs.png)
+
+As you can see, there are two parameters to provide (**db** and **body**). The same exact parameters are documented on the [/{db}}/_bulk_docs](http://developer.couchbase.com/documentation/mobile/current/references/couchbase-lite/rest-api/index.html#!/database/post_db_bulk_docs) endpoint.
 
 ## Install manually
 
@@ -176,63 +238,6 @@ $ pod install
       );
   }
   ```
-
-## Usage
-
-In your app's entrypoint file, import the plugin and initialize the Couchbase Lite Listener.
-
-```js
-import {
-  rncblite,
-} from 'react-native-couchbase-lite';
-
-rncblite(manager => {
-	// use manager to perform operations
-});
-```
-
-The manager is the Couchbase Lite entrypoint to perform different operations. Under the hood, it's performing HTTP requests. You can modify the way the Listener is started in `index.js`.
-
-## Documentation
-
-The full API is derived from the [Couchbase Lite Swagger spec](http://developer.couchbase.com/mobile/swagger/couchbase-lite/).
-
-The API is self documented through the `help()` method. You can print the list of tags for an endpoint.
-
-```javascript
-rncblite(manager => {
-	// use manager to perform operations
-	manager.help();    // prints all tags and endpoints
-});
-```
-
-![](https://cl.ly/0M2L2S2M1j1s/tags.png)
-
-Once you know the kind of operation to perform, you can print all the endpoints available on a particular tag.
-
-```javascript
-rncblite(manager => {
-	// use manager to perform operations
-	manager.database.help();    // prints all endpoints for the database tag
-});
-```
-
-![](https://cl.ly/3d1H281z1c1W/database.png)
-
-End finally drill down on a particular endpoint for the operation you wish to perform.
-
-```javascript
-rncblite(manager => {
-	// use manager to perform operations
-	manager.database.put_db.help(); // prints the list of parameters for PUT /{db}
-});
-```
-
-![](https://cl.ly/070z08081W0X/bulk_docs.png)
-
-As you can see, there are two parameters to provide (**db** and **body**). The same exact parameters are documented on the [/{db}}/_bulk_docs](http://developer.couchbase.com/mobile/swagger/couchbase-lite/#!/database/post_db_bulk_docs) endpoint.
-
-Run the [ReactNativeCouchbaseLiteExample](https://github.com/couchbaselabs/react-native-couchbase-lite/tree/master/ReactNativeCouchbaseLiteExample) project to see this in action.
 
 #### LICENSE
 
