@@ -1,6 +1,6 @@
 {
   "name": "react-native-couchbase-lite",
-  "version": "0.5.4",
+  "version": "0.6.0",
   "description": "Install Couchbase Lite in your app to enable JSON sync.",
   "homepage": "http://developer.couchbase.com/mobile/",
   "keywords": [
@@ -31,6 +31,7 @@
     "base-64": "^0.1.0",
     "events": "^1.1.0",
     "rnpm": "1.6.5",
+    "swagger-client": "^2.1.26",
     "xcode": "0.8.4"
   },
   "rnpm": {

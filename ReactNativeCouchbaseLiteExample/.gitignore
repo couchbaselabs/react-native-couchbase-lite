@@ -1,9 +1,3 @@
-# Couchbase Lite
-ios/CBLRegisterJSViewCompiler.h
-ios/CouchbaseLite.framework
-ios/CouchbaseLiteListener.framework
-ios/libCBLJSViewCompiler.a
-
 # OSX
 #
 .DS_Store
@@ -30,6 +24,7 @@ project.xcworkspace
 
 # Android/IJ
 #
+*.iml
 .idea
 .gradle
 local.properties
@@ -38,3 +33,15 @@ local.properties
 #
 node_modules/
 npm-debug.log
+
+# BUCK
+buck-out/
+\.buckd/
+android/app/libs
+android/keystores/debug.keystore
+
+# Couchbase Lite
+ios/CouchbaseLite.framework/
+ios/CouchbaseLiteListener.framework/
+ios/libCBLJSViewCompiler.a
+ios/CBLRegisterJSViewCompiler.h

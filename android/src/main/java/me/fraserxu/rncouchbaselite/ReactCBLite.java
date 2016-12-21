@@ -3,6 +3,7 @@ package me.fraserxu.rncouchbaselite;
 import android.net.Uri;
 import android.os.AsyncTask;
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Manager;
 import com.couchbase.lite.View;
@@ -12,6 +13,7 @@ import com.couchbase.lite.javascript.JavaScriptViewCompiler;
 import com.couchbase.lite.listener.Credentials;
 import com.couchbase.lite.listener.LiteListener;
 import com.couchbase.lite.util.Log;
+import com.couchbase.lite.util.ZipUtils;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -25,6 +27,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -339,4 +342,29 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
             this.response = response;
         }
     }
+    
+    // Database
+
+    @ReactMethod
+    public void installPrebuiltDatabase(String name) {
+        Manager manager = null;
+        Database db = null;
+        try {
+            manager = new Manager(new AndroidContext(this.context), Manager.DEFAULT_OPTIONS);
+            db = manager.getExistingDatabase(name);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (CouchbaseLiteException e) {
+            e.printStackTrace();
+        }
+        if (db == null) {
+            try {
+                ZipUtils.unzip(this.context.getAssets().open(name + ".zip"), manager.getContext().getFilesDir());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
 }
