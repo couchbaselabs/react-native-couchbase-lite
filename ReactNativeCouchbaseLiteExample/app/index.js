@@ -5,7 +5,7 @@ import {StyleSheet, Text, View, Image, ListView} from "react-native";
 import Couchbase from "react-native-couchbase-lite";
 import List from "./components/list";
 
-const SG_URL = 'http://localhost:4984/moviesapp';
+const SG_URL = 'http://localhost:4984/todo';
 const DB_NAME = 'todo';
 const VIEWS = {
   views: {
@@ -54,8 +54,6 @@ class App extends Component {
     this.state = {
       dataSource: ds.cloneWithRows([]),
       data: [],
-      sequence: '',
-      filteredMovies: '',
     };
   }
 
@@ -124,14 +122,6 @@ class App extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.seqTextLabel}>
-          The database sequence: {this.state.sequence}
-        </Text>
-        { this.state.filteredMovies.length > 0 &&
-        <Text>
-          Movies published in 2004: {this.state.filteredMovies}
-        </Text>
-        }
         <List
           data={this.state.dataSource}
           style={styles.listView}

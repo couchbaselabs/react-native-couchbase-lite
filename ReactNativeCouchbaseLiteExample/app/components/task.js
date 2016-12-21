@@ -35,9 +35,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     textAlign: 'center',
   },
-  year: {
-    textAlign: 'center',
-  },
   thumbnail: {
     width: 53,
     height: 81,
