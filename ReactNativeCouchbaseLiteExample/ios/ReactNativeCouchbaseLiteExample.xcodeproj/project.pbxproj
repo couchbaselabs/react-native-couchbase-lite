@@ -26,9 +26,9 @@
 		6F17152F12254AA1A3EF34A2 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 570E34BAF22447CA9BB10B4A /* Security.framework */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		BE9AAE741DEEE4BA00C8EF2B /* todo.cblite2 in Resources */ = {isa = PBXBuildFile; fileRef = BE9AAE731DEEE4BA00C8EF2B /* todo.cblite2 */; };
-		BEF5C6BE1DB1037F00CCE770 /* CouchbaseLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF5C6BC1DB1037F00CCE770 /* CouchbaseLite.framework */; };
-		BEF5C6BF1DB1037F00CCE770 /* CouchbaseLiteListener.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF5C6BD1DB1037F00CCE770 /* CouchbaseLiteListener.framework */; };
-		BEF5C6C21DB1038D00CCE770 /* libCBLJSViewCompiler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF5C6C11DB1038D00CCE770 /* libCBLJSViewCompiler.a */; };
+		BEF4D0611E0ADEF200B3F205 /* CouchbaseLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF4D05E1E0ADEF200B3F205 /* CouchbaseLite.framework */; };
+		BEF4D0621E0ADEF200B3F205 /* CouchbaseLiteListener.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF4D05F1E0ADEF200B3F205 /* CouchbaseLiteListener.framework */; };
+		BEF4D0631E0ADEF200B3F205 /* libCBLJSViewCompiler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BEF4D0601E0ADEF200B3F205 /* libCBLJSViewCompiler.a */; };
 		D21600CB7DA044ED8E77D620 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = B155233B939648DE83239CE2 /* libsqlite3.tbd */; };
 		DABD308BA19C42E4AA20B8C2 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F70CFC09922D4372A0B0E9C2 /* libz.tbd */; };
 		EC29BC8B35BA441C88CB0C81 /* libReactCBLite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C86A32C704A6422E97BF8BA7 /* libReactCBLite.a */; };
@@ -150,10 +150,10 @@
 		A84481207E68405D9A3E01D9 /* CFNetwork.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		B155233B939648DE83239CE2 /* libsqlite3.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		BE9AAE731DEEE4BA00C8EF2B /* todo.cblite2 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = todo.cblite2; sourceTree = "<group>"; };
-		BEF5C6BC1DB1037F00CCE770 /* CouchbaseLite.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CouchbaseLite.framework; sourceTree = "<group>"; };
-		BEF5C6BD1DB1037F00CCE770 /* CouchbaseLiteListener.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CouchbaseLiteListener.framework; sourceTree = "<group>"; };
-		BEF5C6C01DB1038D00CCE770 /* CBLRegisterJSViewCompiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLRegisterJSViewCompiler.h; sourceTree = "<group>"; };
-		BEF5C6C11DB1038D00CCE770 /* libCBLJSViewCompiler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libCBLJSViewCompiler.a; sourceTree = "<group>"; };
+		BEF4D05D1E0ADEF200B3F205 /* CBLRegisterJSViewCompiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLRegisterJSViewCompiler.h; sourceTree = "<group>"; };
+		BEF4D05E1E0ADEF200B3F205 /* CouchbaseLite.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CouchbaseLite.framework; sourceTree = "<group>"; };
+		BEF4D05F1E0ADEF200B3F205 /* CouchbaseLiteListener.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CouchbaseLiteListener.framework; sourceTree = "<group>"; };
+		BEF4D0601E0ADEF200B3F205 /* libCBLJSViewCompiler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libCBLJSViewCompiler.a; sourceTree = "<group>"; };
 		C86A32C704A6422E97BF8BA7 /* libReactCBLite.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libReactCBLite.a; sourceTree = "<group>"; };
 		F70CFC09922D4372A0B0E9C2 /* libz.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -171,11 +171,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BEF5C6BF1DB1037F00CCE770 /* CouchbaseLiteListener.framework in Frameworks */,
+				BEF4D0621E0ADEF200B3F205 /* CouchbaseLiteListener.framework in Frameworks */,
 				146834051AC3E58100842450 /* libReact.a in Frameworks */,
 				00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */,
-				BEF5C6BE1DB1037F00CCE770 /* CouchbaseLite.framework in Frameworks */,
-				BEF5C6C21DB1038D00CCE770 /* libCBLJSViewCompiler.a in Frameworks */,
+				BEF4D0611E0ADEF200B3F205 /* CouchbaseLite.framework in Frameworks */,
+				BEF4D0631E0ADEF200B3F205 /* libCBLJSViewCompiler.a in Frameworks */,
 				00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */,
 				00C302E81ABCBA2D00DB3ED1 /* libRCTImage.a in Frameworks */,
 				133E29F31AD74F7200F7D852 /* libRCTLinking.a in Frameworks */,
@@ -359,10 +359,10 @@
 		E7D4DA7196574DBAAA3850C1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				BEF5C6C01DB1038D00CCE770 /* CBLRegisterJSViewCompiler.h */,
-				BEF5C6C11DB1038D00CCE770 /* libCBLJSViewCompiler.a */,
-				BEF5C6BC1DB1037F00CCE770 /* CouchbaseLite.framework */,
-				BEF5C6BD1DB1037F00CCE770 /* CouchbaseLiteListener.framework */,
+				BEF4D05D1E0ADEF200B3F205 /* CBLRegisterJSViewCompiler.h */,
+				BEF4D05E1E0ADEF200B3F205 /* CouchbaseLite.framework */,
+				BEF4D05F1E0ADEF200B3F205 /* CouchbaseLiteListener.framework */,
+				BEF4D0601E0ADEF200B3F205 /* libCBLJSViewCompiler.a */,
 				F70CFC09922D4372A0B0E9C2 /* libz.tbd */,
 				B155233B939648DE83239CE2 /* libsqlite3.tbd */,
 				7C229F21996F498DAEE6C9D1 /* SystemConfiguration.framework */,
@@ -695,6 +695,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Frameworks",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -707,6 +708,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Frameworks",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -726,6 +728,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Frameworks",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -738,6 +741,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Frameworks",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
