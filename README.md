@@ -42,9 +42,9 @@ Couchbase Lite binding for react-native on both iOS and Android. It works by exp
 
 4. Start React Native.
 
-```bash
-react-native start
-```
+	```bash
+	react-native start
+	```
 
 5. Build and run for iOS/Android.
 
