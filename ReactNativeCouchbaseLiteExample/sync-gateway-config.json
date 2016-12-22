@@ -1,9 +1,8 @@
 {
   "log": ["*"],
   "databases": {
-    "moviesapp": {
+    "todo": {
       "server": "walrus:",
-      "bucket": "moviesapp",
       "users": {
         "GUEST": {"disabled": false, "admin_channels": ["*"]}
       }

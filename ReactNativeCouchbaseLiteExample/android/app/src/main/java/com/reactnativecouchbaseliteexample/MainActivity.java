@@ -1,7 +1,6 @@
 package com.reactnativecouchbaseliteexample;
 
 import com.facebook.react.ReactActivity;
-import me.fraserxu.rncouchbaselite.ReactCBLiteManager;
 
 public class MainActivity extends ReactActivity {
 
