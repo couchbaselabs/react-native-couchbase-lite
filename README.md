@@ -48,7 +48,7 @@ Couchbase Lite binding for react-native on both iOS and Android. It works by exp
 
 5. Build and run for iOS/Android.
 
-> **Note:** Refer to the [manual installation](https://github.com/couchbaselabs/react-native-couchbase-lite/wiki/Manual-installation) page for more detail on other installation options.
+> **Note:** If you wish to install the plugin from source, refer to the [other installation options](https://github.com/couchbaselabs/react-native-couchbase-lite/wiki/Other-Installation-Options) page.
 
 ## Getting Started
 
