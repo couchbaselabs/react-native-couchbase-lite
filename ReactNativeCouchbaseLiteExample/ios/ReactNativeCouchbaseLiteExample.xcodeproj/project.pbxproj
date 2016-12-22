@@ -38,6 +38,7 @@
 		BE8CA5E71E0BF2AC007E2726 /* CouchbaseLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE8CA5E51E0BF2AC007E2726 /* CouchbaseLite.framework */; };
 		BE8CA5E81E0BF2AC007E2726 /* CouchbaseLiteListener.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE8CA5E61E0BF2AC007E2726 /* CouchbaseLiteListener.framework */; };
 		BE8CA5EB1E0BF2B7007E2726 /* libCBLJSViewCompiler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE8CA5EA1E0BF2B7007E2726 /* libCBLJSViewCompiler.a */; };
+		BEC3C93A1E0D4B6200445439 /* todo.cblite2 in Resources */ = {isa = PBXBuildFile; fileRef = BEC3C9391E0D4B6200445439 /* todo.cblite2 */; };
 		C069D36053A44E109335F99B /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D194155245942A081F70053 /* CFNetwork.framework */; };
 		D2F74C0429EE467094060CDB /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5A49E04B290A44A5BAAC961D /* Octicons.ttf */; };
 		DE188CC3A29F4B6D89409CC4 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E39E6B0492A4CD1941E4545 /* SystemConfiguration.framework */; };
@@ -242,6 +243,7 @@
 		BE8CA5E61E0BF2AC007E2726 /* CouchbaseLiteListener.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CouchbaseLiteListener.framework; sourceTree = "<group>"; };
 		BE8CA5E91E0BF2B7007E2726 /* CBLRegisterJSViewCompiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLRegisterJSViewCompiler.h; sourceTree = "<group>"; };
 		BE8CA5EA1E0BF2B7007E2726 /* libCBLJSViewCompiler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libCBLJSViewCompiler.a; sourceTree = "<group>"; };
+		BEC3C9391E0D4B6200445439 /* todo.cblite2 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = todo.cblite2; sourceTree = "<group>"; };
 		BFD293FA0D2C4AF68074B7AC /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
 		C501F3AE17E54DCBA78066F4 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		DDBAB51C108941D1A072243F /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
@@ -455,6 +457,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				BEC3C9391E0D4B6200445439 /* todo.cblite2 */,
 				13B07FAE1A68108700A75B9A /* ReactNativeCouchbaseLiteExample */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* ReactNativeCouchbaseLiteExampleTests */,
@@ -807,6 +810,7 @@
 				D2F74C0429EE467094060CDB /* Octicons.ttf in Resources */,
 				269C00716A9249078858DF24 /* SimpleLineIcons.ttf in Resources */,
 				1E69793293AA456EBF98D919 /* Zocial.ttf in Resources */,
+				BEC3C93A1E0D4B6200445439 /* todo.cblite2 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

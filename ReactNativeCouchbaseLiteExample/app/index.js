@@ -1,18 +1,45 @@
 'use strict';
 
 import React, {Component} from "react";
-import {StyleSheet, Text, View, Image, ListView} from "react-native";
+import {StyleSheet, Text, View, Image, ListView, TabBarIOS} from "react-native";
 import Couchbase from "react-native-couchbase-lite";
-import List from "./components/list";
+import {Router, Scene} from 'react-native-router-flux';
+import Lists from './components/Lists/index';
+import ListDetail from './components/ListDetail/index';
 
-const SG_URL = 'http://localhost:4984/todo';
-const DB_NAME = 'todo';
+const SG_URL = 'http://mod:pass@localhost:4984/todo';
+var DB_NAME = 'todo';
+global.DB_NAME = DB_NAME;
 const VIEWS = {
   views: {
+    listsByName: {
+      map: function (doc) {
+        if (doc.type == 'task-list') {
+          emit(doc.name, null);
+        }
+      }.toString()
+    },
+    incompleteTasksCount: {
+      map: function (doc) {
+        if (doc.type == 'task' && !doc.complete) {
+          emit(doc.taskList.id, null);
+        }
+      }.toString(),
+      reduce: function(keys, values, rereduce) {
+        return values.length;
+      }.toString()
+    },
     tasksByCreatedAt: {
       map: function (doc) {
         if (doc.type == 'task') {
-          emit(doc.task, null);
+          emit([doc.taskList.id, doc.createdAt, doc.task], null);
+        }
+      }.toString()
+    },
+    usersByUsername: {
+      map: function (doc) {
+        if (doc.type == 'task-list.user') {
+          emit([doc.taskList.id, doc.username], null);
         }
       }.toString()
     }
@@ -26,8 +53,8 @@ export default class Root extends Component {
   }
 
   componentDidMount() {
+    Couchbase.installPrebuiltDatabase(DB_NAME);
     Couchbase.initRESTClient(manager => {
-      Couchbase.installPrebuiltDatabase(DB_NAME);
       this.setState({manager: manager});
     });
   }
@@ -54,13 +81,15 @@ class App extends Component {
     this.state = {
       dataSource: ds.cloneWithRows([]),
       data: [],
+      usersDataSource: ds.cloneWithRows([]),
+      selectedTab: 'users'
     };
   }
 
   setupDatabase() {
     const manager = this.props.manager;
     manager.database.put_db({db: DB_NAME})
-      .then(res => this.setupQuery())
+      .then(res => this.startDatabaseOperations())
       .catch(e => console.log('ERROR', e));
   }
 
@@ -88,47 +117,41 @@ class App extends Component {
       .catch(e => console.log('ERROR', e));
   }
 
-  setupQuery() {
+  startDatabaseOperations() {
     const manager = this.props.manager;
-    manager.query.get_db_design_ddoc_view_view({db: DB_NAME, ddoc: 'main', view: 'tasksByCreatedAt', include_docs: true})
+    manager.database.get_db({db: DB_NAME})
       .then(res => {
-        const rows = res.obj.rows;
-        for (let i = 0; i < rows.length; i++) {
-          rows[i].url = 'http://' + manager.host + '/' + DB_NAME + '/' + rows[i].id + '/image';
-        }
-        this.setState({
-          data: rows,
-          dataSource: this.state.dataSource.cloneWithRows(rows),
-        })
+        this.setupViews();
+        this.setupReplications();
       })
-      .catch(e => console.log('ERROR', e));
+      .catch(e => {
+        if (e.status == 404) {
+          this.setupDatabase();
+        }
+      });
   }
 
   componentDidMount() {
-    const manager = this.props.manager;
-    manager.server.get_all_dbs()
-      .then(res => {
-        const dbs = res.obj;
-        if (dbs.indexOf(DB_NAME) == -1) {
-          this.setupDatabase();
-        } else {
-          this.setupViews();
-          this.setupReplications();
-        }
-      })
-      .catch(e => console.log('ERROR', e));
+    this.startDatabaseOperations();
   }
 
   render() {
     return (
-      <View style={styles.container}>
-        <List
-          data={this.state.dataSource}
-          style={styles.listView}
-        />
-      </View>
+      <Router>
+        <Scene key="root">
+          <Scene
+            key="lists"
+            component={Lists}
+            title="Lists" initial />
+          <Scene
+            key="listdetail"
+            component={ListDetail}
+            title="List Detail"/>
+        </Scene>
+      </Router>
     );
   }
+
 }
 
 const styles = StyleSheet.create({
