@@ -57,9 +57,7 @@ export default class List extends Component {
                 source={{uri: row.url}}
                 style={styles.rowThumbnail}/>
               <Text style={styles.rowTitle}>{row.key[2]}</Text>
-              <View>
-                <Icon style={[styles.rowCheckmark, this.isComplete(row)]} name="check" size={30} color="#900" />
-              </View>
+              <Icon style={[styles.rowCheckmark, this.isComplete(row)]} name="check" size={20} color="black" />
             </View>
           )
         }} />

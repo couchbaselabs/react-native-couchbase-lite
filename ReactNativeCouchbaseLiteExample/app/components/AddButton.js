@@ -26,7 +26,7 @@ export default class AddButton extends Component {
           textInputProps={{autoCapitalize: 'none', autoCorrect: false}} />
         <TouchableWithoutFeedback onPress={() => this.setState({promptVisible: true})}>
           <View style={[styles.button, this.props.style]}>
-            <Icon style={styles.icon} name="plus" size={30} color="white" />
+            <Icon style={styles.icon} name="plus" size={15} color="white" />
           </View>
         </TouchableWithoutFeedback>
       </View>
@@ -36,9 +36,9 @@ export default class AddButton extends Component {
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: 'red',
-    width: 70,
-    height: 70,
+    backgroundColor: '#D63B30',
+    width: 60,
+    height: 60,
     borderRadius: 70/2,
     justifyContent: 'center',
     alignItems: 'center',
