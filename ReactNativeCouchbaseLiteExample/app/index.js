@@ -77,12 +77,4 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   },
-  seqTextLabel: {
-    textAlign: 'center',
-    margin: 5
-  },
-  listView: {
-    flex: 1,
-    backgroundColor: '#F5FCFF',
-  },
 });

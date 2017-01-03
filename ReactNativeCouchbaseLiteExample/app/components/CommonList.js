@@ -59,7 +59,6 @@ const styles = StyleSheet.create({
   },
   listView: {
     flex: 1,
-    backgroundColor: '#F5FCFF',
   },
   button: {
     position: 'absolute',
