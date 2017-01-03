@@ -5,8 +5,7 @@ import React, {Component} from 'react';
 import {View, ListView, Text, StyleSheet} from 'react-native';
 import Couchbase from 'react-native-couchbase-lite';
 import {Actions} from 'react-native-router-flux';
-import Feed from './../../feed';
-import AddButton from './../AddButton';
+import Feed from './../../Feed';
 import CommonList from './../CommonList';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -22,17 +21,14 @@ export default class Lists extends Component {
     };
   }
 
-  componentWillMount() {
-    Couchbase.initRESTClient(manager => {
-      manager.database.get_db({db: DB_NAME})
-        .then(res => {
-          this.manager = manager;
+  componentDidMount() {
+    manager.database.get_db({db: DB_NAME})
+      .then(res => {
+        this.setupQuery();
+        this.feed = new Feed(res.obj.update_seq, () => {
           this.setupQuery();
-          new Feed(res.obj.update_seq, () => {
-            this.setupQuery();
-          });
         });
-    });
+      });
   }
 
   componentWillUnmount() {
@@ -40,7 +36,6 @@ export default class Lists extends Component {
   }
 
   setupQuery() {
-    const manager = this.manager;
     manager.query.get_db_design_ddoc_view_view({
       db: DB_NAME,
       ddoc: 'main',
@@ -77,17 +72,17 @@ export default class Lists extends Component {
   }
 
   createList(text) {
-    var doc = {owner: 'todo', name: text, type: 'task-list'};
-    this.manager.document.post({db: DB_NAME, body: doc});
+    var doc = {owner: this.props.owner, name: text, type: 'task-list', _id: `${this.props.owner}.${Math.random().toString(36).substring(7)}`};
+    manager.document.post({db: DB_NAME, body: doc});
   }
 
   updateList(text, doc) {
     doc.name = text;
-    this.manager.document.put({db: DB_NAME, doc: doc._id, body: doc});
+    manager.document.put({db: DB_NAME, doc: doc._id, body: doc});
   }
 
   deleteList(data) {
-    this.manager.document.delete({db: DB_NAME, doc: data.doc._id, rev: data.doc._rev});
+    manager.document.delete({db: DB_NAME, doc: data.doc._id, rev: data.doc._rev});
   }
 
   render() {

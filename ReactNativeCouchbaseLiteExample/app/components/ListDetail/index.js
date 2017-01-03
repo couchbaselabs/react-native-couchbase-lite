@@ -6,7 +6,7 @@ import Couchbase from 'react-native-couchbase-lite';
 import List from './List/index';
 import Users from './Users/index';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Feed from './../../feed';
+import Feed from './../../Feed';
 
 export default class ListDetail extends Component {
   constructor() {
@@ -23,16 +23,13 @@ export default class ListDetail extends Component {
   }
 
   componentWillMount() {
-    Couchbase.initRESTClient(manager => {
-      this.manager = manager;
-      this.setupQueries();
-      manager.database.get_db({db: DB_NAME})
-        .then(res => {
-          this.feed = new Feed(res.obj.update_seq, () => {
-            this.setupQueries();
-          });
+    this.setupQueries();
+    manager.database.get_db({db: DB_NAME})
+      .then(res => {
+        this.feed = new Feed(res.obj.update_seq, () => {
+          this.setupQueries();
         });
-    });
+      });
   }
 
   componentWillUnmount() {
@@ -40,7 +37,6 @@ export default class ListDetail extends Component {
   }
 
   setupQueries() {
-    const manager = this.manager;
     manager.query.get_db_design_ddoc_view_view({
       db: DB_NAME,
       ddoc: 'main',
@@ -65,7 +61,10 @@ export default class ListDetail extends Component {
       db: DB_NAME,
       ddoc: 'main',
       view: 'usersByUsername',
-      include_docs: true
+      include_docs: true,
+      startkey: "[\"" + this.props.list_id + "\"]",
+      endkey: "[\"" + this.props.list_id + "\"]",
+      prefix_match_level: 1
     })
       .then(res => {
         const rows = res.obj.rows;

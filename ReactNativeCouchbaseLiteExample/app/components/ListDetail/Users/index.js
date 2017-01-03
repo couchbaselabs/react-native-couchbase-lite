@@ -14,7 +14,7 @@ export default class Users extends Component {
   }
 
   inviteUser(name) {
-    var doc = {taskList: {id: this.props.id, owner: this.props.owner}, type: 'task-list.user', username: name, _id: `${this.props.owner}.${Math.random().toString(36).substring(7)}.${name}`};
+    var doc = {taskList: {id: this.props.id, owner: this.props.owner}, type: 'task-list.user', username: name, _id: `${this.props.id}.${name}`};
     this.manager.document.post({db: DB_NAME, body: doc});
   }
 

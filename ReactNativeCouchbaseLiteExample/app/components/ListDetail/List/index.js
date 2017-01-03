@@ -43,7 +43,6 @@ export default class List extends Component {
   }
   render() {
     return (
-
       <CommonList
         title="Task"
         dataSource={this.props.data}
@@ -64,7 +63,6 @@ export default class List extends Component {
             </View>
           )
         }} />
-
     )
   }
 }
