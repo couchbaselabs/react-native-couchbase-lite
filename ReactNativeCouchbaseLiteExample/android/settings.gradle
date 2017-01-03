@@ -1,7 +1,0 @@
-rootProject.name = 'ReactNativeCouchbaseLiteExample'
-include ':react-native-couchbase-lite'
-project(':react-native-couchbase-lite').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-couchbase-lite/android')
-include ':react-native-vector-icons'
-project(':react-native-vector-icons').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-vector-icons/android')
-
-include ':app'
