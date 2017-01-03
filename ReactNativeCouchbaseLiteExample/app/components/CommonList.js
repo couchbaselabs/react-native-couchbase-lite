@@ -21,7 +21,8 @@ export default class CommonList extends Component {
             this.props.onSubmit(text, this.state.selectedRow.doc)
             this.setState({promptVisible: false})
           }}
-          onCancel={() => this.setState({promptVisible: false})} />
+          onCancel={() => this.setState({promptVisible: false})}
+          textInputProps={{autoCapitalize: 'none', autoCorrect: false}} />
         <ListView
           style={styles.listView}
           dataSource={this.props.dataSource}

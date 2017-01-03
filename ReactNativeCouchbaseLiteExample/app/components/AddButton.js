@@ -22,7 +22,8 @@ export default class AddButton extends Component {
         <Prompt title="New List"
           visible={this.state.promptVisible}
           onSubmit={(text) => {this.onSubmit.call(this, text)}}
-          onCancel={() => this.setState({promptVisible: false})} />
+          onCancel={() => this.setState({promptVisible: false})}
+          textInputProps={{autoCapitalize: 'none', autoCorrect: false}} />
         <TouchableWithoutFeedback onPress={() => this.setState({promptVisible: true})}>
           <View style={[styles.button, this.props.style]}>
             <Icon style={styles.icon} name="plus" size={30} color="white" />
