@@ -941,6 +941,9 @@
             "$ref": "#/parameters/key"
           },
           {
+            "$ref": "#/parameters/keys"
+          },
+          {
             "$ref": "#/parameters/limit"
           },
           {
