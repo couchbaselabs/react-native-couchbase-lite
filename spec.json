@@ -3,7 +3,7 @@
   "info": {
     "title": "Couchbase Lite",
     "description": "Documentation for the Couchbase Lite REST API. This page is generated from the Couchbase Lite Swagger spec, the exact same information is also available at [developer.couchbase.com/mobile/swagger/couchbase-lite](http://developer.couchbase.com/mobile/swagger/couchbase-lite/).\n",
-    "version": "1.3"
+    "version": "1.4"
   },
   "host": "localhost:5984",
   "schemes": [
@@ -73,7 +73,13 @@
           "docs": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Document ID."
+                }
+              }
             }
           }
         }
@@ -143,6 +149,20 @@
       "description": "Default is 'normal'. Specifies type of change feed. Valid values are normal, continuous, longpoll, websocket.",
       "type": "string",
       "default": "normal"
+    },
+    "group": {
+      "in": "query",
+      "name": "group",
+      "description": "Group the results using the reduce function to a group or single row.",
+      "type": "boolean",
+      "default": false
+    },
+    "group_level": {
+      "in": "query",
+      "name": "group_level",
+      "description": "Specify the group level to be used.",
+      "type": "integer",
+      "required": false
     },
     "heartbeat": {
       "in": "query",
@@ -274,48 +294,6 @@
       "description": "Default is false. Indicates whether to include the update_seq (document sequence ID) property in the response.",
       "type": "boolean",
       "default": false
-    },
-    "user": {
-      "in": "body",
-      "name": "body",
-      "description": "Request body",
-      "schema": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "Name of the user that will be created"
-          },
-          "password": {
-            "type": "string",
-            "description": "Password of the user that will be created. Required, unless the allow_empty_password Sync Gateway per-database configuration value is set to true, in which case the password can be omitted."
-          },
-          "admin_channels": {
-            "type": "array",
-            "description": "Array of channel names to give the user access to",
-            "items": {
-              "type": "string",
-              "description": "Channel name"
-            }
-          },
-          "admin_roles": {
-            "type": "array",
-            "description": "Array of role names to assign to this user",
-            "items": {
-              "type": "string",
-              "description": "Role name"
-            }
-          },
-          "email": {
-            "type": "string",
-            "description": "Email of the user that will be created."
-          },
-          "disabled": {
-            "type": "boolean",
-            "description": "Boolean property to disable this user. The user will not be able to login if this property is set to true."
-          }
-        }
-      }
     },
     "view": {
       "name": "view",
@@ -588,13 +566,25 @@
     "/{db}/{doc}/{attachment}": {
       "parameters": [
         {
-          "$ref": "#/parameters/db"
+          "name": "db",
+          "in": "path",
+          "description": "Database name",
+          "type": "string",
+          "required": true
         },
         {
-          "$ref": "#/parameters/doc"
+          "name": "doc",
+          "in": "path",
+          "description": "Document ID",
+          "type": "string",
+          "required": true
         },
         {
-          "$ref": "#/parameters/attachment"
+          "in": "path",
+          "name": "attachment",
+          "description": "Attachment name",
+          "type": "string",
+          "required": true
         }
       ],
       "get": {
@@ -605,7 +595,11 @@
         "description": "This request retrieves a file attachment associated with the document. The raw data of the associated attachment is returned (just as if you were accessing a static file). The Content-Type response header is the same content type set when the document attachment was added to the database.\n",
         "parameters": [
           {
-            "$ref": "#/parameters/rev"
+            "name": "rev",
+            "in": "query",
+            "description": "Revision identifier of the parent revision the new one should replace. (Not used when creating a new document.)",
+            "type": "string",
+            "required": false
           }
         ],
         "responses": {
@@ -626,11 +620,42 @@
         ],
         "summary": "Add or update document",
         "description": "This request adds or updates the supplied request content as an attachment to the specified document. The attachment name must be a URL-encoded string (the file name). You must also supply either the rev query parameter or the If-Match HTTP header for validation, and the Content-Type headers (to set the attachment content type).\n\n  When uploading an attachment using an existing attachment name, the corresponding stored content of the database will be updated. Because you must supply the revision information to add an attachment to the document, this serves as validation to update the existing attachment.\n\n  Uploading an attachment updates the corresponding document revision. Revisions are tracked for the parent document, not individual attachments.\n",
+        "parameters": [
+          {
+            "name": "rev",
+            "in": "query",
+            "description": "Revision identifier of the parent revision the new one should replace. (Not used when creating a new document.)",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "The request body",
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Operation completed successfully",
             "schema": {
-              "$ref": "#/definitions/Success"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Design document identifier"
+                },
+                "rev": {
+                  "type": "string",
+                  "description": "Revision identifier"
+                },
+                "ok": {
+                  "type": "boolean",
+                  "description": "Indicates whether the operation was successful"
+                }
+              }
             }
           },
           "409": {
@@ -642,7 +667,11 @@
     "/{db}/_bulk_docs": {
       "parameters": [
         {
-          "$ref": "#/parameters/db"
+          "name": "db",
+          "in": "path",
+          "description": "Database name",
+          "type": "string",
+          "required": true
         }
       ],
       "post": {
@@ -650,19 +679,78 @@
           "database"
         ],
         "summary": "Bulk docs",
-        "description": "This request enables you to add, update, or delete multiple documents to a database in a single request. To add new documents, you can either specify the ID (_id) or let the software create an ID. To update existing documents, you must provide the document ID, revision identifier (_rev), and new document values. To delete existing documents you must provide the document ID, revision identifier, and the deletion flag (_deleted).\n",
+        "description": "This request enables you to add, update, or delete multiple documents to a database in a single request. To add new documents, you can either specify the ID (`_id`) or let the software create an ID. To update existing documents, you must provide the document ID, revision identifier (`_rev`), and new document values. To delete existing documents you must provide the document ID, revision identifier, and the deletion flag (`_deleted`).\n\nThe JSON returned by the `_bulk_docs` operation consists of an array of JSON structures, one for each document in the original submission. The returned JSON structure should be examined to ensure that all of the documents submitted in the original request were successfully added to the database.\n",
         "parameters": [
           {
-            "$ref": "#/parameters/bulkdocs"
+            "in": "body",
+            "name": "body",
+            "description": "The request body",
+            "schema": {
+              "properties": {
+                "all_or_nothing": {
+                  "description": "Indicates whether to use all-or-nothing semantics for the database commit mode",
+                  "type": "boolean",
+                  "default": false
+                },
+                "docs": {
+                  "description": "List containing new or updated documents. Each object in the array can contain the following properties _id, _rev, _deleted, and values for new and updated documents.",
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "new_edits": {
+                  "description": "Indicates whether to assign new revision identifiers to new edits.",
+                  "type": "boolean",
+                  "default": true
+                }
+              }
+            }
           }
         ],
         "responses": {
           "201": {
-            "description": "Documents have been created or updated",
+            "description": "Documents have been created or updated. The response object is an array with the status for each document submitted in the original request.",
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Success"
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Design document identifier"
+                  },
+                  "rev": {
+                    "type": "string",
+                    "description": "Revision identifier"
+                  },
+                  "ok": {
+                    "type": "boolean",
+                    "description": "Indicates whether the operation was successful"
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The operation failed with a forbidden error. Probably because the document already exists in the database but a revision number wasn't specified.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "default": "conflict"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "integer",
+                  "default": 409
+                }
               }
             }
           }
@@ -692,9 +780,50 @@
         "description": "This request retrieves a list of all tasks running on the server.",
         "responses": {
           "200": {
-            "description": "200 OK – Request completed successfully",
+            "description": "200 OK â€“ Request completed successfully",
             "schema": {
-              "$ref": "#/definitions/ActiveTasks"
+              "type": "object",
+              "properties": {
+                "continuous": {
+                  "type": "boolean",
+                  "description": "Indicates whether the task is for a continuous replication"
+                },
+                "error": {
+                  "type": "string",
+                  "description": "Error information"
+                },
+                "progress": {
+                  "type": "integer",
+                  "description": "Percentage of task completed"
+                },
+                "source": {
+                  "type": "string",
+                  "description": "Name of source database"
+                },
+                "status": {
+                  "type": "string",
+                  "description": "Task status"
+                },
+                "target": {
+                  "type": "string",
+                  "description": "Name of target database"
+                },
+                "task": {
+                  "type": "string",
+                  "description": "Session identifier"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "Type of task. The type is always Replication."
+                },
+                "x_active_requests": {
+                  "type": "array",
+                  "description": "Active requests",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
             }
           }
         }
@@ -731,7 +860,114 @@
         "description": "This request starts or cancels a database replication operation.\n\nYou can cancel continuous replications by adding the cancel field to the JSON request object and setting the value to true. Note that the structure of the request must be identical to the original for the cancellation request to be honoured. For example, if you requested continuous replication, the cancellation request must also contain the continuous field.\n",
         "parameters": [
           {
-            "$ref": "#/parameters/replication"
+            "in": "body",
+            "name": "body",
+            "description": "The request message body is a JSON document that contains the following objects.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "allNew": {
+                  "type": "boolean",
+                  "description": "iOS/Mac only. Tells a push replicator that all the revisions being pushed are new ones that don't yet exist on the server. This improves performance by skipping the revs_diff request."
+                },
+                "attachments": {
+                  "type": "boolean",
+                  "description": "iOS/Mac only (experimental). Can be set to false to disable downloading attachments in a pull replication."
+                },
+                "cancel": {
+                  "type": "boolean",
+                  "description": "Indicates that a running replication task should be cancelled, the running task is identified by passing the original source and target values."
+                },
+                "connection_timeout": {
+                  "type": "integer",
+                  "description": "Specifies the timeout to use on HTTP requests"
+                },
+                "continuous": {
+                  "type": "boolean",
+                  "description": "Default is false. Specifies whether the replication should be in continuous mode.",
+                  "default": false
+                },
+                "create_target": {
+                  "type": "boolean",
+                  "description": "Default is false. Indicates whether to create the target database.",
+                  "default": false
+                },
+                "doc_ids": {
+                  "type": "array",
+                  "description": "Array of document IDs to be synchronized",
+                  "items": {
+                    "type": "string",
+                    "description": "Document ID"
+                  }
+                },
+                "filter": {
+                  "type": "string",
+                  "description": "Indicates that the documents should be filtered using the specified filter function name. A common value used when replicating from Sync Gateway is sync_gateway/bychannel to limit the pull replication to a set of channels."
+                },
+                "heartbeat": {
+                  "type": "integer",
+                  "description": "Specifies the heartbeat value to be used in the _changes feed request."
+                },
+                "pinnedCert": {
+                  "type": "string",
+                  "description": "iOS/Mac only. Forces an SSL connection to accept only a specific certificate (instead of any valid certificate for that hostname.) This increases security for regular server-based replication, and if you're using P2P it's the only way to make a trustworthy connection. The parameter body can be either the raw certificate data or a SHA-1 digest of it, in base64."
+                },
+                "poll": {
+                  "type": "integer",
+                  "description": "Makes a continuous pull replication poll the _changes feed, at the given interval in ms, instead of keeping a connection open."
+                },
+                "purgePushed": {
+                  "type": "boolean",
+                  "description": "iOS/Mac only. Tells a push replicator to purge every document after it successfully pushes it to the server.",
+                  "default": false
+                },
+                "network": {
+                  "type": "string",
+                  "description": "Can be used to restrict the replicator to using only WiFi/Ethernet or only cellular networking. Valid values are \"WiFi\" and \"Cell\""
+                },
+                "query_params": {
+                  "type": "object",
+                  "description": "A set of key/value pairs to use in the querystring of the replication. For example, the channels field can be used to pull from a set of channels (in this particular case, the filter key must be set for the channels field to work as expected)."
+                },
+                "remoteUUID": {
+                  "type": "string",
+                  "description": "iOS/Mac only. Tells the replicator to use the given string as the identifier of the remote server, instead of the URL, when constructing the unique identifier of this replication. This is necessary if the server doesn't have a stable URL, i.e. with P2P."
+                },
+                "reset": {
+                  "type": "boolean",
+                  "description": "Forces the checkpoint to be reset, i.e. start over from the beginning."
+                },
+                "source": {
+                  "type": "object",
+                  "description": "Identifies the database to copy the revisions from. Can be a string containing a local database name or a remote database URL, or an object whose url property contains the database name or URL. Also an object can contain headers property that contain custom header values such as a cookie.",
+                  "properties": {
+                    "url": {
+                      "description": "The URL of the remote database.",
+                      "type": "string"
+                    },
+                    "headers": {
+                      "description": "Headers to use in the replication requests.",
+                      "type": "object",
+                      "properties": {
+                        "Cookie": {
+                          "description": "A Sync Gateway session cookie",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "target": {
+                  "type": "string",
+                  "description": "Identifies the target database to copy revisions to. Same format and interpretation as source."
+                },
+                "websocket": {
+                  "type": "string",
+                  "description": "iOS/Mac only. Can be set to false to disable the use of WebSockets for the _changes feed request",
+                  "default": true
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -763,7 +999,7 @@
           "server"
         ],
         "summary": "Retrieve session information",
-        "description": "This request retrieves session information. Even though Couchbase Lite doesn’t support user logins, it implements a generic response to the _session API for compatibility with apps that might call it.",
+        "description": "This request retrieves session information. Even though Couchbase Lite doesnâ€™t support user logins, it implements a generic response to the _session API for compatibility with apps that might call it.",
         "responses": {
           "200": {
             "description": "200 OK"
@@ -796,7 +1032,11 @@
     "/{db}/": {
       "parameters": [
         {
-          "$ref": "#/parameters/db"
+          "name": "db",
+          "in": "path",
+          "description": "Database name",
+          "type": "string",
+          "required": true
         }
       ],
       "get": {
@@ -879,7 +1119,21 @@
           "201": {
             "description": "The document was written successfully",
             "schema": {
-              "$ref": "#/definitions/Success"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Design document identifier"
+                },
+                "rev": {
+                  "type": "string",
+                  "description": "Revision identifier"
+                },
+                "ok": {
+                  "type": "boolean",
+                  "description": "Indicates whether the operation was successful"
+                }
+              }
             }
           }
         }
@@ -894,7 +1148,21 @@
           "200": {
             "description": "Success",
             "schema": {
-              "$ref": "#/definitions/Success"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Design document identifier"
+                },
+                "rev": {
+                  "type": "string",
+                  "description": "Revision identifier"
+                },
+                "ok": {
+                  "type": "boolean",
+                  "description": "Indicates whether the operation was successful"
+                }
+              }
             }
           }
         }
@@ -903,63 +1171,140 @@
     "/{db}/_all_docs": {
       "parameters": [
         {
-          "$ref": "#/parameters/db"
+          "name": "db",
+          "in": "path",
+          "description": "Database name",
+          "type": "string",
+          "required": true
         }
       ],
       "get": {
         "tags": [
-          "query"
+          "database"
         ],
         "summary": "All docs",
         "description": "This request returns a built-in view of all the documents in the database.\n",
         "parameters": [
           {
-            "$ref": "#/parameters/conflicts"
+            "in": "query",
+            "name": "conflicts",
+            "description": "Default is false. Include conflict information in the response. This parameter is ignored if the include_docs parameter is false.",
+            "type": "boolean",
+            "default": false
           },
           {
-            "$ref": "#/parameters/descending"
+            "name": "descending",
+            "in": "query",
+            "description": "Default is false. Return documents in descending order.",
+            "type": "boolean",
+            "required": false
           },
           {
-            "$ref": "#/parameters/endkey"
+            "name": "endkey",
+            "in": "query",
+            "description": "If this parameter is provided, stop returning records when the specified key is reached.",
+            "type": "string",
+            "required": false
           },
           {
-            "$ref": "#/parameters/end_key"
+            "in": "query",
+            "name": "end_key",
+            "description": "Alias for the endkey parameter.",
+            "type": "string",
+            "required": false
           },
           {
-            "$ref": "#/parameters/endkey_docid"
+            "in": "query",
+            "name": "endkey_docid",
+            "description": "If this parameter is provided, stop returning records when the specified document identifier is reached.",
+            "type": "string",
+            "required": false
           },
           {
-            "$ref": "#/parameters/end_key_doc_id"
+            "in": "query",
+            "name": "end_key_doc_id",
+            "description": "Alias for the endkey_docid parameter.",
+            "type": "string",
+            "required": false
           },
           {
-            "$ref": "#/parameters/include_docs"
+            "in": "query",
+            "name": "include_docs",
+            "description": "Default is false. Indicates whether to include the associated document with each result. If there are conflicts, only the winning revision is returned.",
+            "type": "boolean",
+            "default": false
           },
           {
-            "$ref": "#/parameters/inclusive_end"
+            "in": "query",
+            "name": "inclusive_end",
+            "description": "Indicates whether the specified end key should be included in the result.",
+            "type": "boolean",
+            "default": true
           },
           {
-            "$ref": "#/parameters/key"
+            "in": "query",
+            "name": "key",
+            "description": "If this parameter is provided, return only document that match the specified key.",
+            "type": "string",
+            "required": false
           },
           {
-            "$ref": "#/parameters/limit"
+            "in": "query",
+            "name": "keys",
+            "description": "Specify a list of document IDs.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "required": false
           },
           {
-            "$ref": "#/parameters/skip"
+            "in": "query",
+            "name": "limit",
+            "description": "Limits the number of result rows to the specified value. Using a value of 0 has the same effect as the value 1.",
+            "type": "integer"
           },
           {
-            "$ref": "#/parameters/stale"
+            "in": "query",
+            "name": "skip",
+            "description": "If this parameter is provided, skip the specified number of documents before starting to return results.",
+            "type": "integer",
+            "default": 0
           },
           {
-            "$ref": "#/parameters/startkey"
+            "in": "query",
+            "name": "stale",
+            "description": "Allow the results from a stale view to be used, without triggering a rebuild of all views within the encompassing design document. Valid values are 'ok' and 'update_after'.",
+            "type": "string",
+            "required": false
           },
           {
-            "$ref": "#/parameters/start_key"
+            "name": "startkey",
+            "in": "query",
+            "description": "Returns records starting with the specified key.",
+            "type": "string",
+            "required": false
           },
           {
-            "$ref": "#/parameters/startkey_docid"
+            "in": "query",
+            "name": "start_key",
+            "description": "Alias for startkey.",
+            "type": "string",
+            "required": false
           },
           {
-            "$ref": "#/parameters/update_seq"
+            "in": "query",
+            "name": "startkey_docid",
+            "description": "If this parameter is provided, return documents starting with the specified document identifier.",
+            "type": "string",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "update_seq",
+            "description": "Default is false. Indicates whether to include the update_seq (document sequence ID) property in the response.",
+            "type": "boolean",
+            "default": false
           }
         ],
         "responses": {
@@ -976,7 +1321,21 @@
                   "type": "array",
                   "description": "Array of row objects.",
                   "items": {
-                    "$ref": "#/definitions/QueryRow"
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "The ID of the document"
+                      },
+                      "key": {
+                        "type": "object",
+                        "description": "The key in the output row"
+                      },
+                      "value": {
+                        "type": "object",
+                        "description": "The value in the output row"
+                      }
+                    }
                   }
                 },
                 "total_rows": {
@@ -996,7 +1355,11 @@
     "/{db}/_changes": {
       "parameters": [
         {
-          "$ref": "#/parameters/db"
+          "name": "db",
+          "in": "path",
+          "description": "Database name",
+          "type": "string",
+          "required": true
         }
       ],
       "get": {
@@ -1005,28 +1368,59 @@
         ],
         "parameters": [
           {
-            "$ref": "#/parameters/include_docs"
+            "in": "query",
+            "name": "include_docs",
+            "description": "Default is false. Indicates whether to include the associated document with each result. If there are conflicts, only the winning revision is returned.",
+            "type": "boolean",
+            "default": false
           },
           {
-            "$ref": "#/parameters/style"
+            "in": "query",
+            "name": "style",
+            "description": "Default is 'main_only'. Number of revisions to return in the changes array. main_only returns the current winning revision, all_docs returns all leaf revisions including conflicts and deleted former conflicts.",
+            "type": "string",
+            "default": "main_only"
           },
           {
-            "$ref": "#/parameters/descending"
+            "name": "descending",
+            "in": "query",
+            "description": "Default is false. Return documents in descending order.",
+            "type": "boolean",
+            "required": false
           },
           {
-            "$ref": "#/parameters/limit"
+            "in": "query",
+            "name": "limit",
+            "description": "Limits the number of result rows to the specified value. Using a value of 0 has the same effect as the value 1.",
+            "type": "integer"
           },
           {
-            "$ref": "#/parameters/since"
+            "in": "query",
+            "name": "since",
+            "description": "Starts the results from the change immediately after the given sequence ID. Sequence IDs should be considered opaque; they come from the last_seq property of a prior response.",
+            "type": "integer",
+            "required": false
           },
           {
-            "$ref": "#/parameters/filter"
+            "in": "query",
+            "name": "filter",
+            "description": "Reference a filter function from a design document to selectively get updates.",
+            "type": "string",
+            "required": false
           },
           {
-            "$ref": "#/parameters/feed"
+            "in": "query",
+            "name": "feed",
+            "description": "Default is 'normal'. Specifies type of change feed. Valid values are normal, continuous, longpoll, websocket.",
+            "type": "string",
+            "default": "normal"
           },
           {
-            "$ref": "#/parameters/heartbeat"
+            "in": "query",
+            "name": "heartbeat",
+            "description": "Default is 0. Interval in milliseconds at which an empty line (CRLF) is written to the response. This helps prevent gateways from deciding the socket is idle and closing it. Only applicable to longpoll or continuous feeds. Overrides any timeout to keep the feed alive indefinitely. Setting to 0 results in no heartbeat.",
+            "type": "integer",
+            "default": 0
           }
         ],
         "summary": "Changes",
@@ -1045,7 +1439,30 @@
                   "type": "array",
                   "description": "List of changes to the database. See the following table for a list of fields in this object.",
                   "items": {
-                    "$ref": "#/definitions/ChangesFeedRow"
+                    "type": "object",
+                    "properties": {
+                      "changes": {
+                        "type": "array",
+                        "description": "List of the documentâ€™s leafs. Each leaf object contains one field, rev.",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "rev": {
+                              "type": "string",
+                              "description": "Identifier of the document revision that changed."
+                            }
+                          }
+                        }
+                      },
+                      "id": {
+                        "type": "string",
+                        "description": "Document identifier"
+                      },
+                      "seq": {
+                        "type": "integer",
+                        "description": "Update sequence number"
+                      }
+                    }
                   }
                 }
               }
@@ -1059,7 +1476,50 @@
         ],
         "parameters": [
           {
-            "$ref": "#/parameters/changes_body"
+            "in": "body",
+            "name": "ChangesBody",
+            "description": "The request body",
+            "schema": {
+              "properties": {
+                "include_docs": {
+                  "description": "Default is false. Indicates whether to include the associated document with each result. If there are conflicts, only the winning revision is returned.",
+                  "type": "boolean",
+                  "default": false
+                },
+                "style": {
+                  "description": "Default is 'main_only'. Number of revisions to return in the changes array. The only possible value is all_docs and it returns all leaf revisions including conflicts and deleted former conflicts.",
+                  "type": "string",
+                  "default": "main_only"
+                },
+                "descending": {
+                  "description": "Default is false. Return documents in descending order.",
+                  "type": "boolean",
+                  "default": false
+                },
+                "limit": {
+                  "description": "Limits the number of result rows to the specified value. Using a value of 0 has the same effect as the value 1.",
+                  "type": "integer"
+                },
+                "since": {
+                  "description": "Starts the results from the change immediately after the given sequence ID. Sequence IDs should be considered opaque; they come from the last_seq property of a prior response.",
+                  "type": "integer"
+                },
+                "filter": {
+                  "description": "Indicates that the returned documents should be filtered. The valid values are sync_gateway/bychannel and _doc_ids.",
+                  "type": "string"
+                },
+                "feed": {
+                  "description": "Default is 'normal'. Specifies type of change feed. Valid values are normal, continuous, longpoll, websocket.",
+                  "type": "string",
+                  "default": "normal"
+                },
+                "heartbeat": {
+                  "description": "Default is 0. Interval in milliseconds at which an empty line (CRLF) is written to the response. This helps prevent gateways from deciding the socket is idle and closing it. Only applicable to longpoll or continuous feeds. Overrides any timeout to keep the feed alive indefinitely. Setting to 0 results in no heartbeat.",
+                  "type": "integer",
+                  "default": 0
+                }
+              }
+            }
           }
         ],
         "summary": "Changes",
@@ -1068,7 +1528,30 @@
           "200": {
             "description": "Request completed successfully",
             "schema": {
-              "$ref": "#/definitions/ChangesFeedRow"
+              "type": "object",
+              "properties": {
+                "changes": {
+                  "type": "array",
+                  "description": "List of the documentâ€™s leafs. Each leaf object contains one field, rev.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "rev": {
+                        "type": "string",
+                        "description": "Identifier of the document revision that changed."
+                      }
+                    }
+                  }
+                },
+                "id": {
+                  "type": "string",
+                  "description": "Document identifier"
+                },
+                "seq": {
+                  "type": "integer",
+                  "description": "Update sequence number"
+                }
+              }
             }
           }
         }
@@ -1077,10 +1560,18 @@
     "/{db}/{doc}": {
       "parameters": [
         {
-          "$ref": "#/parameters/db"
+          "name": "db",
+          "in": "path",
+          "description": "Database name",
+          "type": "string",
+          "required": true
         },
         {
-          "$ref": "#/parameters/doc"
+          "name": "doc",
+          "in": "path",
+          "description": "Document ID",
+          "type": "string",
+          "required": true
         }
       ],
       "get": {
@@ -1090,16 +1581,38 @@
         "operationId": "get",
         "parameters": [
           {
-            "$ref": "#/parameters/attachments"
+            "in": "query",
+            "name": "attachments",
+            "description": "Default is false. Include attachment bodies in response.",
+            "type": "boolean",
+            "default": false
           },
           {
-            "$ref": "#/parameters/atts_since"
+            "name": "atts_since",
+            "in": "query",
+            "description": "Include attachments only since specified revisions. Does not include attachments for specified revisions.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "required": false
           },
           {
-            "$ref": "#/parameters/open_revs"
+            "name": "open_revs",
+            "in": "query",
+            "description": "Option to fetch specified revisions of the document. The value can be `all` to fetch all leaf revisions or an array of revision numbers (i.e. open_revs=[\"rev1\", \"rev2\"]). If this option is specified the response will be in multipart format. Use the `Accept: application/json` request header to get the result as a JSON object.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "required": false
           },
           {
-            "$ref": "#/parameters/revs"
+            "in": "query",
+            "name": "revs",
+            "description": "Default is false. Indicates whether to include a _revisions property for each document in the response, which contains a revision history of the document.",
+            "type": "boolean",
+            "default": false
           }
         ],
         "summary": "Get document",
@@ -1108,7 +1621,21 @@
           "200": {
             "description": "The message body contains the following objects in a JSON document.",
             "schema": {
-              "$ref": "#/definitions/Success"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Design document identifier"
+                },
+                "rev": {
+                  "type": "string",
+                  "description": "Revision identifier"
+                },
+                "ok": {
+                  "type": "boolean",
+                  "description": "Indicates whether the operation was successful"
+                }
+              }
             }
           }
         }
@@ -1124,14 +1651,52 @@
             "name": "body",
             "description": "Request body",
             "schema": {
-              "$ref": "#/definitions/Document"
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string",
+                  "description": "The document ID."
+                },
+                "_rev": {
+                  "type": "string",
+                  "description": "Revision identifier of the parent revision the new one should replace. (Not used when creating a new document.)"
+                },
+                "_attachments": {
+                  "type": "object",
+                  "description": "List of attachments.",
+                  "properties": {
+                    "my_attachment_name": {
+                      "type": "object",
+                      "description": "Attachment body",
+                      "properties": {
+                        "content-type": {
+                          "type": "string",
+                          "description": "Content type of the attachment (i.e. image/png, text/plain)."
+                        },
+                        "data": {
+                          "type": "string",
+                          "description": "Base64 encoded attachment."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
           },
           {
-            "$ref": "#/parameters/new_edits"
+            "name": "new_edits",
+            "in": "query",
+            "description": "Default is true. Setting this to false indicates that the request body is an already-existing revision that should be directly inserted into the database, instead of a modification to apply to the current document. (This mode is used by the replicato.)",
+            "type": "boolean",
+            "default": true
           },
           {
-            "$ref": "#/parameters/rev"
+            "name": "rev",
+            "in": "query",
+            "description": "Revision identifier of the parent revision the new one should replace. (Not used when creating a new document.)",
+            "type": "string",
+            "required": false
           }
         ],
         "summary": "Create or update document",
@@ -1140,7 +1705,21 @@
           "200": {
             "description": "The response is a JSON document that contains the following objects",
             "schema": {
-              "$ref": "#/definitions/Success"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Design document identifier"
+                },
+                "rev": {
+                  "type": "string",
+                  "description": "Revision identifier"
+                },
+                "ok": {
+                  "type": "boolean",
+                  "description": "Indicates whether the operation was successful"
+                }
+              }
             }
           }
         }
@@ -1152,7 +1731,11 @@
         "operationId": "delete",
         "parameters": [
           {
-            "$ref": "#/parameters/rev"
+            "name": "rev",
+            "in": "query",
+            "description": "Revision identifier of the parent revision the new one should replace. (Not used when creating a new document.)",
+            "type": "string",
+            "required": false
           }
         ],
         "summary": "Delete document",
@@ -1161,7 +1744,21 @@
           "200": {
             "description": "Document successfully removed",
             "schema": {
-              "$ref": "#/definitions/Success"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Design document identifier"
+                },
+                "rev": {
+                  "type": "string",
+                  "description": "Revision identifier"
+                },
+                "ok": {
+                  "type": "boolean",
+                  "description": "Indicates whether the operation was successful"
+                }
+              }
             }
           }
         }
@@ -1170,10 +1767,18 @@
     "/{db}/_design/{ddoc}": {
       "parameters": [
         {
-          "$ref": "#/parameters/db"
+          "name": "db",
+          "in": "path",
+          "description": "Database name",
+          "type": "string",
+          "required": true
         },
         {
-          "$ref": "#/parameters/ddoc"
+          "name": "ddoc",
+          "in": "path",
+          "description": "Design document name",
+          "type": "string",
+          "required": true
         }
       ],
       "get": {
@@ -1189,7 +1794,33 @@
               "type": "object",
               "properties": {
                 "my_view_name": {
-                  "$ref": "#/definitions/View"
+                  "type": "object",
+                  "properties": {
+                    "_rev": {
+                      "type": "string",
+                      "description": "Revision identifier of the parent revision the new one should replace. (Not used when creating a new document.)"
+                    },
+                    "views": {
+                      "type": "object",
+                      "description": "List of views to save on this design document.",
+                      "properties": {
+                        "my_view_name": {
+                          "type": "object",
+                          "description": "The view's map/reduce functions.",
+                          "properties": {
+                            "map": {
+                              "type": "string",
+                              "description": "Inline JavaScript definition for the map function"
+                            },
+                            "reduce": {
+                              "type": "string",
+                              "description": "Inline JavaScript definition for the reduce function"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -1208,7 +1839,33 @@
             "description": "The request body",
             "required": false,
             "schema": {
-              "$ref": "#/definitions/View"
+              "type": "object",
+              "properties": {
+                "_rev": {
+                  "type": "string",
+                  "description": "Revision identifier of the parent revision the new one should replace. (Not used when creating a new document.)"
+                },
+                "views": {
+                  "type": "object",
+                  "description": "List of views to save on this design document.",
+                  "properties": {
+                    "my_view_name": {
+                      "type": "object",
+                      "description": "The view's map/reduce functions.",
+                      "properties": {
+                        "map": {
+                          "type": "string",
+                          "description": "Inline JavaScript definition for the map function"
+                        },
+                        "reduce": {
+                          "type": "string",
+                          "description": "Inline JavaScript definition for the reduce function"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         ],
@@ -1216,7 +1873,21 @@
           "201": {
             "description": "Successful operation",
             "schema": {
-              "$ref": "#/definitions/Success"
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Design document identifier"
+                },
+                "rev": {
+                  "type": "string",
+                  "description": "Revision identifier"
+                },
+                "ok": {
+                  "type": "boolean",
+                  "description": "Indicates whether the operation was successful"
+                }
+              }
             }
           }
         }
@@ -1233,14 +1904,43 @@
             "schema": {
               "type": "object",
               "items": {
-                "$ref": "#/definitions/Design"
+                "type": "object",
+                "properties": {
+                  "offset": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "Position in pagination."
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "Number of items to retrieve (100 max)."
+                  },
+                  "count": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "Total number of items available."
+                  }
+                }
               }
             }
           },
           "default": {
             "description": "Unexpected error",
             "schema": {
-              "$ref": "#/definitions/Error"
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "fields": {
+                  "type": "string"
+                }
+              }
             }
           }
         }
@@ -1249,13 +1949,25 @@
     "/{db}/_design/{ddoc}/_view/{view}": {
       "parameters": [
         {
-          "$ref": "#/parameters/db"
+          "name": "db",
+          "in": "path",
+          "description": "Database name",
+          "type": "string",
+          "required": true
         },
         {
-          "$ref": "#/parameters/ddoc"
+          "name": "ddoc",
+          "in": "path",
+          "description": "Design document name",
+          "type": "string",
+          "required": true
         },
         {
-          "$ref": "#/parameters/view"
+          "name": "view",
+          "in": "path",
+          "description": "View name",
+          "type": "string",
+          "required": true
         }
       ],
       "get": {
@@ -1387,7 +2099,21 @@
                 "row": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/definitions/QueryRow"
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "The ID of the document"
+                      },
+                      "key": {
+                        "type": "object",
+                        "description": "The key in the output row"
+                      },
+                      "value": {
+                        "type": "object",
+                        "description": "The value in the output row"
+                      }
+                    }
                   }
                 },
                 "total_rows": {
@@ -1408,12 +2134,17 @@
         "parameters": [
           {
             "in": "body",
-            "name": "keys",
+            "name": "body",
             "description": "List of identifiers of the documents to retrieve",
             "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
+              "type": "object",
+              "properties": {
+                "keys": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
               }
             }
           }
@@ -1428,7 +2159,11 @@
     "/{db}/_purge": {
       "parameters": [
         {
-          "$ref": "#/parameters/db"
+          "name": "db",
+          "in": "path",
+          "description": "Database name",
+          "type": "string",
+          "required": true
         }
       ],
       "post": {
@@ -1443,13 +2178,24 @@
             "name": "body",
             "description": "The message body is a JSON document that contains the following objects.",
             "schema": {
-              "$ref": "#/definitions/PurgeBody"
+              "type": "object",
+              "description": "Document ID",
+              "properties": {
+                "a_doc_id": {
+                  "type": "array",
+                  "description": "Passing \"*\" as an item in the array will remove all the revisions for that document. Removing specific revisions from a document is not supported.",
+                  "items": {
+                    "type": "string",
+                    "description": "Revision ID to delete or \"*\" to delete all the revisions of the document."
+                  }
+                }
+              }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "OK – The purge operation was successful",
+            "description": "OK â€“ The purge operation was successful",
             "schema": {
               "type": "object",
               "description": "Response object",
@@ -1654,6 +2400,25 @@
         }
       }
     },
+    "Forbidden": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string",
+          "default": "conflict"
+        },
+        "id": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "status": {
+          "type": "integer",
+          "default": 409
+        }
+      }
+    },
     "LogTags": {
       "type": "object",
       "properties": {
@@ -1709,7 +2474,7 @@
       "properties": {
         "a_doc_id": {
           "type": "array",
-          "description": "List containing the revision numbers to purge for the given docID. Passing \"*\" as an item in the array will remove all the revisions for that document.",
+          "description": "Passing \"*\" as an item in the array will remove all the revisions for that document. Removing specific revisions from a document is not supported.",
           "items": {
             "type": "string",
             "description": "Revision ID to delete or \"*\" to delete all the revisions of the document."
@@ -1776,9 +2541,15 @@
       "properties": {
         "changes": {
           "type": "array",
-          "description": "List of the document’s leafs. Each leaf object contains one field, rev.",
+          "description": "List of the documentâ€™s leafs. Each leaf object contains one field, rev.",
           "items": {
-            "type": "string"
+            "type": "object",
+            "properties": {
+              "rev": {
+                "type": "string",
+                "description": "Identifier of the document revision that changed."
+              }
+            }
           }
         },
         "id": {
