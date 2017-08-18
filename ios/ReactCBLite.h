@@ -16,5 +16,6 @@
 @interface ReactCBLite : NSObject <RCTBridgeModule>
 {
     CBLListener *listener;
+    CBLManager *manager;
 }
 @end

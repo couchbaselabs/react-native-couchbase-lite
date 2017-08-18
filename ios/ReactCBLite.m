@@ -31,15 +31,24 @@ RCT_EXPORT_METHOD(initWithAuth:(NSString*)username password:(NSString*)password 
 {
     @try {
         NSLog(@"Launching Couchbase Lite...");
-        CBLManager* dbmgr = [CBLManager sharedInstance];
+        // not using [CBLManager sharedInstance] because it doesn't behave well when the app is backgrounded
+
+        CBLManagerOptions options = {
+            NO, //readonly
+            NSDataWritingFileProtectionCompleteUntilFirstUserAuthentication //fileProtection
+        };
+        NSError* error;
+        manager = [[CBLManager alloc] initWithDirectory: [CBLManager defaultDirectory]
+                                                        options: &options error: &error];
+
         CBLRegisterJSViewCompiler();
 
         //register the server with CBL_URLProtocol
-        [dbmgr internalURL];
+        [manager internalURL];
 
         int suggestedPort = 5984;
 
-        listener = [self createListener:suggestedPort withUsername:username withPassword:password withCBLManager: dbmgr];
+        listener = [self createListener:suggestedPort withUsername:username withPassword:password withCBLManager: manager];
 
         NSLog(@"Couchbase Lite listening on port <%@>", listener.URL.port);
         NSString *extenalUrl = [NSString stringWithFormat:@"http://%@:%@@localhost:%@/", username, password, listener.URL.port];
