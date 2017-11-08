@@ -6,7 +6,11 @@
 //  Copyright © 2015 Couchbase. All rights reserved.
 //
 
-#import <RCTBridgeModule.h>
+#if __has_include(<React/RCTBridgeModule.h>)
+#import <React/RCTBridgeModule.h>
+#else
+#import "RCTBridgeModule.h"
+#endif
 #import <CouchbaseLiteListener/CBLListener.h>
 
 @interface ReactCBLite : NSObject <RCTBridgeModule>

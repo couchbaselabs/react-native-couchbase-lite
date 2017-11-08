@@ -39,6 +39,8 @@ Couchbase Lite binding for react-native on both iOS and Android. It works by exp
 	Download the Couchbase Lite iOS SDK from [here](http://www.couchbase.com/nosql-databases/downloads#) and drag **CouchbaseLite.framework**, **CouchbaseLiteListener.framework**, **CBLRegisterJSViewCompiler.h**, **libCBLJSViewCompiler.a** in the Xcode project.
 
 	![](http://cl.ly/image/3Z1b0n0W0i3w/sdk.png)
+	
+Make sure these files can be resolved via **Framework Search Paths** in the XCODE projects **Build settings**, either by adding them to one of the mentioned directories or adding a new location in the list.
 
 4. Start React Native.
 
