@@ -36,8 +36,8 @@ allprojects {
 }
 
 dependencies {
-    compile 'com.couchbase.lite:couchbase-lite-android:1.3.1'
-    compile 'com.couchbase.lite:couchbase-lite-java-listener:1.3.1'
-    compile 'com.couchbase.lite:couchbase-lite-java-javascript:1.3.1'
+    compile 'com.couchbase.lite:couchbase-lite-android:1.4.0'
+    compile 'com.couchbase.lite:couchbase-lite-java-listener:1.4.0'
+    compile 'com.couchbase.lite:couchbase-lite-java-javascript:1.4.0'
     compile 'com.facebook.react:react-native:0.14.+'
 }
