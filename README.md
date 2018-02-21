@@ -104,3 +104,8 @@ Couchbase.initRESTClient(manager => {
 ![](https://cl.ly/070z08081W0X/bulk_docs.png)
 
 As you can see, there are two parameters to provide (**db** and **body**). The same exact parameters are documented on the [/{db}}/_bulk_docs](http://developer.couchbase.com/documentation/mobile/current/references/couchbase-lite/rest-api/index.html#!/database/post_db_bulk_docs) endpoint.
+
+## Publishing to npm
+
+1. Bump the version number in **package.json**.
+2. Run `npm publish` locally (it will fail if you don't access rights to publish to npm for this module).
