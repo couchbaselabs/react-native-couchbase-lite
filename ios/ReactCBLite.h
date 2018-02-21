@@ -11,6 +11,7 @@
 #else
 #import "RCTBridgeModule.h"
 #endif
+#import <CouchbaseLite/CouchbaseLite.h>
 #import <CouchbaseLiteListener/CBLListener.h>
 
 @interface ReactCBLite : NSObject <RCTBridgeModule>
