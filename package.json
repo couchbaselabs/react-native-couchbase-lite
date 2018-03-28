@@ -30,9 +30,9 @@
   "dependencies": {
     "base-64": "^0.1.0",
     "events": "^1.1.0",
-    "rnpm": "1.6.5",
+    "rnpm": "^1.9.0",
     "swagger-client": "^2.1.26",
-    "xcode": "0.8.4"
+    "xcode": "^1.0.0"
   },
   "rnpm": {
     "commands": {
