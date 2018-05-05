@@ -35,6 +35,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Properties;
 
 import Acme.Serve.Serve;
@@ -131,6 +132,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
             String url;
             if (credentials != null) {
                 url = String.format(
+                        Locale.ENGLISH,
                         "http://%s:%s@localhost:%d/",
                         credentials.getLogin(),
                         credentials.getPassword(),
@@ -138,6 +140,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
                 );
             } else {
                 url = String.format(
+                        Locale.ENGLISH,
                         "http://localhost:%d/",
                         listener.getListenPort()
                 );
@@ -342,7 +345,7 @@ public class ReactCBLite extends ReactContextBaseJavaModule {
             this.response = response;
         }
     }
-    
+
     // Database
 
     @ReactMethod
