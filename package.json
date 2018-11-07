@@ -31,7 +31,7 @@
     "base-64": "^0.1.0",
     "events": "^1.1.0",
     "rnpm": "^1.9.0",
-    "swagger-client": "^3.8.22",
+    "swagger-client": "^2.1.26",
     "xcode": "^1.0.0"
   },
   "rnpm": {
