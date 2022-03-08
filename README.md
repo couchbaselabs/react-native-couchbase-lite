@@ -1,3 +1,5 @@
+:warning: This repo is obsolete.  It is no longer maintained and is based on a version of Couchbase Lite that reached end of life years ago.
+
 # react-native-couchbase-lite
 
 **NOTE:** This plugin works for Couchbase Lite 1.x only. For new projects, we recommend to use the [Couchbase Lite 2.0 Native API](https://developer.couchbase.com/documentation/mobile/2.0/couchbase-lite/index.html)  and to write your own wrapper to access Couchbase Lite APIs from a JavaScript codebase (see https://facebook.github.io/react-native/docs/communication-ios.html).
