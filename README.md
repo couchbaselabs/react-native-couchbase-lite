@@ -1,4 +1,4 @@
-:warning: This repo is obsolete.  It is no longer maintained and is based on a version of Couchbase Lite that reached end of life years ago.
+:warning: This repo is obsolete.  It is no longer maintained and is based on a version of Couchbase Lite that reached end of life years ago.  Please see the [new version](https://github.com/couchbaselabs/couchbase-lite-react-native-module) of this repo for more up to date information.
 
 # react-native-couchbase-lite
 
